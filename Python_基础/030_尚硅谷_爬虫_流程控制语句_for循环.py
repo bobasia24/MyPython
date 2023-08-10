@@ -54,5 +54,10 @@ a_list = ['周杰伦','林俊杰','陶喆','庞龙']
 # 判断列表中的元素的个数
 # print(len(a_list))
 # 0 1 2
-for i in  range(len(a_list)):
+# for i in  range(len(a_list)):
+#     print(i)
+
+
+for i in range(1, 100, 1) :
+    i+=1
     print(i)

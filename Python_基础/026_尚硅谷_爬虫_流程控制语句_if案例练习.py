@@ -11,3 +11,11 @@ if int(age) > 18:
 # （1） 控制台输入
 # （2） 强制类型转换
 # （3） int和str是不能比较的
+
+
+name = input('请出入你的年龄')
+
+if int(name) >= 18 :
+    print('你可以去嫖娼了')
+else :
+    print("回家写作业去吧")
