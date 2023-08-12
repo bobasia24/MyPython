@@ -2,7 +2,7 @@
 
 # fp = open('test.txt','w')
 # # 默认情况我们只能将字符串写入到文件中
-# fp.write('hello world')
+# fp.write('hello world hh')
 #
 # fp.close()
 
@@ -75,14 +75,14 @@
 
 
 # load
-
-fp = open('text.txt','r')
-
-import json
-
-result = json.load(fp)
-
-print(result)
-print(type(result))
-
-fp.close()
+# loads是先读再序列化；load直接读和序列化一起，属于简化版
+# fp = open('text.txt','r')
+#
+# import json
+#
+# result = json.load(fp)
+#
+# print(result)
+# print(type(result))
+#
+# fp.close()
