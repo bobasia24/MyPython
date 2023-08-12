@@ -21,7 +21,7 @@ def file_dispose(file_path, engine):
                 data_file = pd.read_excel(f, sheet_name="sheetTitle0")
     else:
         data_file = pd.read_excel(file_path, sheet_name="Sheet1")
-    data_file.to_sql('运费7月更新', con=engine, if_exists='replace', index=False, chunksize=500)
+    data_file.to_sql('运费7月更新1', con=engine, if_exists='replace', index=False, chunksize=500)
     print("数据插入完成")
 
 
