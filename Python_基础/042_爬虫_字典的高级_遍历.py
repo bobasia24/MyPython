@@ -15,8 +15,8 @@ person = {'name':'阿马','age':18,'sex':'男'}
 #     print(value)
 
 # (3) 遍历字典的key和value
-# for key,value in person.items():
-#     print(key,value)
+for key,value in person.items():
+    print(key,value)
 
 
 # (4) 遍历字典的项/元素
