@@ -21,7 +21,7 @@ def file_dispose(file_path, engine):
                 data_file = pd.read_excel(f, sheet_name="sheetTitle0")
     else:
         data_file = pd.read_excel(file_path, sheet_name="Sheet1")
-    data_file.to_sql('运费7月更新1', con=engine, if_exists='replace', index=False, chunksize=500)
+    data_file.to_sql('8月出库单列表', con=engine, if_exists='replace', index=False, chunksize=500)
     print("数据插入完成")
 
 
@@ -39,5 +39,6 @@ def connection_database():
 
 # 读取
 engine = connection_database()
-download_file_path = r"C:\Users\73769\Desktop\运费7月更新.xlsx"
+#mac
+download_file_path = r"/Users/liyazhou/Desktop/8月出库单列表.xlsx"
 file_dispose(download_file_path, engine)
