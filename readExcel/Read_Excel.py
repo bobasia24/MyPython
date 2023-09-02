@@ -36,7 +36,7 @@ def connection_database():
     connection_str = str_format.format(user=user, password=parse.quote_plus(password), db_host=db_host, port=port,
                                        database=database)
     return create_engine(connection_str, echo=False)
-
+#test
 # 读取
 engine = connection_database()
 #mac
