@@ -33,13 +33,13 @@ content = response.read().decode('utf-8')
 # split 切割
 content = content.split('(')[1].split(')')[0]
 
-with open('074_尚硅谷_爬虫_解析_jsonpath解析淘票票.json','w',encoding='utf-8')as fp:
+with open('074_爬虫_解析_jsonpath解析淘票票.json', 'w', encoding='utf-8')as fp:
     fp.write(content)
 
 import json
 import jsonpath
 
-obj = json.load(open('074_尚硅谷_爬虫_解析_jsonpath解析淘票票.json','r',encoding='utf-8'))
+obj = json.load(open('074_爬虫_解析_jsonpath解析淘票票.json', 'r', encoding='utf-8'))
 
 city_list = jsonpath.jsonpath(obj,'$..regionName')
 

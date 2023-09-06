@@ -5,7 +5,7 @@ from lxml import etree
 # （2）服务器响应的数据  response.read().decode('utf-8') *****   etree.HTML()
 
 # xpath解析本地文件
-tree = etree.parse('070_尚硅谷_爬虫_解析_xpath的基本使用.html')
+tree = etree.parse('070_爬虫_解析_xpath的基本使用.html')
 
 #tree.xpath('xpath路径')
 
