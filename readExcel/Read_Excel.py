@@ -42,6 +42,6 @@ def connection_database():
 #test
 # 读取
 engine = connection_database()
-#mac
+#mac1
 download_file_path = r"C:\Users\73769\Downloads\非自营报价填报111.xlsx"
 file_dispose(download_file_path, engine)
