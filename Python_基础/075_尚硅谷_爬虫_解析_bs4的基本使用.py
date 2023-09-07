@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 # 通过解析本地文件 来将bs4的基础语法进行讲解
 # 默认打开的文件的编码格式是gbk 所以在打开文件的时候需要指定编码
-soup = BeautifulSoup(open('075_尚硅谷_爬虫_解析_bs4的基本使用.html',encoding='utf-8'),'lxml')
+soup = BeautifulSoup(open('075_爬虫_解析_bs4的基本使用.html', encoding='utf-8'), 'lxml')
 
 # 根据标签名查找节点
 # 找到的是第一个符合条件的数据

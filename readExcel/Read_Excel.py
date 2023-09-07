@@ -20,18 +20,21 @@ def file_dispose(file_path, engine):
             with z.open("销售单查询.xlsx") as f:
                 data_file = pd.read_excel(f, sheet_name="sheetTitle0")
     else:
-        data_file = pd.read_excel(file_path, sheet_name="Sheet1")
-    data_file.to_sql('8月出库单列表', con=engine, if_exists='replace', index=False, chunksize=500)
+        data_file = pd.read_excel(file_path, sheet_name="sheet1")
+    data_file.to_sql('非自营报价填报111', con=engine, if_exists='replace', index=False, chunksize=500)
     print("数据插入完成")
 
 
 def connection_database():
     # 连接数据库
-    db_host = "14.116.149.42"
+    # db_host = "14.116.149.42"
+    db_host = "125.91.113.114"
     port = "3306"
     user = "root"
-    password = "Ysyhl9t@"
-    database = "lmykerp"
+    # password = "Ysyhl9t@"
+    password = "Report@123"
+    database = "profit"
+    # database = "lmykerp"
     str_format = "mysql+pymysql://{user}:{password}@{db_host}:{port}/{database}?charset=utf8"
     connection_str = str_format.format(user=user, password=parse.quote_plus(password), db_host=db_host, port=port,
                                        database=database)
@@ -39,6 +42,6 @@ def connection_database():
 #test
 # 读取
 engine = connection_database()
-#mac
-download_file_path = r"/Users/liyazhou/Desktop/8月出库单列表.xlsx"
+#mac1
+download_file_path = r"C:\Users\73769\Downloads\非自营报价填报111.xlsx"
 file_dispose(download_file_path, engine)
