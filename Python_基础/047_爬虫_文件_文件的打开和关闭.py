@@ -16,6 +16,6 @@
 # fp.write('hello shangguigu')
 
 # 文件的关闭
-fp = open('a.txt','w')
+fp = open('ab.txt','w')
 fp.write('hello')
 fp.close()
