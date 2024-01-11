@@ -1,0 +1,4487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="明细" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="wdddh"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="WLMC"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJed"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="WLBM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="BM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DP"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DZSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJst"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="fhzz"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="xs"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="pagenum"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=($page-1)*100]]></Attributes>
+</O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[SELECT *,ifnull(销售收入2,0)-销售收入1 一次未回款
+,ifnull(销售收入2跨期,0)-销售收入1 末次未回款,退款+跨月退款 累计退款
+,平台补贴实际金额-平台补贴预估金额 平台补贴差异
+,税额*实发数量 总税额
+,销售成本+ifnull(税额*实发数量,0) 总成本含税
+FROM `dm_单品收入成本` a
+where 1=${xs}
+${if(and(DZSJ == '',FHSJ == '') ,"","and ( ")}
+${if(DZSJ == '',"",
+"动账年月= date_format(concat( '"+ DZSJ +"','-01'),'%Y%m') or 
+跨月动账年月= date_format(concat('"+ DZSJ +"' ,'-01'),'%Y%m')")} 
+${if(or(DZSJ == '' , FHSJ == '') ,""," or ")}
+${if(len(FHSJ)>0 ,"发货年月 = date_format(concat('"+ FHSJ +"','-01'),'%Y%m')","")} 
+${if(and(DZSJ == '' , FHSJ == '') ,"",") ")}
+${if(and(len(FHSJst)>0 , len(FHSJed)>0) ,"and 发货日期 between date_format('"+ FHSJst +"','%Y%m%d') and date_format('"+ FHSJed +"','%Y%m%d')","")} 
+${if(WLMC=='',"","and 产品名称='" +WLMC +"'")}
+${if(WLBM=='',"","and 产品编码='" +WLBM +"'")}
+${if(DP=='',"","and 管理报表渠道='" +DP +"'")}
+${if(BM=='',"","and 渠道组 in('" +BM +"')")}
+${if(wdddh=='',"","and 网店订单号='" +wdddh +"'")}
+${if(fhzz=='',"","and 发货组织='" +fhzz +"'")}
+LIMIT ${pagenum},100]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="总页数" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="wdddh"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="WLMC"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="WLBM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="BM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DP"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DZSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJed"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJst"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="fhzz"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[SELECT count(1) 总数 FROM `dm_单品收入成本` where 1=1
+${if(and(DZSJ == '',FHSJ == '') ,"","and ( ")}
+${if(DZSJ == '',"",
+"动账年月= date_format(concat( '"+ DZSJ +"','-01'),'%Y%m') or 
+跨月动账年月= date_format(concat('"+ DZSJ +"' ,'-01'),'%Y%m')")} 
+${if(or(DZSJ == '' , FHSJ == '') ,""," or ")}
+${if(len(FHSJ)>0 ,"发货年月 = date_format(concat('"+ FHSJ +"','-01'),'%Y%m')","")} 
+${if(and(DZSJ == '' , FHSJ == '') ,"",") ")}
+${if(and(len(FHSJst)>0 , len(FHSJed)>0) ,"and 发货日期 between date_format('"+ FHSJst +"','%Y%m%d') and date_format('"+ FHSJed +"','%Y%m%d')","")} 
+${if(WLMC=='',"","and 产品名称='" +WLMC +"'")}
+${if(WLBM=='',"","and 产品编码='" +WLBM +"'")}
+${if(DP=='',"","and 管理报表渠道='" +DP +"'")}
+${if(BM=='',"","and 渠道组 in('" +BM +"')")}
+${if(wdddh=='',"","and 网店订单号='" +wdddh +"'")}
+${if(fhzz=='',"","and 发货组织='" +fhzz +"'")}]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="单品收入成本报表导出" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="WLMC"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJed"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="WLBM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="BM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DP"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DZSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJst"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="fhzz"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[SELECT 
+模块,
+单据编号
+,网店订单号
+,运输单号
+,发货组织
+,管理报表渠道
+,产品编码
+,产品名称
+,分类
+,实发数量
+,箱装系数
+,销售收入1 `订单/报价收入`
+,换购金额
+,种菜金额
+,平台补贴预估金额
+,平台补贴实际金额
+,平台补贴实际金额-平台补贴预估金额 平台补贴差异
+,销售收入2 `账单/核对收入`
+,退款
+,ifnull(销售收入2,0)-销售收入1 对账差异
+,单品差异备注
+,销售收入2跨期 `账单(滚动)/核对收入`
+,退款+ifnull(跨月退款,0) 滚动退款
+,ifnull(销售收入2跨期,0)-销售收入1 滚动差异
+,销售成本 总成本不含税
+,税额*实发数量 总税额
+,销售成本+ifnull(税额*实发数量,0) 总成本含税
+,运费 as 预估含税运费
+,预估不含税运费
+,运费-预估不含税运费 预估运费税额
+,含税运费未核对
+,不含税运费未核对
+,含税运费未核对-不含税运费未核对 未核对运费税额
+,含税运费已核对
+,不含税运费已核对
+,含税运费已核对-不含税运费已核对 已核对运费税额
+,含税运费未核对-运费 未核对与预估差额含税
+,不含税运费未核对-预估不含税运费 未核对与预估差额不含税
+,含税运费未核对-运费+预估不含税运费-不含税运费未核对 未核对与预估税额差额
+,含税运费已核对-运费 已核对与预估差额含税
+,不含税运费已核对-预估不含税运费 已核对与预估差额不含税
+,含税运费已核对-运费+预估不含税运费-不含税运费已核对 已核对与预估税额差额
+,含税运费已核对-含税运费未核对 已核对与未核对差额含税
+,不含税运费已核对-不含税运费未核对 已核对与未核对差额不含税
+,含税运费已核对-含税运费未核对+不含税运费未核对-不含税运费已核对 已核对与未核对税额差额
+,订单状态
+,订单类型
+,料,工,费
+,东莞成本 东莞成本含税
+,东莞成本不含税
+,账期状态
+,跨月账期
+,渠道组
+,季节性产品分类
+,归属渠道
+,东莞单价
+,发货年月
+,动账年月
+,跨月动账年月
+,`区域/组别`
+,销售人员
+,税率
+,款项类型
+,发货日期
+,口味
+,规格
+,单位
+FROM `dm_单品收入成本` a where 1=1
+${if(and(DZSJ == '',FHSJ == '') ,"","and ( ")}
+${if(DZSJ == '',"",
+"动账年月= date_format(concat( '"+ DZSJ +"','-01'),'%Y%m') or 
+跨月动账年月= date_format(concat('"+ DZSJ +"' ,'-01'),'%Y%m')")} 
+${if(or(DZSJ == '' , FHSJ == '') ,""," or ")}
+${if(len(FHSJ)>0 ,"发货年月 = date_format(concat('"+ FHSJ +"','-01'),'%Y%m')","")} 
+${if(and(DZSJ == '' , FHSJ == '') ,"",") ")}
+${if(and(len(FHSJst)>0 , len(FHSJed)>0) ,"and 发货日期 between date_format('"+ FHSJst +"','%Y%m%d') and date_format('"+ FHSJed +"','%Y%m%d')","")} 
+${if(WLMC=='',"","and 产品名称='" +WLMC +"'")}
+${if(WLBM=='',"","and 产品编码='" +WLBM +"'")}
+${if(DP=='',"","and 管理报表渠道='" +DP +"'")}
+${if(BM=='',"","and 渠道组 in('" +BM +"')")}
+${if(fhzz=='',"","and 发货组织='" +fhzz +"'")}]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="物料字典" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select distinct 产品名称,产品编码 from dm_单品收入成本]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="合计" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="wdddh"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="WLMC"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJed"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="WLBM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="BM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DP"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DZSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJst"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="fhzz"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[SELECT sum(实发数量) 实发数量,sum(换购金额) 换购金额,sum(种菜金额) 种菜金额,sum(销售成本) 销售成本,sum(税额*实发数量)税额,sum(销售成本)+ifnull(sum(税额*实发数量),0) 总成本含税,sum(运费) 运费,sum(预估不含税运费) 预估不含税运费,sum(含税运费未核对) 含税运费未核对,sum(不含税运费未核对) 不含税运费未核对,sum(含税运费已核对) 含税运费已核对,sum(不含税运费已核对) 不含税运费已核对
+,sum(销售收入1) 销售收入1,sum(销售收入2) 销售收入2,sum(销售收入2跨期) 销售收入2跨期
+,sum(销售收入1)-ifnull(sum(销售收入2),0) 一次未回款,sum(销售收入1)-ifnull(sum(销售收入2跨期),0) 末次未回款,sum(退款) 退款,sum(退款)+ifnull(sum(跨月退款),0) 累计退款
+,sum(平台补贴预估金额)平台补贴预估金额,sum(平台补贴实际金额)平台补贴实际金额,sum(平台补贴预估金额)-ifnull(sum(平台补贴实际金额),0) 平台补贴差异,sum(料) 料,sum(工) 工 ,sum(费) 费,sum(东莞成本) 东莞成本,sum(东莞成本不含税) 东莞成本不含税
+FROM `dm_单品收入成本` a
+where 1=1
+${if(and(DZSJ == '',FHSJ == '') ,"","and ( ")}
+${if(DZSJ == '',"",
+"动账年月= date_format(concat( '"+ DZSJ +"','-01'),'%Y%m') or 
+跨月动账年月= date_format(concat('"+ DZSJ +"' ,'-01'),'%Y%m')")} 
+${if(or(DZSJ == '' , FHSJ == '') ,""," or ")}
+${if(len(FHSJ)>0 ,"发货年月 = date_format(concat('"+ FHSJ +"','-01'),'%Y%m')","")} 
+${if(and(DZSJ == '' , FHSJ == '') ,"",") ")}
+${if(and(len(FHSJst)>0 , len(FHSJed)>0) ,"and 发货日期 between date_format('"+ FHSJst +"','%Y%m%d') and date_format('"+ FHSJed +"','%Y%m%d')","")} 
+${if(WLMC=='',"","and 产品名称='" +WLMC +"'")}
+${if(WLBM=='',"","and 产品编码='" +WLBM +"'")}
+${if(DP=='',"","and 管理报表渠道='" +DP +"'")}
+${if(BM=='',"","and 渠道组 in('" +BM +"')")}
+${if(wdddh=='',"","and 网店订单号='" +wdddh +"'")}
+${if(fhzz=='',"","and 发货组织='" +fhzz +"'")}]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="汇总" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="WLMC"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJed"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="WLBM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJst"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="BM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DP"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DZSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="fhzz"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="xs"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="pagenum"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=($page-1)*100]]></Attributes>
+</O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with a as(
+SELECT
+模块 
+,单据编号
+,网店订单号
+,发货组织
+,管理报表渠道
+,产品编码
+,产品名称
+,分类
+,实发数量*ifnull(箱装系数,1) 实发数量
+,销售收入1 `订单/报价收入`
+,换购金额
+,种菜金额
+,销售收入2 `账单/核对收入`
+,销售收入2跨期 `账单(跨期)/核对收入`
+,销售成本
+,运费
+,预估不含税运费
+,含税运费未核对
+,不含税运费未核对
+,含税运费已核对
+,不含税运费已核对
+,订单类型
+,东莞成本
+,账期状态
+,跨月账期
+,渠道组
+,季节性产品分类
+,归属渠道
+,东莞单价
+,发货年月
+,动账年月
+,跨月动账年月
+,`区域/组别`
+,销售人员
+,税率
+,发货日期
+,口味
+,规格
+,单位
+,税额
+,东莞成本不含税
+,料,工,费
+FROM `dm_单品收入成本` a
+where 0=${xs}
+${if(and(DZSJ == '',FHSJ == '') ,"","and ( ")}
+${if(DZSJ == '',"",
+"动账年月= date_format(concat( '"+ DZSJ +"','-01'),'%Y%m') or 
+跨月动账年月= date_format(concat('"+ DZSJ +"' ,'-01'),'%Y%m')")} 
+${if(or(DZSJ == '' , FHSJ == '') ,""," or ")}
+${if(len(FHSJ)>0 ,"发货年月 = date_format(concat('"+ FHSJ +"','-01'),'%Y%m')","")} 
+${if(and(DZSJ == '' , FHSJ == '') ,"",") ")}
+${if(and(len(FHSJst)>0 , len(FHSJed)>0) ,"and 发货日期 between date_format('"+ FHSJst +"','%Y%m%d') and date_format('"+ FHSJed +"','%Y%m%d')","")} 
+${if(WLMC=='',"","and 产品名称='" +WLMC +"'")}
+${if(WLBM=='',"","and 产品编码='" +WLBM +"'")}
+${if(DP=='',"","and 管理报表渠道='" +DP +"'")}
+${if(BM=='',"","and 渠道组 in('" +BM +"')")}
+${if(fhzz=='',"","and 发货组织='" +fhzz +"'")}
+)select b.公司
+,b.管理报表渠道名称 管理报表渠道
+,b.渠道_1  明细
+,b.`区域/组别`
+,b.销售人员
+,a.产品编码
+,a.产品名称
+,a.分类
+,sum(a.实发数量) 实发数量
+,sum(ifnull(a.`账单(跨期)/核对收入`,a.`订单/报价收入`)/(税率+1))/sum(a.实发数量) 平均售价
+,sum(case when 
+instr(账期状态,concat(replace('${FHSJ}','-',''),'结账'))!=0 then a.`账单/核对收入`
+when instr(账期状态,concat(replace('${FHSJ}','-',''),'发货'))!=0 and instr(账期状态,'未结账')!=0 or 模块='非自营' then a.`订单/报价收入` 
+else a.`账单(跨期)/核对收入`-a.`账单/核对收入` end) 含税收入
+,sum(case when 
+instr(账期状态,concat(replace('${FHSJ}','-',''),'结账'))!=0 then a.`账单/核对收入`
+when instr(账期状态,concat(replace('${FHSJ}','-',''),'发货'))!=0 and instr(账期状态,'未结账')!=0 or 模块='非自营' then a.`订单/报价收入` 
+else a.`账单(跨期)/核对收入`-a.`账单/核对收入` end/(税率+1)) 销售收入
+,sum(销售成本) 销售成本
+,sum(销售成本+ifnull(税额,0)*实发数量) 含税成本
+,sum(东莞成本不含税) 东莞成本不含税
+,sum(东莞成本) 含税东莞成本
+,sum(运费) 运费
+,sum(预估不含税运费) 预估不含税运费
+,sum(含税运费未核对) 含税运费未核对
+,sum(不含税运费未核对) 不含税运费未核对
+,sum(含税运费已核对) 含税运费已核对
+,sum(不含税运费未核对) 不含税运费未核对
+,a.渠道组
+,a.季节性产品分类
+,b.归属 归属渠道
+,a.发货年月 月份
+from a
+left join dm_01财务_profit_客户中间表 b
+on a.管理报表渠道=b.渠道
+group by b.公司
+,b.管理报表渠道名称
+,b.渠道_1
+,b.`区域/组别`
+,b.销售人员
+,a.产品编码
+,a.产品名称
+,a.分类
+,a.渠道组
+,b.归属
+,a.发货年月
+LIMIT ${pagenum},100]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="汇总数据导出" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="WLMC"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJed"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="WLBM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJst"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="BM"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DP"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="DZSJ"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="fhzz"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with a as(
+SELECT 
+模块
+,单据编号
+,网店订单号
+,发货组织
+,管理报表渠道
+,产品编码
+,产品名称
+,分类
+,实发数量*ifnull(箱装系数,1) 实发数量
+,销售收入1 `订单/报价收入`
+,换购金额
+,种菜金额
+,销售收入2 `账单/核对收入`
+,销售收入2跨期 `账单(跨期)/核对收入`
+,销售成本
+,运费
+,预估不含税运费
+,含税运费未核对
+,不含税运费未核对
+,含税运费已核对
+,不含税运费已核对
+,订单类型
+,东莞成本
+,账期状态
+,跨月账期
+,渠道组
+,季节性产品分类
+,归属渠道
+,东莞单价
+,发货年月
+,动账年月
+,跨月动账年月
+,`区域/组别`
+,销售人员
+,税率
+,发货日期
+,口味
+,规格
+,单位
+,税额
+,东莞成本不含税
+,料,工,费
+FROM `dm_单品收入成本` a
+where 0=0
+${if(and(DZSJ == '',FHSJ == '') ,"","and ( ")}
+${if(DZSJ == '',"",
+"动账年月= date_format(concat( '"+ DZSJ +"','-01'),'%Y%m') or 
+跨月动账年月= date_format(concat('"+ DZSJ +"' ,'-01'),'%Y%m')")} 
+${if(or(DZSJ == '' , FHSJ == '') ,""," or ")}
+${if(len(FHSJ)>0 ,"发货年月 = date_format(concat('"+ FHSJ +"','-01'),'%Y%m')","")} 
+${if(and(DZSJ == '' , FHSJ == '') ,"",") ")}
+${if(and(len(FHSJst)>0 , len(FHSJed)>0) ,"and 发货日期 between date_format('"+ FHSJst +"','%Y%m%d') and date_format('"+ FHSJed +"','%Y%m%d')","")} 
+${if(WLMC=='',"","and 产品名称='" +WLMC +"'")}
+${if(WLBM=='',"","and 产品编码='" +WLBM +"'")}
+${if(DP=='',"","and 管理报表渠道='" +DP +"'")}
+${if(BM=='',"","and 渠道组 in('" +BM +"')")}
+${if(fhzz=='',"","and 发货组织='" +fhzz +"'")}
+)select b.公司
+,b.管理报表渠道名称 管理报表渠道
+,b.渠道_1  明细
+,b.`区域/组别`
+,b.销售人员
+,a.产品编码
+,a.产品名称
+,a.分类
+,sum(a.实发数量) 实发数量
+,sum(ifnull(a.`账单(跨期)/核对收入`,a.`订单/报价收入`)/(税率+1))/sum(a.实发数量) 平均售价
+,sum(case when 
+instr(账期状态,concat(replace('${FHSJ}','-',''),'结账'))!=0 then a.`账单/核对收入`
+when instr(账期状态,concat(replace('${FHSJ}','-',''),'发货'))!=0 and instr(账期状态,'未结账')!=0 or 模块='非自营' then a.`订单/报价收入` 
+else a.`账单(跨期)/核对收入`-a.`账单/核对收入` end) 销售收入含税
+,sum(case when 
+instr(账期状态,concat(replace('${FHSJ}','-',''),'结账'))!=0 then a.`账单/核对收入`
+when instr(账期状态,concat(replace('${FHSJ}','-',''),'发货'))!=0 and instr(账期状态,'未结账')!=0 or 模块='非自营' then a.`订单/报价收入` 
+else a.`账单(跨期)/核对收入`-a.`账单/核对收入` end/(税率+1)) 销售收入不含税
+,sum(销售成本) 销售成本
+,sum(销售成本+ifnull(税额,0)*实发数量) 含税成本
+,sum(东莞成本不含税) 东莞成本不含税
+,sum(东莞成本) 含税东莞成本
+,sum(运费) 运费
+,sum(预估不含税运费) 预估不含税运费
+,sum(含税运费未核对) 含税运费未核对
+,sum(不含税运费未核对) 不含税运费未核对
+,sum(含税运费已核对) 含税运费已核对
+,sum(不含税运费未核对) 不含税运费未核对
+,a.渠道组
+,a.季节性产品分类
+,b.归属 归属渠道
+,a.发货年月 月份
+from a
+left join dm_01财务_profit_客户中间表 b
+on a.管理报表渠道=b.渠道
+group by b.公司
+,b.管理报表渠道名称
+,b.渠道_1
+,b.`区域/组别`
+,b.销售人员
+,a.产品编码
+,a.产品名称
+,a.分类
+,a.渠道组
+,b.归属
+,a.发货年月]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ReportWebAttr>
+<ServerPrinter/>
+<WebPageContent>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.form.ui.CustomToolBarButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[上一页]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[previous]]></IconName>
+<JavaScript class="com.fr.js.JavaScriptImpl">
+<Parameters/>
+<Content>
+<![CDATA[var page = $("tr[tridx=0]A", "div.content-container").children().eq(0).html();
+var FHSJ = $("tr[tridx=0]A", "div.content-container").children().eq(3).html();
+var DZSJ = $("tr[tridx=0]A", "div.content-container").children().eq(4).html();
+var WLMC = $("tr[tridx=0]A", "div.content-container").children().eq(5).html();
+var WLBM = $("tr[tridx=0]A", "div.content-container").children().eq(6).html();
+var BM = $("tr[tridx=0]A", "div.content-container").children().eq(7).html();
+var DP = $("tr[tridx=0]A", "div.content-container").children().eq(8).html();
+var xs = $("tr[tridx=0]A", "div.content-container").children().eq(9).html();
+//如果报表显示第一页，则上一页不可用 
+if (page == 0) {
+	this.setEnable(false);
+} else {
+	window.location.href = "${servletURL}?reportlet=利润成本/3.单品成本收入报表.cpt&page=" + page +"&FHSJ="+ FHSJ +"&DZSJ="+ DZSJ +"&WLMC="+ WLMC +"&WLBM="+ WLBM +"&WLMC="+ WLMC +"&BM="+ BM +"&DP="+ DP +"&xs="+ xs;
+}]]></Content>
+</JavaScript>
+</Widget>
+<Widget class="com.fr.form.ui.CustomToolBarButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[下一页]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[next]]></IconName>
+<JavaScript class="com.fr.js.JavaScriptImpl">
+<Parameters/>
+<Content>
+<![CDATA[var page = $("tr[tridx=0]A", "div.content-container").children().eq(1).html();
+var total = $("tr[tridx=0]A", "div.content-container").children().eq(2).html();
+var FHSJ = $("tr[tridx=0]A", "div.content-container").children().eq(3).html();
+var DZSJ = $("tr[tridx=0]A", "div.content-container").children().eq(4).html();
+var WLMC = $("tr[tridx=0]A", "div.content-container").children().eq(5).html();
+var WLBM = $("tr[tridx=0]A", "div.content-container").children().eq(6).html();
+var BM = $("tr[tridx=0]A", "div.content-container").children().eq(7).html();
+var DP = $("tr[tridx=0]A", "div.content-container").children().eq(8).html();
+var xs = $("tr[tridx=0]A", "div.content-container").children().eq(9).html();
+//如果报表显示最后一页，则下一页不可用 
+if (parseInt(page) > parseInt(total)) {
+		this.setEnable(false);
+	} else {
+		window.location.href = "${servletURL}?reportlet=利润成本/3.单品成本收入报表.cpt&page=" + page +"&FHSJ="+ FHSJ +"&DZSJ="+ DZSJ +"&WLMC="+ WLMC +"&WLBM="+ WLBM +"&WLMC="+ WLMC +"&GS="+ BM +
+		"&KH="+ DP +"&xs="+ xs;
+	}]]></Content>
+</JavaScript>
+</Widget>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+<Widget class="com.fr.report.web.button.NewPrint">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Print')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[print]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.Word">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[Word]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[word]]></IconName>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<WebPage isPage="true" showAsImage="false" autoScale="false" tdHeavy="false" pageFixedRow="false" pageFixedRowCount="100"/>
+</WebPageContent>
+<Background name="ImageBackground" layout="1"/>
+</ReportWebAttr>
+<ReportExportAttr>
+<ExcelExportAttr hideColumn="false" hideRow="false" exportWaterMark="true"/>
+<PDFExportAttr/>
+<HTMLExportAttr/>
+<WordExportAttr exportWaterMark="true"/>
+<ImageExportAttr imageResolution="96" imageType="false" renderQuality="0" format="png"/>
+</ReportExportAttr>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR/>
+<FR/>
+<HC/>
+<FC/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[723900,1524000,1278720,1524000,1278720,1152000,723900,723900,723900,723900,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[6896100,6477000,5829300,3962400,4229100,4381500,3543300,2743200,2743200,2743200,4000500,3924300,4533900,5143500,5181600,4419600,4191000,3543300,3543300,3543300,3543300,3543300,3543300,3657600,2743200,4191000,3543300,4152900,3543300,4343400,3543300,4229100,3162300,2743200,2743200,2743200,4305300,4686300,6324600,5372100,4038600,2933700,2895600,2590800,2667000,2857500,4229100,4533900,3162300,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" s="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$page - 1]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.RowHeightHighlightAction"/>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="A1"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="0" s="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$page + 1]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="0" s="0">
+<O t="DSColumn">
+<Attributes dsName="总页数" columnName="总数"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[roundup($$$/100,0)]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="0" s="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$FHSJ]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="0" s="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$DZSJ]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="0" s="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$WLBM]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="0" s="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$WLMC]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="0" s="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$BM]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="0" s="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$DP]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="0" s="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$xs]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="1" s="1">
+<O>
+<![CDATA[公司]]></O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[$xs = 1]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.RowHeightHighlightAction"/>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="1" s="1">
+<O>
+<![CDATA[管理报表渠道]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="1" s="1">
+<O>
+<![CDATA[明细]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="1" s="1">
+<O>
+<![CDATA[区域/组别]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="1" s="1">
+<O>
+<![CDATA[销售人员]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="1" s="1">
+<O>
+<![CDATA[产品编码]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="1" s="1">
+<O>
+<![CDATA[产品名称]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="1" s="1">
+<O>
+<![CDATA[分类]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="1" s="1">
+<O>
+<![CDATA[实发数量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="1" s="1">
+<O>
+<![CDATA[平均售价]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="1" s="1">
+<O>
+<![CDATA[销售收入不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="1" s="1">
+<O>
+<![CDATA[销售收入含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="1" s="1">
+<O>
+<![CDATA[总成本不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="13" r="1" s="1">
+<O>
+<![CDATA[总成本含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="14" r="1" s="1">
+<O>
+<![CDATA[东莞成本不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="15" r="1" s="1">
+<O>
+<![CDATA[东莞成本含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="1" s="1">
+<O>
+<![CDATA[预估运费含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="17" r="1" s="1">
+<O>
+<![CDATA[预估运费不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="18" r="1" s="1">
+<O>
+<![CDATA[预估运费含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="19" r="1" s="1">
+<O>
+<![CDATA[预估运费不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="20" r="1" s="1">
+<O>
+<![CDATA[预估运费含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="21" r="1" s="1">
+<O>
+<![CDATA[预估运费不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="22" r="1" s="1">
+<O>
+<![CDATA[含税收入]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="23" r="1" s="1">
+<O>
+<![CDATA[渠道组]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="1" s="1">
+<O>
+<![CDATA[季节性产品分类]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="25" r="1" s="1">
+<O>
+<![CDATA[归属渠道]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="26" r="1" s="1">
+<O>
+<![CDATA[月份]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="公司"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[$xs = 1]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.RowHeightHighlightAction"/>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="管理报表渠道"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="明细"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="区域/组别"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="销售人员"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="产品编码"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="产品名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="分类"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="实发数量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="平均售价"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="销售收入"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="含税收入"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="销售成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="13" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="含税成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="14" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="东莞成本不含税"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="15" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="含税东莞成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="运费"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="17" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="预估不含税运费"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="18" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="含税运费未核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="19" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="不含税运费未核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="20" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="含税运费已核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="21" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="不含税运费未核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="22" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="含税收入"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="23" r="2" s="4">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="渠道组"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="2" s="4">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="季节性产品分类"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="25" r="2" s="4">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="归属渠道"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="26" r="2" s="4">
+<O t="DSColumn">
+<Attributes dsName="汇总" columnName="月份"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="27" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="28" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="29" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="30" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="31" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="32" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="33" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="34" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="35" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="36" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="37" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="38" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="39" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="40" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="41" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="42" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="43" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="44" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="45" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="46" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="47" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="48" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="49" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="50" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="51" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="52" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="53" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="54" r="2" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="3" s="1">
+<O>
+<![CDATA[单据编号]]></O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[$xs = 0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.RowHeightHighlightAction"/>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="3" s="1">
+<O>
+<![CDATA[网店订单号]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="3" s="1">
+<O>
+<![CDATA[运输单号]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="3" s="1">
+<O>
+<![CDATA[发货组织]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="3" s="1">
+<O>
+<![CDATA[管理报表渠道]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="3" s="1">
+<O>
+<![CDATA[产品编码]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="3" s="1">
+<O>
+<![CDATA[产品名称]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="3" s="1">
+<O>
+<![CDATA[分类]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="3" s="1">
+<O>
+<![CDATA[实发数量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="3" s="1">
+<O>
+<![CDATA[箱装系数]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="3" s="1">
+<O>
+<![CDATA[订单/报价收入]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="3" s="1">
+<O>
+<![CDATA[换购金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="3" s="1">
+<O>
+<![CDATA[种菜金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="13" r="3" s="1">
+<O>
+<![CDATA[平台补贴预估金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="14" r="3" s="1">
+<O>
+<![CDATA[平台补贴实际金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="15" r="3" s="1">
+<O>
+<![CDATA[平台补贴差异]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="3" s="1">
+<O>
+<![CDATA[账单/核对收入]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="17" r="3" s="1">
+<O>
+<![CDATA[退款]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="18" r="3" s="1">
+<O>
+<![CDATA[对账差异]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="19" r="3" s="1">
+<O>
+<![CDATA[差异备注]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="20" r="3" s="1">
+<O>
+<![CDATA[账单(滚动)/核对收入]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="21" r="3" s="1">
+<O>
+<![CDATA[滚动退款]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="22" r="3" s="1">
+<O>
+<![CDATA[滚动差异]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="23" r="3" s="1">
+<O>
+<![CDATA[总成本不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="3" s="1">
+<O>
+<![CDATA[总税额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="25" r="3" s="1">
+<O>
+<![CDATA[总成本含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="26" r="3" s="1">
+<O>
+<![CDATA[预估运费含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="27" r="3" s="1">
+<O>
+<![CDATA[预估运费不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="28" r="3" s="1">
+<O>
+<![CDATA[未核对运费含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="29" r="3" s="1">
+<O>
+<![CDATA[未核对运费不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="30" r="3" s="1">
+<O>
+<![CDATA[已核对运费含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="31" r="3" s="1">
+<O>
+<![CDATA[已核对运费不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="32" r="3" s="1">
+<O>
+<![CDATA[订单类型]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="33" r="3" s="1">
+<O>
+<![CDATA[料]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="34" r="3" s="1">
+<O>
+<![CDATA[工]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="35" r="3" s="1">
+<O>
+<![CDATA[费]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="36" r="3" s="1">
+<O>
+<![CDATA[东莞成本含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="37" r="3" s="1">
+<O>
+<![CDATA[东莞成本不含税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="38" r="3" s="1">
+<O>
+<![CDATA[账期状态]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="39" r="3" s="1">
+<O>
+<![CDATA[跨月账期]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="40" r="3" s="1">
+<O>
+<![CDATA[渠道组]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="41" r="3" s="1">
+<O>
+<![CDATA[季节性产品分类]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="42" r="3" s="1">
+<O>
+<![CDATA[归属渠道]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="43" r="3" s="1">
+<O>
+<![CDATA[东莞单价]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="44" r="3" s="1">
+<O>
+<![CDATA[发货年月]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="45" r="3" s="1">
+<O>
+<![CDATA[动账年月]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="46" r="3" s="1">
+<O>
+<![CDATA[跨月动账年月]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="47" r="3" s="1">
+<O>
+<![CDATA[区域/组别]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="48" r="3" s="1">
+<O>
+<![CDATA[销售人员]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="49" r="3" s="1">
+<O>
+<![CDATA[税率]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="50" r="3" s="1">
+<O>
+<![CDATA[发货日期]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="51" r="3" s="1">
+<O>
+<![CDATA[口味]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="52" r="3" s="1">
+<O>
+<![CDATA[规格]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="53" r="3" s="1">
+<O>
+<![CDATA[单位]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="54" r="3" s="1">
+<O>
+<![CDATA[款项类型]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="4" s="6">
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[$xs = 0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.RowHeightHighlightAction"/>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="2" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="3" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="4" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="5" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="6" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="7" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="8" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="实发数量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="销售收入1"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="换购金额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="种菜金额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="13" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="平台补贴预估金额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="14" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="平台补贴实际金额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="15" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="平台补贴差异"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="销售收入2"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="17" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="退款"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="18" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="一次未回款"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="19" r="4" s="2">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="20" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="销售收入2跨期"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="21" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="累计退款"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="22" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="末次未回款"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="23" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="销售成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="税额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="25" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="总成本含税"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="26" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="运费"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="27" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="预估不含税运费"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="28" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="含税运费未核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="29" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="不含税运费未核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="30" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="含税运费已核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="31" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="不含税运费已核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="32" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="33" r="4" s="7">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="料"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="34" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="工"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="35" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="费"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="36" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="东莞成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="37" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="合计" columnName="东莞成本不含税"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="38" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="39" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="40" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="41" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="42" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="43" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="44" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="45" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="46" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="47" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="48" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="49" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="50" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="51" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="52" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="53" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="54" r="4" s="6">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="单据编号"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[$xs = 0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.RowHeightHighlightAction"/>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="网店订单号"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="运输单号"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="发货组织"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="管理报表渠道"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="产品编码"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="产品名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="分类"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="实发数量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="箱装系数"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="销售收入1"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="换购金额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="种菜金额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="13" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="平台补贴预估金额"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="14" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="平台补贴实际金额"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="15" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="平台补贴差异"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="销售收入2"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="17" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="退款"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="18" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="一次未回款"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="19" r="5" s="9">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="单品差异备注"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="20" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="销售收入2跨期"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="21" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="累计退款"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="22" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="末次未回款"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="23" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="销售成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="总税额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="25" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="总成本含税"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="26" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="运费"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="27" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="预估不含税运费"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="28" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="含税运费未核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="29" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="不含税运费未核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="30" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="含税运费已核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="31" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="不含税运费已核对"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="32" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="订单类型"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="33" r="5" s="8">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="料"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="34" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="工"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="35" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="费"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="36" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="东莞成本"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="37" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="东莞成本不含税"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="38" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="账期状态"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="39" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="跨月账期"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="40" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="渠道组"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="41" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="季节性产品分类"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="42" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="归属渠道"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="43" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="东莞单价"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="44" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="发货年月"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="45" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="动账年月"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="46" r="5" s="7">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="跨月动账年月"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="47" r="5" s="7">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="区域/组别"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="48" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="销售人员"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="49" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="税率"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="50" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="发货日期"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="51" r="5" s="7">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="口味"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="52" r="5" s="7">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="规格"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="53" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="单位"/>
+<Complex/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="54" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="明细" columnName="款项类型"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting>
+<PaperSize width="223200000" height="432000000"/>
+<Margin top="986400" left="2743200" bottom="986400" right="2743200"/>
+</PaperSetting>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="false" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="8"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+<ParameterUI class="com.fr.form.main.parameter.FormParameterUI">
+<Parameters/>
+<Layout class="com.fr.form.ui.container.WParameterLayout">
+<WidgetName name="para"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<FollowingTheme borderStyle="false"/>
+<Margin top="0" left="0" bottom="0" right="0"/>
+<Border>
+<border style="0" borderRadius="0" type="0" borderStyle="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+<WidgetTitle>
+<O>
+<![CDATA[新建标题]]></O>
+<FRFont name="SimSun" style="0" size="72"/>
+<Position pos="0"/>
+</WidgetTitle>
+<Alpha alpha="1.0"/>
+</Border>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-526086" hor="-1" ver="-1"/>
+</color>
+</Background>
+<LCAttr vgap="0" hgap="0" compInterval="0"/>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboBox">
+<Listener event="afteredit" name="编辑后1">
+<JavaScript class="com.fr.js.JavaScriptImpl">
+<Parameters/>
+<Content>
+<![CDATA[var xs=document.querySelectorAll(".fr-trigger-texteditor.fr-widget-background.fr-widget-font")[9]A.value
+var button2=this.options.form.getWidgetByName("button2");
+var button2_c=this.options.form.getWidgetByName("button2_c");
+var st1 = function(){
+if(xs=="明细"){
+//$("tr[tridx=0]A", "div.content-container").children().eq(9).html()=1;
+button2.setVisible(true);
+button2.setEnable(true);
+button2_c.setVisible(false);
+button2_c.setEnable(false);
+	}
+else{
+button2_c.setVisible(true);
+button2_c.setEnable(true);
+button2.setVisible(false);
+button2.setEnable(false);
+	} 
+}
+setTimeout(st1,500);]]></Content>
+</JavaScript>
+</Listener>
+<WidgetName name="xs"/>
+<WidgetID widgetID="ed6ce3cd-ee4a-4192-bca5-2a6da6f48642"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<allowBlank>
+<![CDATA[false]]></allowBlank>
+<DirectEdit>
+<![CDATA[false]]></DirectEdit>
+<CustomData>
+<![CDATA[false]]></CustomData>
+<Dictionary class="com.fr.data.impl.CustomDictionary">
+<CustomDictAttr>
+<Dict key="1" value="明细"/>
+<Dict key="0" value="汇总"/>
+</CustomDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[明细]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="1100" y="50" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.FreeButton">
+<Listener event="click" name="汇总">
+<JavaScript class="com.fr.plugin.largedatasetexcelexport.javascript.LargeDatasetExcelExportJavaScript" pluginID="com.fr.plugin.largedatasetexcelexport.v11" plugin-version="1.1.17">
+<Parameters>
+<Parameter>
+<Attributes name="WLMC"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$WLMC]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJed"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$FHSJed]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="WLBM"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$WLBM]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJ"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$FHSJ]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJst"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$FHSJst]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="BM"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$BM]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="DP"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$DP]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="DZSJ"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$DZSJ]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="fhzz"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$fhzz]]></Attributes>
+</O>
+</Parameter>
+</Parameters>
+<LargeDatasetExcelExportJS exportFileName="单品汇总数据导出" dsName="汇总数据导出" colNames="{}" exportFormat="excel" encodeFormat="UTF-8"/>
+</JavaScript>
+</Listener>
+<WidgetName name="button2_c"/>
+<WidgetID widgetID="a416245f-c91d-4b70-8677-7fc80b2187d8"/>
+<WidgetAttr disabled="true" invisible="true" aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[汇总导出]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="820" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboCheckBox">
+<WidgetName name="BM"/>
+<WidgetID widgetID="8ad5caa1-4829-4938-89fc-7e23ae68a82d"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<CustomData>
+<![CDATA[false]]></CustomData>
+<Dictionary class="com.fr.data.impl.DatabaseDictionary">
+<FormulaDictAttr kiName="部门" viName="部门"/>
+<DBDictAttr tableName="dm_01财务_profit_客户中间表" schemaName="" ki="-1" vi="-1" kiName="部门" viName="部门"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+<RAAttr delimiter="&apos;,&apos;" isArray="false"/>
+</InnerWidget>
+<BoundsAttr x="466" y="50" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label4"/>
+<WidgetID widgetID="5260b647-84a0-4c92-a685-e3fa7c82fee0"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[发货组织：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="924" y="50" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboBox">
+<WidgetName name="fhzz"/>
+<WidgetID widgetID="991d018a-38b4-4ade-9965-19cca5ef454e"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.CustomDictionary">
+<CustomDictAttr>
+<Dict key="深圳榴芒" value="深圳榴芒"/>
+<Dict key="东莞榴芒" value="东莞榴芒"/>
+</CustomDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[深圳榴芒]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="1004" y="50" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="FHSJst"/>
+<WidgetID widgetID="f0e907ad-2513-46b4-ab16-75d82f3cde2e"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[='']]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="1020" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="FHSJed"/>
+<WidgetID widgetID="f0e907ad-2513-46b4-ab16-75d82f3cde2e"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[='']]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="1100" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label0_c"/>
+<WidgetID widgetID="43e7a533-6807-4b93-bef7-cb263c788e8b"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[发货时间闭区间：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="917" y="16" width="103" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.FreeButton">
+<Listener event="click" name="明细">
+<JavaScript class="com.fr.plugin.largedatasetexcelexport.javascript.LargeDatasetExcelExportJavaScript" pluginID="com.fr.plugin.largedatasetexcelexport.v11" plugin-version="1.1.17">
+<Parameters>
+<Parameter>
+<Attributes name="WLMC"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$WLMC]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJed"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$FHSJed]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="WLBM"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$WLBM]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJ"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$FHSJ]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="BM"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$BM]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="DP"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$DP]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="DZSJ"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$DZSJ]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="FHSJst"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$FHSJst]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="fhzz"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$fhzz]]></Attributes>
+</O>
+</Parameter>
+</Parameters>
+<LargeDatasetExcelExportJS exportFileName="单品收入成本明细" dsName="单品收入成本报表导出" colNames="{}" exportFormat="excel" encodeFormat="UTF-8"/>
+</JavaScript>
+</Listener>
+<WidgetName name="button2"/>
+<WidgetID widgetID="a416245f-c91d-4b70-8677-7fc80b2187d8"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[明细导出]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="820" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label2_c_c_c"/>
+<WidgetID widgetID="72ce73e3-6743-4672-a766-87feb3d39cb5"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[部门：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="386" y="51" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label2_c_c"/>
+<WidgetID widgetID="72ce73e3-6743-4672-a766-87feb3d39cb5"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[店铺：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="386" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboBox">
+<WidgetName name="DP"/>
+<WidgetID widgetID="e6010d19-2e7b-4d91-91ee-b843013e5f4b"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.DatabaseDictionary">
+<FormulaDictAttr kiName="渠道" viName="渠道"/>
+<DBDictAttr tableName="dm_01财务_profit_客户中间表" schemaName="" ki="-1" vi="-1" kiName="渠道" viName="渠道"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="466" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label2_c"/>
+<LabelName name="部门："/>
+<WidgetID widgetID="72ce73e3-6743-4672-a766-87feb3d39cb5"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[网店订单号：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="575" y="51" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.TextEditor">
+<WidgetName name="wdddh"/>
+<WidgetID widgetID="4b6ebc62-e30b-45f3-98a9-ae4018d81ccf"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</InnerWidget>
+<BoundsAttr x="655" y="51" width="145" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboBox">
+<WidgetName name="WLBM"/>
+<WidgetID widgetID="cbf312ef-bab1-42b8-9c3e-1eac00c8510b"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="产品编码" viName="产品编码"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[WL]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="285" y="51" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboBox">
+<WidgetName name="WLMC"/>
+<WidgetID widgetID="e6010d19-2e7b-4d91-91ee-b843013e5f4b"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="产品名称" viName="产品名称"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[WL]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="285" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.TextEditor">
+<WidgetName name="status"/>
+<WidgetID widgetID="89e769f3-af84-4f55-8ef6-ccada2422feb"/>
+<WidgetAttr disabled="true" aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<fontSize>
+<![CDATA[13]]></fontSize>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</InnerWidget>
+<BoundsAttr x="655" y="16" width="65" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.parameter.FormSubmitButton">
+<WidgetName name="formSubmit0"/>
+<WidgetID widgetID="4d7bd993-ab2d-4914-80b2-96f90f66059a"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[查询]]></Text>
+<Hotkeys>
+<![CDATA[enter]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="820" y="51" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.FreeButton">
+<Listener event="click" name="点击1">
+<JavaScript class="com.fr.js.JavaScriptImpl">
+<Parameters/>
+<Content>
+<![CDATA[var status = FR.remoteEvaluate('sql("sc","select status from kettle_status where jobname=\'单品收入成本/计算运费\'",1,1)');
+if(status==0)
+{
+	document.querySelectorAll(".fr-widget-background.fr-texteditor")[0]A.value='已闭环';
+}
+else if(status==1)
+{
+	document.querySelectorAll(".fr-widget-background.fr-texteditor")[0]A.value='已准备';
+}
+else
+{
+	document.querySelectorAll(".fr-widget-background.fr-texteditor")[0]A.value='计算中';
+}
+]]></Content>
+</JavaScript>
+</Listener>
+<WidgetName name="button1"/>
+<WidgetID widgetID="60fe578e-499f-4bda-86a9-4008a2e8090b"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[确认状态]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="720" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.FreeButton">
+<Listener event="click" name="点击1">
+<JavaScript class="com.fr.js.JavaScriptImpl">
+<Parameters/>
+<Content>
+<![CDATA[var inp1=_g().getParameterContainer().getWidgetByName("fhsj").getText()
+var lock = FR.remoteEvaluate("sql(\"profit\",\"SELECT count(1) FROM information_schema.processlist where INFO like 'create table profit.dm_单品收入成本1%'\",1,1)");
+var status = FR.remoteEvaluate('sql("sc","select status from kettle_status where jobname=\'单品收入成本/计算运费\'",1,1)');
+if(status == 2){
+	document.querySelectorAll(".fr-widget-background.fr-texteditor")[0]A.value='计算中';
+}
+else{
+if (lock + status == 0) {
+document.querySelectorAll(".fr-widget-background.fr-texteditor")[0]A.value='已准备';
+FR.remoteEvaluate('sql("profit","call set_status(1,\''+ inp1 +'\');",1,1)');
+} else {
+document.querySelectorAll(".fr-widget-background.fr-texteditor")[0]A.value='已闭环';
+FR.remoteEvaluate('sql("profit","call set_status(0,\'\');",1,1)');
+}
+}]]></Content>
+</JavaScript>
+</Listener>
+<WidgetName name="button0"/>
+<WidgetID widgetID="2d068126-fd83-4788-8531-9ab636f5e251"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[计算匹配]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="575" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label3"/>
+<WidgetID widgetID="297494fe-af85-4d21-bbe5-c5f208e9a67e"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[物料编码：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="205" y="51" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label2"/>
+<WidgetID widgetID="72ce73e3-6743-4672-a766-87feb3d39cb5"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[物料名称：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="205" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label1"/>
+<WidgetID widgetID="cdadd2e6-518a-4e56-89ba-c94283987de4"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[动账时间：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="28" y="51" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label0"/>
+<WidgetID widgetID="43e7a533-6807-4b93-bef7-cb263c788e8b"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[发货时间：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="28" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="DZSJ"/>
+<WidgetID widgetID="7591b52a-250f-40cf-a380-e00d84450fff"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr format="yyyy-MM"/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[='']]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="108" y="51" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<Listener event="afteredit" name="编辑后1">
+<JavaScript class="com.fr.js.JavaScriptImpl">
+<Parameters/>
+<Content>
+<![CDATA[var fhsj=this.options.form.getWidgetByName("FHSJ");
+var xs=this.options.form.getWidgetByName("xs");
+if(fhsj.oriText=="")
+{
+	this.options.form.getWidgetByName("xs").setValue(1);
+	//fhsj.setVisible(false);
+	xs.setEnable(false);
+}else
+{
+	//fhsj.setVisible(true);
+	xs.setEnable(true);
+}]]></Content>
+</JavaScript>
+</Listener>
+<WidgetName name="FHSJ"/>
+<WidgetID widgetID="f0e907ad-2513-46b4-ab16-75d82f3cde2e"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr format="yyyy-MM"/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=MONTHDELTA(todate(now()),-1)]]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="108" y="16" width="80" height="21"/>
+</Widget>
+<ShowBookmarks showBookmarks="false"/>
+<Sorted sorted="false"/>
+<MobileWidgetList>
+<Widget widgetName="FHSJ"/>
+<Widget widgetName="WLMC"/>
+<Widget widgetName="DP"/>
+<Widget widgetName="button0"/>
+<Widget widgetName="status"/>
+<Widget widgetName="button1"/>
+<Widget widgetName="button2"/>
+<Widget widgetName="FHSJst"/>
+<Widget widgetName="FHSJed"/>
+<Widget widgetName="BM"/>
+<Widget widgetName="fhzz"/>
+<Widget widgetName="xs"/>
+<Widget widgetName="DZSJ"/>
+<Widget widgetName="WLBM"/>
+<Widget widgetName="wdddh"/>
+<Widget widgetName="formSubmit0"/>
+</MobileWidgetList>
+<FrozenWidgets/>
+<MobileBookMarkStyle class="com.fr.form.ui.mobile.impl.DefaultMobileBookMarkStyle"/>
+<Display display="true"/>
+<DelayDisplayContent delay="false"/>
+<UseParamsTemplate use="true"/>
+<paramFireStopEdit fireEvent="false"/>
+<Position position="0"/>
+<Design_Width design_width="1184"/>
+<NameTagModified/>
+<WidgetNameTagMap/>
+<ParamAttr class="com.fr.report.mobile.DefaultMobileParamStyle"/>
+<ParamStyle class="com.fr.form.ui.mobile.impl.DefaultMobileParameterStyle"/>
+</Layout>
+<DesignAttr width="1184" height="80"/>
+</ParameterUI>
+<Parameter>
+<Attributes name="page"/>
+<O>
+<![CDATA[1]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="xs"/>
+<O>
+<![CDATA[1]]></O>
+</Parameter>
+</ReportParameterAttr>
+<StyleList>
+<Style style_name="默认" full="true" border_source="-1" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="1" size="88"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-2826753" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-6119272" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-6119272" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-6119272" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-6119272" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#0.00]]></Format>
+<FRFont name="simhei" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="simhei" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="simhei" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#0.00]]></Format>
+<FRFont name="simhei" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="simhei" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="0"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="单品收入成本报表导出" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="合计" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="明细" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="汇总数据导出" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="汇总" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="总页数" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="物料字典" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="9b2b983f-3e98-4158-8088-42de776dbec2"/>
+</TemplateIdAttMark>
+</WorkBook>
