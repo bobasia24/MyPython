@@ -1,0 +1,1185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>ods_dm_费用科目表_tmp</name>
+    <description/>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>/</directory>
+    <parameters>
+    </parameters>
+    <log>
+      <trans-log-table>
+        <connection/>
+        <schema/>
+        <table/>
+        <size_limit_lines/>
+        <interval/>
+        <timeout_days/>
+        <field>
+          <id>ID_BATCH</id>
+          <enabled>Y</enabled>
+          <name>ID_BATCH</name>
+        </field>
+        <field>
+          <id>CHANNEL_ID</id>
+          <enabled>Y</enabled>
+          <name>CHANNEL_ID</name>
+        </field>
+        <field>
+          <id>TRANSNAME</id>
+          <enabled>Y</enabled>
+          <name>TRANSNAME</name>
+        </field>
+        <field>
+          <id>STATUS</id>
+          <enabled>Y</enabled>
+          <name>STATUS</name>
+        </field>
+        <field>
+          <id>LINES_READ</id>
+          <enabled>Y</enabled>
+          <name>LINES_READ</name>
+          <subject/>
+        </field>
+        <field>
+          <id>LINES_WRITTEN</id>
+          <enabled>Y</enabled>
+          <name>LINES_WRITTEN</name>
+          <subject/>
+        </field>
+        <field>
+          <id>LINES_UPDATED</id>
+          <enabled>Y</enabled>
+          <name>LINES_UPDATED</name>
+          <subject/>
+        </field>
+        <field>
+          <id>LINES_INPUT</id>
+          <enabled>Y</enabled>
+          <name>LINES_INPUT</name>
+          <subject/>
+        </field>
+        <field>
+          <id>LINES_OUTPUT</id>
+          <enabled>Y</enabled>
+          <name>LINES_OUTPUT</name>
+          <subject/>
+        </field>
+        <field>
+          <id>LINES_REJECTED</id>
+          <enabled>Y</enabled>
+          <name>LINES_REJECTED</name>
+          <subject/>
+        </field>
+        <field>
+          <id>ERRORS</id>
+          <enabled>Y</enabled>
+          <name>ERRORS</name>
+        </field>
+        <field>
+          <id>STARTDATE</id>
+          <enabled>Y</enabled>
+          <name>STARTDATE</name>
+        </field>
+        <field>
+          <id>ENDDATE</id>
+          <enabled>Y</enabled>
+          <name>ENDDATE</name>
+        </field>
+        <field>
+          <id>LOGDATE</id>
+          <enabled>Y</enabled>
+          <name>LOGDATE</name>
+        </field>
+        <field>
+          <id>DEPDATE</id>
+          <enabled>Y</enabled>
+          <name>DEPDATE</name>
+        </field>
+        <field>
+          <id>REPLAYDATE</id>
+          <enabled>Y</enabled>
+          <name>REPLAYDATE</name>
+        </field>
+        <field>
+          <id>LOG_FIELD</id>
+          <enabled>Y</enabled>
+          <name>LOG_FIELD</name>
+        </field>
+        <field>
+          <id>EXECUTING_SERVER</id>
+          <enabled>N</enabled>
+          <name>EXECUTING_SERVER</name>
+        </field>
+        <field>
+          <id>EXECUTING_USER</id>
+          <enabled>N</enabled>
+          <name>EXECUTING_USER</name>
+        </field>
+        <field>
+          <id>CLIENT</id>
+          <enabled>N</enabled>
+          <name>CLIENT</name>
+        </field>
+      </trans-log-table>
+      <perf-log-table>
+        <connection/>
+        <schema/>
+        <table/>
+        <interval/>
+        <timeout_days/>
+        <field>
+          <id>ID_BATCH</id>
+          <enabled>Y</enabled>
+          <name>ID_BATCH</name>
+        </field>
+        <field>
+          <id>SEQ_NR</id>
+          <enabled>Y</enabled>
+          <name>SEQ_NR</name>
+        </field>
+        <field>
+          <id>LOGDATE</id>
+          <enabled>Y</enabled>
+          <name>LOGDATE</name>
+        </field>
+        <field>
+          <id>TRANSNAME</id>
+          <enabled>Y</enabled>
+          <name>TRANSNAME</name>
+        </field>
+        <field>
+          <id>STEPNAME</id>
+          <enabled>Y</enabled>
+          <name>STEPNAME</name>
+        </field>
+        <field>
+          <id>STEP_COPY</id>
+          <enabled>Y</enabled>
+          <name>STEP_COPY</name>
+        </field>
+        <field>
+          <id>LINES_READ</id>
+          <enabled>Y</enabled>
+          <name>LINES_READ</name>
+        </field>
+        <field>
+          <id>LINES_WRITTEN</id>
+          <enabled>Y</enabled>
+          <name>LINES_WRITTEN</name>
+        </field>
+        <field>
+          <id>LINES_UPDATED</id>
+          <enabled>Y</enabled>
+          <name>LINES_UPDATED</name>
+        </field>
+        <field>
+          <id>LINES_INPUT</id>
+          <enabled>Y</enabled>
+          <name>LINES_INPUT</name>
+        </field>
+        <field>
+          <id>LINES_OUTPUT</id>
+          <enabled>Y</enabled>
+          <name>LINES_OUTPUT</name>
+        </field>
+        <field>
+          <id>LINES_REJECTED</id>
+          <enabled>Y</enabled>
+          <name>LINES_REJECTED</name>
+        </field>
+        <field>
+          <id>ERRORS</id>
+          <enabled>Y</enabled>
+          <name>ERRORS</name>
+        </field>
+        <field>
+          <id>INPUT_BUFFER_ROWS</id>
+          <enabled>Y</enabled>
+          <name>INPUT_BUFFER_ROWS</name>
+        </field>
+        <field>
+          <id>OUTPUT_BUFFER_ROWS</id>
+          <enabled>Y</enabled>
+          <name>OUTPUT_BUFFER_ROWS</name>
+        </field>
+      </perf-log-table>
+      <channel-log-table>
+        <connection/>
+        <schema/>
+        <table/>
+        <timeout_days/>
+        <field>
+          <id>ID_BATCH</id>
+          <enabled>Y</enabled>
+          <name>ID_BATCH</name>
+        </field>
+        <field>
+          <id>CHANNEL_ID</id>
+          <enabled>Y</enabled>
+          <name>CHANNEL_ID</name>
+        </field>
+        <field>
+          <id>LOG_DATE</id>
+          <enabled>Y</enabled>
+          <name>LOG_DATE</name>
+        </field>
+        <field>
+          <id>LOGGING_OBJECT_TYPE</id>
+          <enabled>Y</enabled>
+          <name>LOGGING_OBJECT_TYPE</name>
+        </field>
+        <field>
+          <id>OBJECT_NAME</id>
+          <enabled>Y</enabled>
+          <name>OBJECT_NAME</name>
+        </field>
+        <field>
+          <id>OBJECT_COPY</id>
+          <enabled>Y</enabled>
+          <name>OBJECT_COPY</name>
+        </field>
+        <field>
+          <id>REPOSITORY_DIRECTORY</id>
+          <enabled>Y</enabled>
+          <name>REPOSITORY_DIRECTORY</name>
+        </field>
+        <field>
+          <id>FILENAME</id>
+          <enabled>Y</enabled>
+          <name>FILENAME</name>
+        </field>
+        <field>
+          <id>OBJECT_ID</id>
+          <enabled>Y</enabled>
+          <name>OBJECT_ID</name>
+        </field>
+        <field>
+          <id>OBJECT_REVISION</id>
+          <enabled>Y</enabled>
+          <name>OBJECT_REVISION</name>
+        </field>
+        <field>
+          <id>PARENT_CHANNEL_ID</id>
+          <enabled>Y</enabled>
+          <name>PARENT_CHANNEL_ID</name>
+        </field>
+        <field>
+          <id>ROOT_CHANNEL_ID</id>
+          <enabled>Y</enabled>
+          <name>ROOT_CHANNEL_ID</name>
+        </field>
+      </channel-log-table>
+      <step-log-table>
+        <connection/>
+        <schema/>
+        <table/>
+        <timeout_days/>
+        <field>
+          <id>ID_BATCH</id>
+          <enabled>Y</enabled>
+          <name>ID_BATCH</name>
+        </field>
+        <field>
+          <id>CHANNEL_ID</id>
+          <enabled>Y</enabled>
+          <name>CHANNEL_ID</name>
+        </field>
+        <field>
+          <id>LOG_DATE</id>
+          <enabled>Y</enabled>
+          <name>LOG_DATE</name>
+        </field>
+        <field>
+          <id>TRANSNAME</id>
+          <enabled>Y</enabled>
+          <name>TRANSNAME</name>
+        </field>
+        <field>
+          <id>STEPNAME</id>
+          <enabled>Y</enabled>
+          <name>STEPNAME</name>
+        </field>
+        <field>
+          <id>STEP_COPY</id>
+          <enabled>Y</enabled>
+          <name>STEP_COPY</name>
+        </field>
+        <field>
+          <id>LINES_READ</id>
+          <enabled>Y</enabled>
+          <name>LINES_READ</name>
+        </field>
+        <field>
+          <id>LINES_WRITTEN</id>
+          <enabled>Y</enabled>
+          <name>LINES_WRITTEN</name>
+        </field>
+        <field>
+          <id>LINES_UPDATED</id>
+          <enabled>Y</enabled>
+          <name>LINES_UPDATED</name>
+        </field>
+        <field>
+          <id>LINES_INPUT</id>
+          <enabled>Y</enabled>
+          <name>LINES_INPUT</name>
+        </field>
+        <field>
+          <id>LINES_OUTPUT</id>
+          <enabled>Y</enabled>
+          <name>LINES_OUTPUT</name>
+        </field>
+        <field>
+          <id>LINES_REJECTED</id>
+          <enabled>Y</enabled>
+          <name>LINES_REJECTED</name>
+        </field>
+        <field>
+          <id>ERRORS</id>
+          <enabled>Y</enabled>
+          <name>ERRORS</name>
+        </field>
+        <field>
+          <id>LOG_FIELD</id>
+          <enabled>N</enabled>
+          <name>LOG_FIELD</name>
+        </field>
+      </step-log-table>
+      <metrics-log-table>
+        <connection/>
+        <schema/>
+        <table/>
+        <timeout_days/>
+        <field>
+          <id>ID_BATCH</id>
+          <enabled>Y</enabled>
+          <name>ID_BATCH</name>
+        </field>
+        <field>
+          <id>CHANNEL_ID</id>
+          <enabled>Y</enabled>
+          <name>CHANNEL_ID</name>
+        </field>
+        <field>
+          <id>LOG_DATE</id>
+          <enabled>Y</enabled>
+          <name>LOG_DATE</name>
+        </field>
+        <field>
+          <id>METRICS_DATE</id>
+          <enabled>Y</enabled>
+          <name>METRICS_DATE</name>
+        </field>
+        <field>
+          <id>METRICS_CODE</id>
+          <enabled>Y</enabled>
+          <name>METRICS_CODE</name>
+        </field>
+        <field>
+          <id>METRICS_DESCRIPTION</id>
+          <enabled>Y</enabled>
+          <name>METRICS_DESCRIPTION</name>
+        </field>
+        <field>
+          <id>METRICS_SUBJECT</id>
+          <enabled>Y</enabled>
+          <name>METRICS_SUBJECT</name>
+        </field>
+        <field>
+          <id>METRICS_TYPE</id>
+          <enabled>Y</enabled>
+          <name>METRICS_TYPE</name>
+        </field>
+        <field>
+          <id>METRICS_VALUE</id>
+          <enabled>Y</enabled>
+          <name>METRICS_VALUE</name>
+        </field>
+      </metrics-log-table>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <step_performance_capturing_size_limit>100</step_performance_capturing_size_limit>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+    <created_user>-</created_user>
+    <created_date>2023/07/29 15:53:05.477</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2023/07/29 15:53:05.477</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
+    <is_key_private>N</is_key_private>
+  </info>
+  <notepads>
+  </notepads>
+  <connection>
+    <name>Fbi</name>
+    <server>125.91.113.114</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>profit</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted 2be98afc86aa7a081bb16bc64fec3fd89</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>IS_CLUSTERED</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>PORT_NUMBER</code>
+        <attribute>3306</attribute>
+      </attribute>
+      <attribute>
+        <code>PRESERVE_RESERVED_WORD_CASE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>QUOTE_ALL_FIELDS</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>STREAM_RESULTS</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>USE_POOLING</code>
+        <attribute>N</attribute>
+      </attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>中台</name>
+    <server>14.116.149.42</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>lmykerp_pro</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted 2be98afc86aa7f2e4920ab778d2cbbbfa</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>IS_CLUSTERED</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>PORT_NUMBER</code>
+        <attribute>3306</attribute>
+      </attribute>
+      <attribute>
+        <code>PRESERVE_RESERVED_WORD_CASE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>QUOTE_ALL_FIELDS</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>STREAM_RESULTS</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>USE_POOLING</code>
+        <attribute>N</attribute>
+      </attribute>
+    </attributes>
+  </connection>
+  <order>
+    <hop>
+      <from>表输入</from>
+      <to>表输出</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>表输入</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>中台</connection>
+    <sql>#深圳
+select 
+a.id号 as id, a.f_date as 日期,
+-- 账簿,
+会计年度 年度,
+期间 月份,
+凭证号,
+摘要,
+科目编码,
+科目全名,
+核算维度,
+借方金额,
+贷方金额,
+原币金额,
+case when 科目全名 regexp('财务费用') then '财务费用' 
+	 when 科目全名 regexp('应交税费') and 会计科目 regexp('主营业务收入') then '主营业务收入'
+	 when 科目全名 regexp('应交税费') and 会计科目 regexp('主营业务成本') then '主营业务成本'
+	 when 科目全名 regexp('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp('其他业务支出') then '其他业务支出' 
+	 when 会计科目 = '管理费用_税金' then '管理费用_税金'
+	 when 会计科目 = '营业外收入' and 核算维度 regexp('应交未交税金') then '营业外收入_应交未交税金' 
+	 else 科目全名
+end as 资产分类,
+case when 会计科目 = '管理费用_税金' then '营业外收入_应交未交税金' 
+	 when 会计科目 = '营业外收入' and 核算维度 regexp('应交未交税金') then '营业外收入_应交未交税金' 
+else 会计科目 end  as 明细科目,
+case 
+	when a.科目全名 regexp('营业税金及附加') then '财务部'
+	when a.核算维度 regexp('应交未交税金') then '财务部'
+	when a.科目全名 regexp('资产减值损失') then '总经办'
+	when a.科目全名 regexp('销售费用') and  a.管理报表核算渠道名称 regexp ('不分') then 
+			case when  f_date regexp('2023-01|2023-02|2023-03')  then 
+					case  when  substring_index(substring_index(核算维度, ';', 2) , '/', -1) regexp ('不分部门') and  a.摘要 regexp('理赔') then  '客服部'
+						  when substring_index(substring_index(核算维度, ';', 2) , '/', -1) regexp ('市场部')  then  '市场部'
+					else substring_index(substring_index(核算维度, ';', 2) , '/', -1) 
+					end
+				 when   substring_index(substring_index(核算维度, ';', 2) , '/', -1) regexp ('不分部门') then
+				 	case when  a.摘要 regexp('客服|理赔|补货款|快递补款') then  '客服部'
+				 		 when  a.摘要 regexp('分销渠道部|雄牧商贸|玖先商贸') then  '分销事业部'
+				 		 end
+			else	substring_index(substring_index(核算维度,';',2),'-',-1 )
+			end
+	when a.科目全名 regexp('管理费用|应交税费_应交增值税|营业外') 
+		and  a.管理报表核算渠道名称 regexp ('福利|物业|租金|水电|工会|福利|办公|不分|场地|费|公共|低耗品') then 
+		case when (a.摘要 regexp('人力|行政|人政|人事') or a.核算维度 regexp('水电|物业|低耗品') )then '人力行政部' 
+			 when a.摘要 regexp('总经办') then '总经办'
+			 when a.摘要 regexp('法务')   then '法务部'
+			 when a.摘要 regexp('客服')   then '客服部'
+			 when a.摘要 regexp('财务')  then '财务部'
+			 when a.核算维度  regexp('工会会费') then '财务部'
+			 when a.摘要 regexp('IT')    then 'IT部门'
+			 when a.摘要 regexp('市场')  then '市场部'
+			 when a.摘要 regexp('产品')  then '产品部'
+		else '' 
+		end
+	when substring_index(substring_index(核算维度,';',2),'-',-1 ) regexp ('线上分销') then '分销'
+	when a.管理报表核算渠道名称 regexp('康欣') then '私域代理'
+	when a.管理报表核算渠道名称 regexp('人事部') then '人力行政部'
+	when a.管理报表核算渠道名称 regexp('KA-经销|线下KA') then 
+		case when a.核算维度 regexp('美团|沃尔玛|盒马|朴朴') then '直营'
+		else '线下KA'
+		end
+	else a.管理报表核算渠道名称 
+	
+end as 管理报表核算渠道名称,
+case when a.分销私域代理KA渠道商名 regexp('不分客户') then  
+		case when 	substring_index(substring_index(核算维度, ';', 2) , '/', -1) regexp ('线下|线上') then '公共'	else null end
+	 when a.分销私域代理KA渠道商名 regexp('盒马') then  '盒马总店'
+	 when a.分销私域代理KA渠道商名 regexp('有赞') then  null
+	 when a.分销私域代理KA渠道商名 regexp('xnMKTT') then  'MKTT'
+	 when a.管理报表核算渠道名称 regexp('市场部兑换卡') then  '市场部兑换卡'
+	 
+				
+else a.分销私域代理KA渠道商名 end as
+分销私域代理KA渠道商名,
+-- case when a.季节性产品 regexp('不分') then '' 
+-- 	 when a.季节性产品 regexp('sz|私域|有赞|榴芒|客服|线下|部门|其他|华南|华中|华北|直营') then ''
+-- else a.季节性产品
+-- end as 
+-- 季节性产品,
+a.季节性产品,
+case 
+	when a.科目全名 regexp('财务费用') then '财务部'
+	when a.核算维度 regexp('应交未交税金') then '财务部'
+	when a.科目全名 regexp('资产减值损失') then '总经办'
+	when a.分组 regexp('拼多多|京东|京多') then '京多事业部' 
+	when a.分组 regexp('抖音|快手|生鲜') then '兴趣电商部'
+	when a.分组 regexp('天猫|榴芒企业店|淘宝|三夫|三毛') then '天猫事业部'
+	when a.分组 regexp('小红书|市场部') then '市场部'
+	when a.分组 regexp('KA|线下') then '线下业务部'
+	when a.分组 regexp('分销') then '分销事业部'
+	when a.分组 regexp('有赞|私域') then '私域事业部'
+	when a.分组 regexp('人事') then '人力行政部'
+	when a.分组 regexp('市场部') then '市场部'
+	when a.分组 regexp('不分|物业|公共|社保|运费|费|低耗|进项税') then 
+		case when (a.摘要 regexp('人力|行政|人政|人事') or a.核算维度 regexp('场地|水电|物业|低耗品') )then '人力行政部' 
+			 when a.摘要 regexp('总经办') then '总经办'
+			 when a.摘要 regexp('法务') then '法务部'
+			 when a.摘要 regexp('客服') then '客服部'
+			 when a.摘要 regexp('财务') then '财务部'
+			 when a.核算维度  regexp('工会会费') then '财务部'
+			 when a.摘要 regexp('IT') then 'IT部门'
+			 when a.摘要 regexp('市场') then '市场部'
+			 when a.摘要 regexp('产品') then '产品部'
+			 when a.摘要 regexp('理赔') then '客服部'
+		else ''
+		end
+	else a.分组 
+end as 费用归属组,
+case 
+	when a.科目全名 regexp('财务费用') then '财务费用'
+	when a.科目全名='管理费用' then 
+		case 
+			when a.毛利表费用分类 regexp('差旅费|交通费|业务招待费') then '差旅招待费'
+			when a.毛利表费用分类 regexp('工资|公积金|社保|福利费|劳务') then '人员成本'
+			when a.毛利表费用分类 regexp('物业|水电|水费|电费') then '场地租金及物业管理费'
+			when a.毛利表费用分类 regexp('办公费|通讯费|快递费|其他费用|培训费|寄样|累计摊销|物料消耗|低耗品|咨询费|招聘费|工会') then '其他管理费用' 
+			else a.毛利表费用分类 
+		end
+	when a.科目全名='销售费用' then 
+		case 
+			when a.毛利表费用分类 regexp('平台佣金') then '平台佣金费'
+			when a.毛利表费用分类 regexp('代理推广佣金') then '平台佣金费'
+			when a.毛利表费用分类 regexp('工资|公积金|社保|福利费|劳务') then '人员相关费用'
+			when a.毛利表费用分类 regexp('快递') then '仓储物流费'
+			when a.毛利表费用分类 regexp('办公费|通讯费|业务招待费|差旅费|交通费|其他费用|培训费|寄样|累计摊销|物料消耗|低耗品|咨询费|招聘费|工会') then '其他销售费用' 
+			when a.毛利表费用分类 regexp('代理推广佣金|广告促销|平台其他|寄样成本') and a.分组 regexp('市场部') then '品牌投放费用'
+			when a.毛利表费用分类 regexp('代理推广佣金|广告促销|平台其他|寄样成本') and a.分组 not rlike ('市场部') then '线上渠道'
+			when a.毛利表费用分类 regexp('售后扣款') and a.分组 ='线下KA' then '线下渠道'
+			when a.毛利表费用分类 regexp('售后扣款') and a.分组 regexp ('线上分销|抖音|京多|天猫|私域') then '线上渠道'
+			when a.毛利表费用分类 regexp('寄样成本') and a.分组 ='客服部' then '其他费用'
+			else a.毛利表费用分类
+		end
+	when a.科目全名='研发费用' then 
+		case 
+
+			when a.毛利表费用分类 regexp('工资|公积金|社保|福利费|劳务') then '人员成本'
+			when a.毛利表费用分类 regexp('办公费|通讯费|快递费|业务招待费|差旅费|交通|其他费用|培训费|寄样|累计摊销|物料消耗|低耗品|咨询费|招聘费|工会') then '其他研发费用' 
+			else a.毛利表费用分类
+		end
+	when a.科目全名='应交税费_应交增值税_进项税额' then 
+		case 
+
+			when a.毛利表费用分类 regexp('工资|公积金|社保|福利费|劳务') then '人工相关费用'
+			when a.毛利表费用分类 regexp('平台佣金') then '平台佣金费'
+			when a.会计科目 regexp('销售费用_通讯费|销售费用_交通费|销售费用_差旅费|销售费用_业务招待费|销售费用_培训费|销售费用_物料消耗|销售费用_低耗品|销售费用_办公费') then '其他费用' 
+			when a.毛利表费用分类 regexp('代理推广佣金|广告促销|平台其他|寄样成本') and a.分组 regexp('市场部') then '品牌投放费用'
+			when a.毛利表费用分类 regexp('代理推广佣金|广告促销|平台其他|寄样成本|售后扣款') and a.分组 not rlike ('市场部') then '线上渠道'
+			when a.会计科目 regexp('主营业务成本') and a.分组 regexp ('市场部|小红书' )then '品牌投放费用'
+			else a.毛利表费用分类
+		end
+	when a.科目全名='应交税费_应交增值税_销项税额' then 
+		case 
+			when a.会计科目 regexp('主营业务收入') and a.分组 regexp ('市场部|小红书' )then '品牌投放费用'
+		end
+	
+end as 投资名称归属,'深圳' as 业务主体
+from
+(
+select
+	id as id号, f_date ,
+	f_account_book_id_name as 账簿,
+	f_year as 会计年度,
+	f_period as 期间,
+	f_voucher_group_id_name as 凭证字,
+	f_voucher_group_no as 凭证号,
+	f_currency_id_name 	as 币别,
+	 f_acct_full_name  科目全名,
+	f_detail_id as 核算维度,
+	f_explanation as 摘要,
+	f_account_id_number as 科目编码,
+	f_debit as 借方金额,
+	f_credit  贷方金额,
+	f_amount_for 原币金额,
+	f_bill_no as 凭证编号,
+	case 
+	when f_acct_full_name ='销售费用' then concat('销售费用','_', substring_index( substring_index(f_detail_id,';',1),'-',-1 ))
+	when f_acct_full_name ='管理费用' then concat('管理费用','_', substring_index( substring_index(f_detail_id,';',1),'-',-1 ))
+	when f_acct_full_name ='研发费用' then concat('研发费用','_', substring_index( substring_index(f_detail_id,';',1),'-',-1 ))
+	when f_acct_full_name regexp ('财务费用') then f_acct_full_name
+	when f_acct_full_name ='主营业务收入' then '主营业务收入'
+	when f_acct_full_name ='主营业务成本' then  
+		case when f_detail_id regexp('运费') then '主营业务成本-运费'	
+			 when f_detail_id regexp('货品') then '主营业务成本-货品'	
+		else '主营业务成本' end
+	when f_acct_full_name regexp ('营业税金及附加') then f_acct_full_name
+	when f_acct_full_name ='其他业务成本_运费' then '其他业务成本'
+	when f_acct_full_name ='应交税费_应交增值税_进项税额' then 
+		case 
+			when substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='成本' then '主营业务成本'
+			when f_explanation regexp '转出未交增值税' then '进项_转出未交增值税'
+		else
+		concat(substring_index(substring_index(f_detail_id, ';', 1) , '/', -1),'_', substring_index(substring_index(f_detail_id, ';', 2) , '-', -1)) end 
+	when f_acct_full_name ='应交税费_应交增值税_销项税额' then 
+		case when f_explanation regexp '转出未交增值税' then '销项_转出未交增值税' else '主营业务收入' end
+	else f_acct_full_name
+	end as '会计科目',
+	case 
+	when f_acct_full_name regexp ('管理费用|研发费用' ) then  
+		case when  f_date regexp('2023-01|2023-02|2023-03') then  substring_index(substring_index(f_detail_id, ';', 2) , '/', -1)
+		else 
+			substring_index(substring_index(f_detail_id, ';', 2) , '-', -1) 
+		end 
+	when f_acct_full_name regexp ('销售费用' )  then   substring_index(substring_index(f_detail_id, ';', 3) , '/', -1)
+	when f_acct_full_name regexp ('财务费用|营业税金及附加' ) then  '财务部'
+	when f_acct_full_name = '主营业务成本'then  
+		case 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='自营' then substring_index(substring_index(f_detail_id, ';', 2) , '/', -1)
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='分销' then '分销'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='私域' then '私域代理'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='线下' then 'KA-经销'
+		end
+	when f_acct_full_name = '主营业务收入'then  
+		case 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='自营' then substring_index(substring_index(f_detail_id, ';', 2) , '/', -1)
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='分销' then '分销'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='私域' then '私域代理'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='线下' then 'KA-经销'
+		end
+
+	when f_acct_full_name ='应交税费_应交增值税_销项税额' then 
+		case 
+			when  f_explanation regexp('转出未交增值税') then '财务部'
+			when 	substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) regexp('自营') then substring_index(substring_index(f_detail_id, ';', 3) , '/', -1) 
+			when 	substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) regexp('分销') then '分销'
+			when 	substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) regexp('私域') then '私域代理'
+			when 	substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) regexp('线下') then 'KA-经销'
+		end	
+	when f_acct_full_name ='应交税费_应交增值税_进项税额'  then
+		case 
+			 when  f_explanation regexp('转出未交增值税') then '财务部'
+			 when substring_index( substring_index(f_detail_id,';',1),'/',-1 ) in ('研发费用')  then '产品部'
+			 when substring_index( substring_index(f_detail_id,';',1),'/',-1 ) in ('管理费用')  then substring_index(substring_index(substring_index(f_detail_id, ';', 3) , '/', -1),'-',-1)
+			 when substring_index( substring_index(f_detail_id,';',1),'/',-1 )='销售费用'  then  
+					case when substring_index( substring_index(f_detail_id,';',3),'/',-1) regexp('自营') then substring_index(substring_index(f_detail_id, ';', 4) , '/', -1)
+					 	 when substring_index( substring_index(f_detail_id,';',3),'/',-1) regexp('分销') then '分销'
+						 when substring_index( substring_index(f_detail_id,';',3),'/',-1) regexp('私域') then '私域代理'
+			 			 when substring_index( substring_index(f_detail_id,';',4),'/',-1 ) regexp '不分' then 
+			 			   case when substring_index( substring_index(f_detail_id,';',3),'/',-1) regexp('线下') then '线下业务部'  
+-- 			 			   else	substring_index( substring_index(f_detail_id,';',3),'/',-1 ) 
+			 			   else substring_index(substring_index( substring_index(f_detail_id,';',3),'/',-1),'-',-1)
+			 			   end
+					else substring_index( substring_index(f_detail_id,';',4),'/',-1)
+			 		end
+			 when substring_index( substring_index(f_detail_id,';',1),'/',-1 )='成本'and substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) ='自营'  then substring_index(substring_index(f_detail_id, ';', 3) , '/', -1)
+			 when substring_index( substring_index(f_detail_id,';',1),'/',-1 )='成本'and	 substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) ='分销' then '分销'
+			 when substring_index( substring_index(f_detail_id,';',1),'/',-1 )='成本'and	 substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) ='私域' then '私域代理'
+			 when substring_index( substring_index(f_detail_id,';',1),'/',-1 )='成本'and	 substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) ='线下' then 'KA-经销'
+		end
+	when f_acct_full_name regexp('营业外收入|营业外支出')  then 
+		case when (f_detail_id is not null or f_detail_id !='')then  substring_index(substring_index(f_detail_id, '/', -1),'-',-1)  else '不分' end
+    else '不分'
+end as 管理报表核算渠道名称,
+ 	case
+ 	when substring_index( substring_index(f_detail_id,';',2),'-',-1 ) regexp ('线上分销|线下|私域|分销' ) then 
+ 		substring_index(substring_index(f_detail_id, ';', 3) , '/', -1)
+--  		substring_index(substring_index(substring_index(f_detail_id, ';', 3) , '/', -1),'-',1)
+ 	when substring_index( substring_index(f_detail_id,';',2),'/',-1 ) regexp ('线上分销|线下|私域组|分销' ) then 
+ 		substring_index(substring_index(f_detail_id, ';', 3) , '/', -1)
+--  		substring_index(substring_index(substring_index(f_detail_id, ';', 3) , '/', -1),'-',1)
+ 	when substring_index( substring_index(f_detail_id,';',3),'/',-1 ) regexp ('线上分销|线下|私域组|分销' ) then 
+ 		substring_index(substring_index(f_detail_id, ';', 4) , '/', -1) 	
+--  		substring_index(substring_index(substring_index(f_detail_id, ';', 4) , '/', -1) ,'-',1)	
+ 	when f_acct_full_name in ('主营业务收入','主营业务成本') and substring_index( substring_index(f_detail_id,';',1),'/',-1 ) != '自营' then 
+ 		substring_index(substring_index(f_detail_id, ';', 2) , '/', -1)
+--  		substring_index(substring_index(substring_index(f_detail_id, ';', 2) , '/', -1),'-',1)
+ 	end as 分销私域代理KA渠道商名,
+ 	case when f_detail_id regexp('JJXCP0303') then '月饼' 
+ 		 when f_detail_id regexp('JJXCP0302') then '冰粽' 
+ 		 when f_detail_id regexp('JJXCP0304') then '年货' 
+ 		 when f_detail_id regexp('JJXCP0310') then '其他' 
+ 		 when f_detail_id regexp('JJXCP0305') then '其他'
+ 		 when f_detail_id not rlike('JJXCP0303|JJXCP0302|JJXCP0304|JJXCP0305|JJXCP0310') 
+ 		 and f_acct_full_name regexp('管理费用|研发费用|营业外收入') then '其他'
+ 		 when f_acct_full_name regexp('财务费用|营业税金及附加|资产减值损失')  then '其他' 
+ 		 else '未分'
+ 		 end as 季节性产品,
+
+ 	case 
+	when f_acct_full_name in ('管理费用','研发费用','销售费用') then  substring_index(substring_index(f_detail_id, ';', 1),'-',-1)
+	when f_acct_full_name = '主营业务成本'then  
+		case 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='自营' then substring_index(substring_index(substring_index(f_detail_id, ';', 2) , '/', -1),'-',1) 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='分销' then '分销'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='私域' then '私域代理'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='线下' then 'KA-经销'
+		end
+	when f_acct_full_name = '主营业务收入'then  
+		case 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='自营' then substring_index(substring_index(substring_index(f_detail_id, ';', 2) , '/', -1),'-',1) 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='分销' then '分销'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='私域' then '私域代理'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='线下' then 'KA-经销'
+		end		 	
+	end as 毛利表费用分类,
+case when f_acct_full_name regexp ('管理费用|销售费用|研发费用') then
+		case when  f_date regexp('2023-01|2023-02|2023-03') then  substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) else
+		substring_index(substring_index(f_detail_id, ';', 2) , '-', -1) 
+		end
+	when f_acct_full_name regexp('财务费用') then '公共'
+	when f_acct_full_name = '主营业务成本'then  
+		case 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='自营' then substring_index(substring_index(substring_index(f_detail_id, ';', 2) , '/', -1),'-',1) 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='分销' then '线上分销'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='私域' then '私域代理'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='线下' then '线下KA'
+		end
+	when f_acct_full_name = '主营业务收入'then  
+		case 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='自营' then substring_index(substring_index(substring_index(f_detail_id, ';', 2) , '/', -1),'-',1) 
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='分销' then '线上分销'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='私域' then '私域代理'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '-', -1) ='线下KA' then '线下KA'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '-', -1) ='天猫组' then '天猫'
+			when 	substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) ='线下' then '线下KA'
+		end	
+	when f_acct_full_name = '应交税费_应交增值税_进项税额'   then 
+		case  when substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) regexp('销售费用|管理费用') then 
+			     case when substring_index(substring_index(f_detail_id, ';', 3) , '/', -1)='自营' then  substring_index(substring_index(substring_index(f_detail_id, ';', 4) , '/', -1),'-',1)
+			 	      else  substring_index(substring_index(substring_index(f_detail_id, ';', 3) , '/', -1),'-',-1)
+			     end
+			  when substring_index(substring_index(f_detail_id, ';', 1) , '/', -1)='成本' then 
+			     case when substring_index(substring_index(f_detail_id, ';', 2) , '/', -1)='自营' then  substring_index(substring_index(substring_index(f_detail_id, ';', 3) , '/', -1),'-',1)
+			 	      else substring_index(substring_index(f_detail_id, ';', 2) , '/', -1)
+			     end
+			  when  f_explanation regexp('转出未交增值税') then '财务部'
+			  when substring_index(substring_index(f_detail_id, ';', 1) , '/', -1)='管理费用' then substring_index(substring_index(f_detail_id, ';', 3) , '/', -1)
+			  when substring_index(substring_index(f_detail_id, ';', 1) , '/', -1)='研发费用' then '产品部'
+		else f_explanation
+		end
+	when f_acct_full_name ='应交税费_应交增值税_销项税额' then 
+		case 
+			when 	substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) ='自营' then substring_index(substring_index(substring_index(f_detail_id, ';', 3) , '/', -1),'-',1) 
+			when 	substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) ='分销' then '分销'
+			when 	substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) ='私域' then '私域代理'
+			when 	substring_index(substring_index(f_detail_id, ';', 2) , '/', -1) ='线下' then 'KA-经销'
+			when  f_explanation regexp('转出未交增值税') then '财务部'
+
+		end
+	when f_acct_full_name regexp('营业外收入|营业外支出') then 
+		 case when (f_detail_id is not null or f_detail_id !='')then  substring_index(substring_index(f_detail_id, '/', -1) , '-', -1) else '不分' end
+	when f_acct_full_name regexp('营业税金及附加') then '财务部'
+	when f_detail_id regexp('应交未交税金') then '财务部'
+
+
+	else '不分'
+	end as 分组
+from
+	lmykerp_pro.jindie_voucher
+where
+	f_date regexp ('2023|2024|2025')
+	and f_account_book_id_name regexp '深圳'
+	and f_explanation not rlike ('结转本期损益')
+  	and f_acct_full_name   regexp('管理费用|销售费用|研发费用|财务费用|主营业务收入|主营业务成本|营业税金及附加|其他业务收入|其他业务成本|其他业务支出|营业外收入|营业外支出|资产减值损失|应交税费_应交增值税_进项税额|应交税费_应交增值税_销项税额')
+)a
+
+union all
+
+#东莞
+select id,f_date 日期
+,年度
+,月份
+,凭证号
+,摘要
+,科目编码
+,科目全名
+,核算维度
+,借方金额
+,贷方金额
+,原币金额
+,case  when 明细科目 regexp('管理费用_税金') then '管理费用_税金' else 资产分类 end 资产分类
+,
+case  when 明细科目 regexp('管理费用_税金') then '管理费用_税金' 
+	  when 明细科目 regexp('销售费用_工资及奖金津贴') then '销售费用_工资及奖金'
+	  when 明细科目 regexp('销售费用_公积金') then '销售费用_住房公积金'
+	  when 明细科目 regexp('管理费用_工资及奖金津贴') then '管理费用_工资及奖金'
+	  when 明细科目 regexp('管理费用_公积金') then '管理费用_住房公积金'
+	  when 明细科目 regexp('管理费用_租金及管理费') then '管理费用_场地租金及物业管理费'
+	  when 明细科目 regexp('管理费用_其他') then '管理费用_其他费用'
+	  when 明细科目 regexp('管理费用_样品') then '管理费用_寄样成本'
+	  when 明细科目 regexp('管理费用_运费') then '管理费用_快递费'
+	  when 明细科目 regexp('销售费用_佣金') then '销售费用_平台佣金'
+	  when 明细科目 regexp('销售费用_运费') then '销售费用_快递费'
+	  when 明细科目 regexp('销售费用_租赁费') then '销售费用_租金及管理费'
+ 	  when 明细科目 regexp('销售费用_交通费') then '销售费用_差旅费'
+else 明细科目 end 明细科目
+
+,管理报表核算渠道名称
+,分销私域代理KA渠道商名
+,季节性产品
+,费用归属组 ,
+case 
+	when 科目全名 regexp ('财务') then '财务费用'
+	when 科目全名 regexp ('管理费用|研发|销售') then
+	case when 明细科目 regexp('差旅费|业务招待费|交通费') then '差旅招待费' 
+	 	 when 明细科目 regexp('物业|水电|租金|水费|电费') then '场地租金及水电费' 
+	 	 when 明细科目 regexp('咨询费') then '第三方公司代理费' 
+	 	 when 明细科目 regexp('社保费|工会会费|工资|社保|公积金|福利|伙食费') then '人员成本' 
+	 	 when 明细科目 regexp('寄样成本') then '事务性费用' 
+	 	 when 明细科目 regexp('营业外收入_应交未交税金') then '政府补贴' 
+	 	 when 明细科目 regexp('低耗品|维修费') then '办公费' 
+	 	 when 明细科目 regexp('其他') then '其他管理费用'
+	else substring_index(substring_index(核算维度, ';', -1) , '/', -1)
+	end	
+else ''
+end as 投资名称归属,
+'东莞' as 业务主体
+from (
+select
+id,f_date
+,f_year 年度
+,f_period 月份
+,f_voucher_group_no 凭证号
+,f_explanation 摘要
+,f_account_id_number 科目编码
+,f_acct_full_name 科目全名
+,f_detail_id 核算维度
+,f_debit 借方金额
+,f_credit 贷方金额
+,f_amount_for 原币金额
+,case 
+	when f_acct_full_name regexp ('营业外收入') then '营业外收入'
+	when f_acct_full_name regexp ('营业外支出') then '营业外支出'
+	when f_acct_full_name regexp ('其他业务收入') then '其他业务收入'
+	when f_acct_full_name regexp ('其他业务支出') then '其他业务支出'
+	when f_acct_full_name regexp ('财务费用') then '财务费用'
+	else f_acct_full_name
+end as 资产分类
+,
+case 
+	when f_acct_full_name regexp('管理费用') then 
+		case when f_detail_id regexp('样品|材料费用') then concat(f_acct_full_name,'_','材料成本')
+	else concat(f_acct_full_name,'_',substring_index(substring_index(f_detail_id, ';', -1) , '/', -1) ) 
+		end
+	when f_acct_full_name regexp('销售费用|研发费用') then 
+		case when f_detail_id regexp('材料费用') then concat(f_acct_full_name,'_','材料成本')
+			 when f_detail_id regexp('模具费用') then concat(f_acct_full_name,'_','模具费用')
+			 when f_detail_id regexp('样品') then concat(f_acct_full_name,'_','寄样成本')
+		else concat(f_acct_full_name,'_',substring_index(substring_index(f_detail_id, ';', -1) , '/', -1) ) 
+		end
+	else f_acct_full_name
+end as 明细科目,
+case when f_acct_full_name regexp('管理费用|销售费用|研发费用') then substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) 
+	 when f_acct_full_name regexp('财务费用|营业税金及附加') then '财务管理部'
+
+	 else ''
+end as 管理报表核算渠道名称,
+'' 分销私域代理KA渠道商名,
+'其他' 季节性产品,
+
+case when f_acct_full_name regexp('管理费用|销售费用|研发费用') then substring_index(substring_index(f_detail_id, ';', 1) , '/', -1) 
+	 when f_acct_full_name regexp('财务费用|营业税金及附加') then '财务管理部'
+	 when f_acct_full_name regexp('资产减值损失') then '总经理办公室'
+	 when f_acct_full_name regexp('营业外收入_其他') then '订单组'
+	 when f_acct_full_name regexp('营业外收入_应交') then '财务管理部'
+	 when f_acct_full_name regexp('营业外支出_其他') then '财务管理部'
+	 when f_acct_full_name regexp('营业外支出_捐赠') then '人事行政部'
+	 when f_acct_full_name regexp('主营业务|其他业务收入|其他业务支出') then '东莞合计'
+	 else ''
+end as 费用归属组
+from
+	lmykerp_pro.jindie_voucher
+where
+	f_date regexp ('2023|2024|2025')
+	and f_account_book_id_name regexp '东莞'
+	and f_explanation not rlike ('结转本期损益')
+	and f_acct_full_name  regexp('管理费用|销售费用|研发费用|财务费用|主营业务收入|主营业务成本|营业税金及附加|其他业务收入|其他业务成本|其他业务支出|营业外收入|营业外支出|资产减值损失|应交税费_应交增值税_进项税额|应交税费_应交增值税_销项税额')
+)a</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>128</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>表输出</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>Fbi</connection>
+    <schema/>
+    <table>ods_dm_费用科目表_tmp</table>
+    <commit>1000</commit>
+    <truncate>Y</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+      <field>
+        <column_name>id</column_name>
+        <stream_name>id</stream_name>
+      </field>
+      <field>
+        <column_name>日期</column_name>
+        <stream_name>日期</stream_name>
+      </field>
+      <field>
+        <column_name>年度</column_name>
+        <stream_name>年度</stream_name>
+      </field>
+      <field>
+        <column_name>月份</column_name>
+        <stream_name>月份</stream_name>
+      </field>
+      <field>
+        <column_name>凭证号</column_name>
+        <stream_name>凭证号</stream_name>
+      </field>
+      <field>
+        <column_name>摘要</column_name>
+        <stream_name>摘要</stream_name>
+      </field>
+      <field>
+        <column_name>科目编码</column_name>
+        <stream_name>科目编码</stream_name>
+      </field>
+      <field>
+        <column_name>科目全名</column_name>
+        <stream_name>科目全名</stream_name>
+      </field>
+      <field>
+        <column_name>核算维度</column_name>
+        <stream_name>核算维度</stream_name>
+      </field>
+      <field>
+        <column_name>借方金额</column_name>
+        <stream_name>借方金额</stream_name>
+      </field>
+      <field>
+        <column_name>贷方金额</column_name>
+        <stream_name>贷方金额</stream_name>
+      </field>
+      <field>
+        <column_name>原币金额</column_name>
+        <stream_name>原币金额</stream_name>
+      </field>
+      <field>
+        <column_name>资产分类</column_name>
+        <stream_name>资产分类</stream_name>
+      </field>
+      <field>
+        <column_name>明细科目</column_name>
+        <stream_name>明细科目</stream_name>
+      </field>
+      <field>
+        <column_name>管理报表核算渠道名称</column_name>
+        <stream_name>管理报表核算渠道名称</stream_name>
+      </field>
+      <field>
+        <column_name>分销私域代理KA渠道商名</column_name>
+        <stream_name>分销私域代理KA渠道商名</stream_name>
+      </field>
+      <field>
+        <column_name>季节性产品</column_name>
+        <stream_name>季节性产品</stream_name>
+      </field>
+      <field>
+        <column_name>费用归属组</column_name>
+        <stream_name>费用归属组</stream_name>
+      </field>
+      <field>
+        <column_name>投资名称归属</column_name>
+        <stream_name>投资名称归属</stream_name>
+      </field>
+      <field>
+        <column_name>业务主体</column_name>
+        <stream_name>业务主体</stream_name>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>416</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step_error_handling>
+  </step_error_handling>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
+  <attributes/>
+</transformation>
