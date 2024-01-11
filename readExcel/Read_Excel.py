@@ -20,23 +20,23 @@ def file_dispose(file_path, engine):
             with z.open("销售单查询.xlsx") as f:
                 data_file = pd.read_excel(f, sheet_name="判断用")
     else:
-        data_file = pd.read_excel(file_path, sheet_name="凭证用费用_202309231030")
-    data_file.to_sql('bi_self_bill_expense_jindie_1', con=engine, if_exists='replace', index=False, chunksize=500)
+        data_file = pd.read_excel(file_path, sheet_name="22")
+    data_file.to_sql('手动导入12月料工费', con=engine, if_exists='replace', index=False, chunksize=500)
     print("数据插入完成")
-
+#replace，append
 
 def connection_database():
     # 连接数据库
     port = "3306"
     user = "root"
+    #
+    # db_host = "14.116.149.42"
+    # password = "Ysyhl9t@"
+    # database = "lmykerp_pro"
 
-    db_host = "14.116.149.42"
-    password = "Ysyhl9t@"
-    database = "lmykerp_pro"
-
-    # db_host = "125.91.113.114"
-    # password = "Report@123"
-    # database = "profit"
+    db_host = "125.91.113.114"
+    password = "Report@123"
+    database = "profit"
 
     str_format = "mysql+pymysql://{user}:{password}@{db_host}:{port}/{database}?charset=utf8"
     connection_str = str_format.format(user=user, password=parse.quote_plus(password), db_host=db_host, port=port,
@@ -46,5 +46,5 @@ def connection_database():
 # 读取
 engine = connection_database()
 #mac1
-download_file_path = r"C:\Users\73769\Desktop\凭证用费用_202309231030.xlsx"
+download_file_path = r"C:\Users\73769\Desktop\12月跑东莞成本.xlsx"
 file_dispose(download_file_path, engine)
