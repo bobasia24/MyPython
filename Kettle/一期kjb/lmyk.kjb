@@ -1,0 +1,919 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job>
+  <name>lmyk</name>
+  <description/>
+  <extended_description/>
+  <job_version/>
+  <directory>/</directory>
+  <created_user>-</created_user>
+  <created_date>2023/04/10 15:18:50.667</created_date>
+  <modified_user>-</modified_user>
+  <modified_date>2023/04/10 15:18:50.667</modified_date>
+  <parameters>
+    </parameters>
+  <connection>
+    <name>lmyk</name>
+    <server>125.91.113.114</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>sc</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted 2be98afc86aa7a081bb16bc64fec3fd89</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>IS_CLUSTERED</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>PORT_NUMBER</code>
+        <attribute>3306</attribute>
+      </attribute>
+      <attribute>
+        <code>PRESERVE_RESERVED_WORD_CASE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>QUOTE_ALL_FIELDS</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>STREAM_RESULTS</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>USE_POOLING</code>
+        <attribute>N</attribute>
+      </attribute>
+    </attributes>
+  </connection>
+  <slaveservers>
+    </slaveservers>
+  <job-log-table>
+    <connection/>
+    <schema/>
+    <table/>
+    <size_limit_lines/>
+    <interval/>
+    <timeout_days/>
+    <field>
+      <id>ID_JOB</id>
+      <enabled>Y</enabled>
+      <name>ID_JOB</name>
+    </field>
+    <field>
+      <id>CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>CHANNEL_ID</name>
+    </field>
+    <field>
+      <id>JOBNAME</id>
+      <enabled>Y</enabled>
+      <name>JOBNAME</name>
+    </field>
+    <field>
+      <id>STATUS</id>
+      <enabled>Y</enabled>
+      <name>STATUS</name>
+    </field>
+    <field>
+      <id>LINES_READ</id>
+      <enabled>Y</enabled>
+      <name>LINES_READ</name>
+    </field>
+    <field>
+      <id>LINES_WRITTEN</id>
+      <enabled>Y</enabled>
+      <name>LINES_WRITTEN</name>
+    </field>
+    <field>
+      <id>LINES_UPDATED</id>
+      <enabled>Y</enabled>
+      <name>LINES_UPDATED</name>
+    </field>
+    <field>
+      <id>LINES_INPUT</id>
+      <enabled>Y</enabled>
+      <name>LINES_INPUT</name>
+    </field>
+    <field>
+      <id>LINES_OUTPUT</id>
+      <enabled>Y</enabled>
+      <name>LINES_OUTPUT</name>
+    </field>
+    <field>
+      <id>LINES_REJECTED</id>
+      <enabled>Y</enabled>
+      <name>LINES_REJECTED</name>
+    </field>
+    <field>
+      <id>ERRORS</id>
+      <enabled>Y</enabled>
+      <name>ERRORS</name>
+    </field>
+    <field>
+      <id>STARTDATE</id>
+      <enabled>Y</enabled>
+      <name>STARTDATE</name>
+    </field>
+    <field>
+      <id>ENDDATE</id>
+      <enabled>Y</enabled>
+      <name>ENDDATE</name>
+    </field>
+    <field>
+      <id>LOGDATE</id>
+      <enabled>Y</enabled>
+      <name>LOGDATE</name>
+    </field>
+    <field>
+      <id>DEPDATE</id>
+      <enabled>Y</enabled>
+      <name>DEPDATE</name>
+    </field>
+    <field>
+      <id>REPLAYDATE</id>
+      <enabled>Y</enabled>
+      <name>REPLAYDATE</name>
+    </field>
+    <field>
+      <id>LOG_FIELD</id>
+      <enabled>Y</enabled>
+      <name>LOG_FIELD</name>
+    </field>
+    <field>
+      <id>EXECUTING_SERVER</id>
+      <enabled>N</enabled>
+      <name>EXECUTING_SERVER</name>
+    </field>
+    <field>
+      <id>EXECUTING_USER</id>
+      <enabled>N</enabled>
+      <name>EXECUTING_USER</name>
+    </field>
+    <field>
+      <id>START_JOB_ENTRY</id>
+      <enabled>N</enabled>
+      <name>START_JOB_ENTRY</name>
+    </field>
+    <field>
+      <id>CLIENT</id>
+      <enabled>N</enabled>
+      <name>CLIENT</name>
+    </field>
+  </job-log-table>
+  <jobentry-log-table>
+    <connection/>
+    <schema/>
+    <table/>
+    <timeout_days/>
+    <field>
+      <id>ID_BATCH</id>
+      <enabled>Y</enabled>
+      <name>ID_BATCH</name>
+    </field>
+    <field>
+      <id>CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>CHANNEL_ID</name>
+    </field>
+    <field>
+      <id>LOG_DATE</id>
+      <enabled>Y</enabled>
+      <name>LOG_DATE</name>
+    </field>
+    <field>
+      <id>JOBNAME</id>
+      <enabled>Y</enabled>
+      <name>TRANSNAME</name>
+    </field>
+    <field>
+      <id>JOBENTRYNAME</id>
+      <enabled>Y</enabled>
+      <name>STEPNAME</name>
+    </field>
+    <field>
+      <id>LINES_READ</id>
+      <enabled>Y</enabled>
+      <name>LINES_READ</name>
+    </field>
+    <field>
+      <id>LINES_WRITTEN</id>
+      <enabled>Y</enabled>
+      <name>LINES_WRITTEN</name>
+    </field>
+    <field>
+      <id>LINES_UPDATED</id>
+      <enabled>Y</enabled>
+      <name>LINES_UPDATED</name>
+    </field>
+    <field>
+      <id>LINES_INPUT</id>
+      <enabled>Y</enabled>
+      <name>LINES_INPUT</name>
+    </field>
+    <field>
+      <id>LINES_OUTPUT</id>
+      <enabled>Y</enabled>
+      <name>LINES_OUTPUT</name>
+    </field>
+    <field>
+      <id>LINES_REJECTED</id>
+      <enabled>Y</enabled>
+      <name>LINES_REJECTED</name>
+    </field>
+    <field>
+      <id>ERRORS</id>
+      <enabled>Y</enabled>
+      <name>ERRORS</name>
+    </field>
+    <field>
+      <id>RESULT</id>
+      <enabled>Y</enabled>
+      <name>RESULT</name>
+    </field>
+    <field>
+      <id>NR_RESULT_ROWS</id>
+      <enabled>Y</enabled>
+      <name>NR_RESULT_ROWS</name>
+    </field>
+    <field>
+      <id>NR_RESULT_FILES</id>
+      <enabled>Y</enabled>
+      <name>NR_RESULT_FILES</name>
+    </field>
+    <field>
+      <id>LOG_FIELD</id>
+      <enabled>N</enabled>
+      <name>LOG_FIELD</name>
+    </field>
+    <field>
+      <id>COPY_NR</id>
+      <enabled>N</enabled>
+      <name>COPY_NR</name>
+    </field>
+  </jobentry-log-table>
+  <channel-log-table>
+    <connection/>
+    <schema/>
+    <table/>
+    <timeout_days/>
+    <field>
+      <id>ID_BATCH</id>
+      <enabled>Y</enabled>
+      <name>ID_BATCH</name>
+    </field>
+    <field>
+      <id>CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>CHANNEL_ID</name>
+    </field>
+    <field>
+      <id>LOG_DATE</id>
+      <enabled>Y</enabled>
+      <name>LOG_DATE</name>
+    </field>
+    <field>
+      <id>LOGGING_OBJECT_TYPE</id>
+      <enabled>Y</enabled>
+      <name>LOGGING_OBJECT_TYPE</name>
+    </field>
+    <field>
+      <id>OBJECT_NAME</id>
+      <enabled>Y</enabled>
+      <name>OBJECT_NAME</name>
+    </field>
+    <field>
+      <id>OBJECT_COPY</id>
+      <enabled>Y</enabled>
+      <name>OBJECT_COPY</name>
+    </field>
+    <field>
+      <id>REPOSITORY_DIRECTORY</id>
+      <enabled>Y</enabled>
+      <name>REPOSITORY_DIRECTORY</name>
+    </field>
+    <field>
+      <id>FILENAME</id>
+      <enabled>Y</enabled>
+      <name>FILENAME</name>
+    </field>
+    <field>
+      <id>OBJECT_ID</id>
+      <enabled>Y</enabled>
+      <name>OBJECT_ID</name>
+    </field>
+    <field>
+      <id>OBJECT_REVISION</id>
+      <enabled>Y</enabled>
+      <name>OBJECT_REVISION</name>
+    </field>
+    <field>
+      <id>PARENT_CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>PARENT_CHANNEL_ID</name>
+    </field>
+    <field>
+      <id>ROOT_CHANNEL_ID</id>
+      <enabled>Y</enabled>
+      <name>ROOT_CHANNEL_ID</name>
+    </field>
+  </channel-log-table>
+  <pass_batchid>N</pass_batchid>
+  <shared_objects_file/>
+  <entries>
+    <entry>
+      <name>Start</name>
+      <description/>
+      <type>SPECIAL</type>
+      <attributes/>
+      <start>Y</start>
+      <dummy>N</dummy>
+      <repeat>N</repeat>
+      <schedulerType>0</schedulerType>
+      <intervalSeconds>0</intervalSeconds>
+      <intervalMinutes>60</intervalMinutes>
+      <hour>12</hour>
+      <minutes>0</minutes>
+      <weekDay>1</weekDay>
+      <DayOfMonth>1</DayOfMonth>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>144</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>成功</name>
+      <description/>
+      <type>SUCCESS</type>
+      <attributes/>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>1024</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>自营-历史备份</name>
+      <description/>
+      <type>SQL</type>
+      <attributes/>
+      <sql>delete from dw_多店自营并集_H where date_format(date_add(now(),interval -1 month),'%Y-%m')=date_format(credate,'%Y-%m');
+
+insert into dw_多店自营并集_H select *,date_format(date_add(now(),interval -1 month),'%Y-%m-%d') credate from dw_多店自营并集_对仗;
+
+commit</sql>
+      <useVariableSubstitution>F</useVariableSubstitution>
+      <sqlfromfile>F</sqlfromfile>
+      <sqlfilename/>
+      <sendOneStatement>F</sendOneStatement>
+      <connection>lmyk</connection>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>272</xloc>
+      <yloc>112</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>金蝶吉客云初始化</name>
+      <description/>
+      <type>SQL</type>
+      <attributes/>
+      <sql>drop table if exists dw_吉客云销售单明细账;
+create table dw_吉客云销售单明细账 as
+select order_no 订单编号,if(right(online_store_order_number,1)='A' and distribution_channel='放心购自营-sz'
+,substring(online_store_order_number,1,length(online_store_order_number)-1),online_store_order_number) 网店订单号,
+case when distribution_channel in('零食放心购-sz','榴芒一刻零食旗舰店-sz') then '榴芒一刻零食旗舰店' else distribution_channel end as 销售渠道
+,logistics_company 物流公司
+,logistics_bill_no 物流单号
+,delivery_warehouse 发货仓库
+,customer_no 客户编号
+,customer_name 客户名称
+,customer_account 客户账号
+,consignee 收货人
+,address 地址
+,item_code 货品编号
+,description_of_goods 货品名称
+,specifications 规格
+,item_barcode 货品条码
+,quantity 数量
+,unit_price 单价
+,preferential 优惠
+,discount 折扣
+,amount_of_money 金额
+,cost_of_goods 货品成本
+,unit_price_after_allocation 分摊后单价
+,allocated_amount 分摊金额
+,amount_after_allocation 分摊后金额
+,untaxed_gross_profit 未税毛利
+,gross_profit_rate_before_tax `未税毛利率(%)`
+,delivery_time 发货时间
+,creation_time 下单时间
+,amount_of_money 报价
+,null 订单来源 
+from rpa.ods_01财务_rpa_吉客云_销售明细单数据 A ; -- 稍微清洗一下数据
+CREATE INDEX dw_吉客云销售单明细账_物流单号_IDX USING BTREE ON sc.dw_吉客云销售单明细账 (物流单号);
+CREATE INDEX dw_吉客云销售单明细账_网店订单号_IDX USING BTREE ON sc.dw_吉客云销售单明细账 (网店订单号);
+CREATE INDEX dw_吉客云销售单明细账_货品编号_IDX USING BTREE ON sc.dw_吉客云销售单明细账 (货品编号);-- 合理的配上索引
+call sc.pr_金叠修复(); -- `sc`.`pr_金叠修复1`(); /*补足网店订单号并清洗数据*/
+call sc.金蝶补网店号();/*补足网店订单号并清洗数据 历史数据*/
+drop table if exists sc.dw_金蝶销售出库单;
+create table sc.dw_金蝶销售出库单 as 
+select 日期,单据编号,客户,发货组织,单据状态,运输单号,收货人姓名,备注,联系电话,物料编码,物料名称,库存单位,实发数量,仓库,含税单价,价税合计,销售成本价,总成本,运费,关联应收金额,cast(null as char) as 源单编号,订单单号
+,关联应收数量,`未关联应收数量（计价单位）`,管易订单单号,平台单号,cast(null as char) as 管易单号,发货通知单号,是否已生成调拨单,订单类型,网店订单号,订单来源,网店没有平台来凑号,补主键号 from dw_金蝶销售出库单2 where instr(客户,'部')=0 and instr(客户,'组')=0
+union all 
+select 日期,单据编号,客户,发货组织,单据状态,运输单号,收货人姓名,备注,联系电话,物料编码,物料名称,库存单位,实发数量,仓库,含税单价,价税合计,销售成本价,replace(总成本,',',''),运费
+,关联应收金额,源单编号,订单单号,关联应收数量,`未关联应收数量（计价单位）`,管易订单单号,平台单号,管易单号,发货通知单号,是否已生成调拨单,订单类型,网店订单号,订单来源,网店没有平台来凑号,补主键号 from dw_金蝶销售出库单1  where instr(客户,'部')=0 and instr(客户,'组')=0;
+ALTER TABLE sc.dw_金蝶销售出库单 MODIFY COLUMN 网店订单号 varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL;
+ALTER TABLE sc.dw_金蝶销售出库单 MODIFY COLUMN 网店没有平台来凑号 varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL;
+ALTER TABLE sc.dw_金蝶销售出库单 
+COMMENT='月维度金蝶销售出库单';
+CREATE INDEX dw_金蝶销售出库单_网店订单号_IDX USING BTREE ON sc.dw_金蝶销售出库单 (网店订单号);
+CREATE INDEX dw_金蝶销售出库单_物料编码_IDX USING BTREE ON sc.dw_金蝶销售出库单 (物料编码);
+CREATE INDEX dw_金蝶销售出库单_运输单号_IDX USING BTREE ON sc.dw_金蝶销售出库单 (运输单号);
+CREATE INDEX dw_金蝶销售出库单_网店没有平台来凑号_IDX USING BTREE ON sc.dw_金蝶销售出库单 (网店没有平台来凑号);-- 合理的配上索引
+commit</sql>
+      <useVariableSubstitution>F</useVariableSubstitution>
+      <sqlfromfile>F</sqlfromfile>
+      <sqlfilename/>
+      <sendOneStatement>F</sendOneStatement>
+      <connection>lmyk</connection>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>400</xloc>
+      <yloc>112</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>多店合订</name>
+      <description/>
+      <type>SQL</type>
+      <attributes/>
+      <sql>drop table if exists dw_多店合订;
+create table dw_多店合订 as
+select update_time 导入时间,replace(master_order_number,'	','')主订单编号,order_status 订单状态
+,order_payable_amount 订单应付金额,shopping_products 选购商品
+,item_id 商品ID,cast(null as char) as 订单来源 from rpa.ods_01财务_rpa_0111财务对账_抖店_订单_订单明细  
+union all 
+select update_time,replace(replace(order_no,'=',''),'"',''),order_status,actual_amount_paid_by_the_buyer,baby_title,cast(null as char),cast(null as char)
+from rpa.ods_01财务_rpa_天猫旗舰店_交易管理_订单数据 where brand&lt;&gt;'榴芒一刻旗舰店'
+union all
+select update_time,replace(order_number,'	',''),order_status,actual_amount_received_by_the_merchant,commodity_specification,item_id,cast(null as char)
+from rpa.ods_01财务_rpa_拼多多商家后台_订单明细 
+union all
+select update_time,replace(order_number,'	',''),order_status,actual_amount_received_by_the_merchant_payment_amount
+,sku_specification,cast(null as char),cast(null as char)
+from rpa.ods_01财务_rpa_019财务对账_小红书_交易_订单管理 
+union all
+select update_time,replace(order_number,'	',''),order_status,replace(actual_payment,'¥',''),commodity_specification,item_id,cast(null as char)
+from rpa.ods_01财务_rpa_0114财务对账_快手小店_订单查询_订单明细 
+union all
+select update_time,replace(order_number,'	',''),order_status,actual_amount_of_order-order_refunded_amount,null,null,null
+from rpa.ods_01财务_rpa_有赞商城_订单明细 
+union all 
+select update_time,replace(order_number,'	',''),null,payment_amount,null,null,null from rpa.ods_01财务_rpa_0118财务对账_生意经_订单明细
+union all
+select distinct update_time 导入时间,replace(order_number,'	','') 订单号,order_status 订单状态,settlement_amount 结算金额,null 商品名称,null 商品ID
+,null from rpa.ods_01财务_rpa_0119财务对账_京东旗舰店_订单明细
+union all
+select update_time,order_number,current_state,quantity*purchase_price,sku_name,merchant_sku,null 
+from rpa.ods_01财务_rpa_0121财务对账_京东自营_订单管理_门店订单
+-- 整合清洗订单数据
+/*===============
+union all
+select 导入时间,主订单号,订单状态,订单实付金额,商品名称,商品ID,null from sc.ods_天猫微博_订单
+/*union all
+select 导入时间,客户订单号,订单状态,采购金额,商品名称,商品编号,订单来源 from sc.ods_京东自营店_订单*/ ;
+
+drop table if exists dw_多店wy合订;
+create table dw_多店wy合订 as
+select 主订单编号,if(主订单编号 is null,null,group_concat(distinct 订单状态 SEPARATOR '或')) 订单状态,if(订单来源='补货工作台-自动','京东入仓',null) 订单来源,sum(replace(订单应付金额,',','')) 订单应付金额
+,if(主订单编号 is null,null,group_concat(distinct 选购商品)) 选购商品,group_concat(商品ID) 商品ID from (
+select *,max(导入时间)over(partition by 主订单编号) 最新时间 from dw_多店合订 ) a where 导入时间=最新时间 
+group by 主订单编号,if(订单来源='补货工作台-自动','京东入仓',null);
+commit</sql>
+      <useVariableSubstitution>F</useVariableSubstitution>
+      <sqlfromfile>F</sqlfromfile>
+      <sqlfilename/>
+      <sendOneStatement>F</sendOneStatement>
+      <connection>lmyk</connection>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>512</xloc>
+      <yloc>112</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>多店合账</name>
+      <description/>
+      <type>SQL</type>
+      <attributes/>
+      <sql>drop table if exists dw_多店合账;
+create table dw_多店合账 as
+select case brand when '榴芒一刻官方旗舰店' then '抖音旗舰店-sz' when '榴芒一刻生鲜旗舰店' then '抖音生鲜店-sz' when '榴芒一刻零食旗舰店' then '抖音零食店-sz' else '抖音三毛店-sz' end as 店铺,
+date_format(time_of_moving_account,'%Y%m') 动账年月,
+replace(order_number,'''','') as 订单号,sum(order_actual_payment_payable
++actual_platform_subsidies__freight+actual_platform_subsidies+actual_talent_allowance+actual_tiktok_payment_subsidy+actual_monthly_marketing_subsidies_paid_by_tiktok
+)订单实付应结
+,sum(order_refund)订单退款,'账单' as 款项类型
+from rpa.ods_01财务_rpa_0112财务对账_抖店_资金_资金流水明细 
+group by brand,date_format(time_of_moving_account,'%Y%m'),replace(order_number,'''','')
+union all
+select case brand when '榴芒一刻企业店' then '榴芒企业店-sz' when '榴芒一刻旗舰店' then '天猫旗舰店-sz'
+when '榴芒一刻三毛专卖店' then '天猫三毛店-sz' when '榴芒一刻旗舰店供应商' then '榴芒一刻旗舰店供应商' when '榴芒一刻美食店' then '淘宝美食店-sz' end
+,date_format(time_of_occurrence,'%Y%m'),if(instr(trade_name,'天猫优选商品订单 备注')=0,replace(business_basic_order_no,'	','')
+,replace(substr(SUBSTRING_INDEX(trade_name,' lid_',1),instr(trade_name,'tid_')),'tid_',''))
+,sum(income_amount_yuan),sum(expenditure_amount_yuan),'账单'
+from rpa.ods_01财务_rpa_支付宝_账单明细数据 
+where business_description in('0010001|交易收款-交易收款','0020001|交易退款-余额退款','0010001|交易收款-交易收款	','0010002|交易收款-预售定金（买家责任不退还）','0020011|交易退款-交易退款	','0020001|交易退款-余额退款	')
+or remarks in ('境内商户结算	','境内商户结算') -- business_description in('0010001|交易收款-交易收款','0020001|交易退款-余额退款','0010001|交易收款-交易收款	','0020001|交易退款-余额退款	') 
+group by brand,
+if(instr(trade_name,'天猫优选商品订单 备注')=0,replace(business_basic_order_no,'	','')
+,replace(substr(SUBSTRING_INDEX(trade_name,' lid_',1),instr(trade_name,'tid_')),'tid_',''))
+,date_format(time_of_occurrence,'%Y%m')
+union all
+select case brand when '榴芒一刻水果店' then '拼多多鲜果店-sz' when '榴芒一刻旗舰店' then '拼多多旗舰店-sz' 
+when '榴芒一刻专卖店' then '拼多多专卖店-sz' when '榴芒一刻糕点店' then '拼多多糕点店-sz' end,
+date_format(time_of_occurrence,'%Y%m'),
+replace(merchant_order_number,'	',''),
+sum(income_amount_yuan)订单实付应结,sum(expenditure_amount_yuan)订单退款 ,'账单'
+from rpa.ods_01财务_rpa_拼多多_对账中心_贷款明细 
+where business_description like'%交易%' group by brand,replace(merchant_order_number,'	',''),date_format(time_of_occurrence,'%Y%m')
+union all 
+select '小红书-sz'
+,date_format(settlement_time,'%Y%m'),order_number,sum(if(actual_paymentreturn_of_goods>=0,actual_paymentreturn_of_goods+platform_discount,0)) 商品实付
+,sum(if(actual_paymentreturn_of_goods&lt;0,actual_paymentreturn_of_goods+platform_discount,0)) 商品实退,'账单'
+from rpa.ods_01财务_rpa_0110财务对账_小红书_资金_订单结算明细 group by date_format(settlement_time,'%Y%m'),order_number
+union all 
+select case brand when '榴芒一刻三毛专卖店' then '快手专卖店-sz' else '快手-sz' end,date_format(actual_settlement_time,'%Y%m')
+,order_number,sum(total_income_yuan),sum(order_refund_yuan)*-1,'账单'
+from rpa.ods_01财务_rpa_0115财务对账_快手小店_资金_结算账单明细 
+group by brand,date_format(actual_settlement_time,'%Y%m'),order_number
+union all
+select case brand when '榴芒一刻' then '有赞店铺-sz' when '榴芒一刻美食' then '有赞美食店-sz' end
+,date_format(time_of_entry,'%Y%m')
+,case when business_order_no IN(select 网店没有平台来凑号 from dw_金蝶销售出库单) then business_order_no else associated_doc_no end,
+sum(income_yuan),sum(expenditure_yuan*-1),'账单'
+from rpa.ods_01财务_rpa_018财务对账_有赞_资产_对账单明细
+where `type` in('订单入账','退款')
+group by brand,date_format(time_of_entry,'%Y%m')
+,case when business_order_no IN(select 网店没有平台来凑号 from dw_金蝶销售出库单) then business_order_no else associated_doc_no end
+-- 有赞储蓄卡
+union all 
+SELECT '有赞店铺-sz',date_format(`time`,'%Y%m'),odd_numbers,sum(if(`type`='消费',balance_change,0))*-1,sum(if(`type`='退款',balance_change,0))*-1,'储值卡' 
+FROM rpa.ods_01财务_rpa_018财务对账_有赞_资产_储值资金用户交易 WHERE `type` IN ('消费','退款') group by date_format(`time`,'%Y%m'),odd_numbers
+union all 
+-- 京东旗舰
+select '京东旗舰店-sz',concat(date_format(`fee_settlement_time`,'%Y%m'),ifnull(date_format(`delivery_time`,'%Y%m'),'')),replace(replace(order_number,'"',''),'=','') 
+,sum(if(revenue_and_expenditure_direction='收入',money,null)) 
+,sum(if(revenue_and_expenditure_direction='支出',money,null)) ,if(ifnull(num,0)=0,'账单','账单(入仓)') 状态
+from rpa.ods_01财务_rpa_0117财务对账_京东金融_收款管理_已收款账单 A 
+left join (select COUNT(1) num,sales_platform_order_number,delivery_time from rpa.ods_01财务_rpa_0122财务对账_京慧_销售出库明细报表 group by sales_platform_order_number) B
+on replace(replace(order_number,'"',''),'=','') = B.sales_platform_order_number
+where expense_item in('货款')
+group by  
+date_format(`fee_settlement_time`,'%Y%m'),
+order_number
+union all
+-- 猫超账单
+select '天猫超市-sz'
+,date_format(`bill_generation_time`,'%Y%m')
+,concat(external_order_number,replace(waybill_number,'`','-'))
+,sum(if(amount_including_tax>0,amount_including_tax,0))
+,sum(if(amount_including_tax>0,0,amount_including_tax)),'账单'
+from rpa.ods_01财务_rpa_0113财务对账_猫超_结算管理_对账单明细 a
+join rpa.ods_01财务_rpa_0113财务对账_大宝wms_出库_订单查询 b 
+on a.expense_type IN ('货款','赠品补差')
+-- and date_format(`bill_generation_time`,'%Y%m')>='202306'
+and if(a.expense_type='赠品补差',business_subdocument_code,a.`transaction_sub-order`)
+=replace(b.transaction_number,'`','')
+group by date_format(`bill_generation_time`,'%Y%m')
+,concat(external_order_number,replace(waybill_number,'`','-'))
+union all
+select '京东自营渠道-sz'
+,date_format(entering_accounts_payable_time,'%Y%m')
+,b.customer_order_number
+,sum(if(replace(money,',','')>0,replace(money,',',''),0))
+,sum(if(replace(money,',','')&lt;0,replace(money,',',''),0))
+,'账单'
+from rpa.ods_01财务_rpa_0121财务对账_京东自营_结算管理_应收应付对账单 a
+left join (
+select purchase_order_number,customer_order_number,count(1) num 
+from rpa.ods_01财务_rpa_0121财务对账_京东自营_结算管理_应收应付单据明细
+group by purchase_order_number) b
+on a.purchase_order_number=b.purchase_order_number
+where ifnull(num,0)>0
+group by date_format(`document_date`,'%Y%m')
+,b.customer_order_number
+-- 整合清洗账单数据,并粗化粒度
+
+/*===============
+select date_format('','%Y%m')
+-- 有赞小程序
+union all 
+SELECT '有赞店铺-sz',date_format(结算时间,'%Y%m'),订单号,订单总价,0,'小程序' 
+FROM sc.ods_有赞旗舰店_小程序 WHERE 结算状态 IN ('已结算')
+union all 
+select '京东旗舰店-sz',date_format(费用结算时间,'%Y%m'),订单编号,sum(if(收支方向='收入',金额,null)),sum(if(收支方向='支出',金额,null)),'账单' from sc.ods_京东旗舰店_账单 
+where 费用项 in('货款','预售首付款','定金货款','尾款货款')group by date_format(费用结算时间,'%Y%m'),订单编号
+union all 
+select 店铺,date_format(发生时间,'%Y%m'),replace(业务基础订单号,'	','') as 订单号,sum(`收入金额（+元）`)订单实付应结,sum(`支出金额（-元）`)订单退款,'账单' 
+from sc.ods_天猫多店合并_账单 where 业务描述 in('0010001|交易收款-交易收款	','0020001|交易退款-余额退款	') group by 店铺,replace(业务基础订单号,'	',''),date_format(发生时间,'%Y%m')
+union all 
+select '天猫微博-sz',date_format(结算时间,'%Y%m'),replace(主订单号,'	','') as 订单号,sum(订单实付)订单实付应结,sum(订单退款)订单退款,'账单' 
+from sc.ods_天猫微博_账单  group by replace(主订单号,'	',''),date_format(结算时间,'%Y%m')
+union all
+select '京东自营店-sz',date_format(进入应付账时间,'%Y%m'),客户订单号,sum(if(金额>0,金额,0)),sum(if(金额&lt;0,金额,0)),if(a.订单来源 in ('VC','补货工作台-自动'),'京东入仓','账单') 款项类型
+from (select distinct 客户订单号,采购单号,订单来源 from sc.ods_京东自营店_订单) a left join sc.ods_京东自营店_账单 b on a.采购单号 =b.采购单号 group by date_format(进入应付账时间,'%Y%m'),客户订单号
+union all
+select '京东自营渠道-sz',null,null,null,null,null
+union all 
+select '天猫超市-sz',date_format(账单生成时间,'%Y%m'),交易主单, sum(含税金额),0,'账单'
+from sc.ods_天猫超市_账单 where 结算方式='货款' group by date_format(账单生成时间,'%Y%m'),交易主单*/;
+
+/*================因为要用金蝶的维度看数据，故行转列聚合不影响金蝶的维度========================*/
+drop table if exists dw_多店合账hzl;
+create table dw_多店合账hzl as 
+select 店铺,订单号,款项类型,sum(if(动账次序=1,订单实付应结,null)) 订单实付应结,sum(if(动账次序=1,订单退款,null)) 订单退款
+,sum(if(动账次序=1,上期订单实付应结,null)) 上期订单实付应结,sum(if(动账次序=1,上期订单退款,null)) 上期订单退款,min(if(动账次序=1,动账年月,null)) 动账年月
+,sum(if(动账次序=2,订单实付应结,null)) 次月订单实付应结,sum(if(动账次序=2,订单退款,null)) 次月订单退款
+,sum(if(动账次序=2,上期订单实付应结,null)) 上期次月订单实付应结,sum(if(动账次序=2,上期订单退款,null)) 上期次月订单退款,min(if(动账次序=2,动账年月,null)) 跨月动账年月
+from (select *,ROW_NUMBER()over(partition by 订单号,店铺,款项类型 order by 动账年月) 动账次序
+from (select 店铺,订单号,款项类型,订单实付应结,动账年月,订单退款,if(动账年月>date_format(date_add(now(),interval -2 month),'%Y%m'),null,订单实付应结) 上期订单实付应结
+,if(动账年月>date_format(date_add(now(),interval -2 month),'%Y%m'),null,订单退款) 上期订单退款 from dw_多店合账 where 动账年月>='202302' and length(订单号)>=3)a)a1 
+group by 订单号,店铺,款项类型;
+-- 拆字段为一次动账和二次动账，三次及以后属于极少数情况最终做插入处理并在状态字段给予说明
+-- 业务人员提出需求需要对仗上个月的收入，这里做一个限制数据的收入和支出
+commit</sql>
+      <useVariableSubstitution>F</useVariableSubstitution>
+      <sqlfromfile>F</sqlfromfile>
+      <sqlfilename/>
+      <sendOneStatement>F</sendOneStatement>
+      <connection>lmyk</connection>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>624</xloc>
+      <yloc>112</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>多店自营并集</name>
+      <description/>
+      <type>SQL</type>
+      <attributes/>
+      <sql>create table dw_多店自营并集_对仗1 as 
+select *
+,ifnull(round(ifnull(订单实付应结,订单应付金额)*ifnull(收入税价占比,0),9),ifnull(实发数量*京自采购价,实发数量*猫超采购价)) 收入 /*2，4*/,round(订单退款*ifnull(退款税价占比,0),9) 退款 /*2，4*/
+,ifnull(round(ifnull(上期订单实付应结,订单应付金额)*ifnull(收入税价占比,0),9),ifnull(实发数量*京自采购价,实发数量*猫超采购价)) 上期收入 /*2，4,6*/,round(上期订单退款*ifnull(退款税价占比,0),9) 上期退款 /*2，4,6*/
+,round(次月订单实付应结*ifnull(跨月收入税价占比,0),9) 跨月收入,round(次月订单退款*ifnull(跨月退款税价占比,0),9) 跨月退款
+,round(上期次月订单实付应结*ifnull(跨月收入税价占比,0),9) 上期跨月收入,round(次月订单退款*ifnull(上期跨月退款税价占比,0),9) 上期跨月退款
+,if(客户='有赞店铺-sz',round(总成本* ifnull(ifnull(ifnull(订单实付应结,订单应付金额)*收入税价占比,0)/sum(ifnull(订单实付应结,订单应付金额)*收入税价占比)over(partition by 单据编号,补主键号),1),9),总成本) 深圳_成本 /*5*/
+,if(客户='有赞店铺-sz',round(运费* ifnull(ifnull(ifnull(订单实付应结,订单应付金额)*收入税价占比,0)/sum(ifnull(订单实付应结,订单应付金额)*收入税价占比)over(partition by 单据编号,补主键号),1),4),运费) 深圳_总运费 /*5*/
+from(
+select date_format(ifnull(日期,发货时间),'%Y-%m-%d') 时间,ifnull(单据编号,订单编号) 单据编号,b1.purchase_price*b1.`transaction` 京自采购价,b2.purchase_price 猫超采购价
+,ifnull(ifnull(客户,销售渠道),a3.店铺) 客户,发货组织,单据状态,ifnull(运输单号,物流单号) 运输单号
+,ifnull(收货人姓名,收货人) 收货人姓名,a1.备注 ,联系电话
+,ifnull(a1.物料编码,a2.货品编号) 物料编码,ifnull(a1.物料名称,a2.货品名称) 物料名称,库存单位  
+,replace(ifnull(实发数量,a2.数量),',','') 实发数量,ifnull(a1.仓库,发货仓库) as 发货仓库,ifnull(含税单价,单价) 单价
+,价税合计,销售成本价,cast(replace(总成本,',','') as double) 总成本,补主键号,关联应收金额,订单单号,关联应收数量,`未关联应收数量（计价单位）`
+,管易订单单号,平台单号,发货通知单号,是否已生成调拨单,a1.订单类型,a.网店订单号,date_format(日期,'%Y%m') 发货年月,a3.动账年月,a3.订单实付应结,a3.订单退款,a3.上期订单实付应结,a3.上期订单退款 
+,concat(ifnull(ifnull(date_format(日期,'%Y%m'),concat(date_format(a2.发货时间,'%Y%m'),'jky')),'未'),'发货',if(date_format(日期,'%Y%m')&lt;'202302','已',ifnull(a3.动账年月,'未')),'结账') 账期状态
+,a3.跨月动账年月,a3.次月订单实付应结,a3.次月订单退款,a3.上期次月订单实付应结,a3.上期次月订单退款  
+,concat(ifnull(ifnull(date_format(日期,'%Y%m'),concat(date_format(a2.发货时间,'%Y%m'),'jky')),'未'),'发货',if(date_format(日期,'%Y%m')&lt;'202302','已',ifnull(a3.跨月动账年月,'未')),'结账') 跨月账期
+,a3.款项类型,d.`零售价-加工价税合计`,f.订单状态,f.订单应付金额,f.选购商品,f.商品ID
+,if(ifnull(日期,发货时间) is null,1,if(订单实付应结 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',','')))/sum(if(订单实付应结 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',',''))))over(partition by 网店订单号,款项类型)) as 收入税价占比 /*4*/
+,if(ifnull(日期,发货时间) is null,1,if(a3.订单退款 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',','')))/sum(if(a3.订单退款 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',',''))))over(partition by 网店订单号,款项类型)) as 退款税价占比 /*4*/
+,if(ifnull(日期,发货时间) is null,1,if(次月订单实付应结 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',','')))/sum(if(次月订单实付应结 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',',''))))over(partition by 网店订单号,款项类型)) as 跨月收入税价占比 /*4*/
+,if(ifnull(日期,发货时间) is null,1,if(a3.次月订单退款 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',','')))/sum(if(a3.次月订单退款 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',',''))))over(partition by 网店订单号,款项类型)) as 跨月退款税价占比 /*4*/
+,if(ifnull(日期,发货时间) is null,1,if(上期订单实付应结 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',','')))/sum(if(上期订单实付应结 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',',''))))over(partition by 网店订单号,款项类型)) as 上期收入税价占比 /*4,6*/
+,if(ifnull(日期,发货时间) is null,1,if(a3.上期订单退款 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',','')))/sum(if(a3.上期订单退款 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',',''))))over(partition by 网店订单号,款项类型)) as 上期退款税价占比 /*4,6*/
+,if(ifnull(日期,发货时间) is null,1,if(上期次月订单实付应结 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',','')))/sum(if(上期次月订单实付应结 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',',''))))over(partition by 网店订单号,款项类型)) as 上期跨月收入税价占比 /*4,6*/
+,if(ifnull(日期,发货时间) is null,1,if(a3.上期次月订单退款 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',','')))/sum(if(a3.上期次月订单退款 =0 or a1.订单类型='售后发货',NULL,if(d.`零售价-加工价税合计` is null,1.5*总成本,d.`零售价-加工价税合计`*replace(ifnull(实发数量,a2.数量),',',''))))over(partition by 网店订单号,款项类型)) as 上期跨月退款税价占比 /*4,6*/
+,ifnull(a1.订单来源,a2.订单来源) 订单来源,a1.运费
+from(
+select 网店没有平台来凑号 as 网店订单号 from dw_金蝶销售出库单 where 总成本&lt;&gt;'总成本'-- where 客户 in(select distinct 店铺 from dw_多店合账hzl)
+union select 网店订单号 from sc.dw_吉客云销售单明细账 where 销售渠道 in(select distinct 店铺 from dw_多店合账hzl) and date_format(发货时间,'%Y%m')>='202302'
+union select 订单号 from dw_多店合账hzl-- where 动账年月 >='202302' or 跨月动账年月>='202302'
+)a  /*1*/
+left join dw_金蝶销售出库单 a1 on a.网店订单号=a1.网店没有平台来凑号 
+left join sc.fill_jdrc_price b1 on b1.prodid =a1.物料编码 and a1.客户 in('京东自营店-sz','京东自营渠道-sz','京东入仓-sz') and b1.monthy=date_format(a1.日期,'%Y-%m') /*2*/
+left join rpa.ods_01财务_rpa_0113财务对账_猫超_采购管理_供货价格列表 b2 on a1.客户 ='天猫超市-sz' and b2.item_id =a1.物料编码 and date_format(a1.日期,'%Y-%m-%d') between b2.price_effective_date and expiration_date /*2*/
+left join (select * from dw_吉客云销售单明细账 where 销售渠道 in(select distinct 店铺 from dw_多店合账hzl) and date_format(发货时间,'%Y%m')>='202302') a2 on a1.日期 is null and a.网店订单号=a2.网店订单号 /*3*/
+left join dw_多店合账hzl a3 on a.网店订单号=a3.订单号
+left join sc.ods_价目总表 d on ifnull(a1.物料编码,a2.货品编号) =d.货品编号-- instr(ifnull(客户,销售渠道),'部')=0 and instr(ifnull(客户,销售渠道),'组')=0
+left join sc.dw_多店wy合订 f on a.网店订单号 =f.主订单编号)a11;
+/*   需要把账单数据做入金蝶用来算毛利
+ * 1，考虑到mysql没有全外关联没有办法保留未发货的数据和吉客云刷单数据先拿到所有网店订单号作为主表
+ * 2，京东自营和天猫超市有“部分”数据无法获取需要特殊处理，人工表注入价格通过发货数量计算收入
+ * 3，吉客云刷单数据并入，目前金蝶匹配过的数据视为非刷单数据所以直接调整关联条件
+ * 4，收入和成本存在维度差异，为此收入做出妥协被金蝶发货数据按比例瓜分为成本的粒度
+ * 5，因为有赞存在混合支付的情况收入来源不仅仅只是账单还有小程序和储值卡，成本和运费也存在维度的妥协
+ * 6，上月收入从下层套了进来
+ * */commit</sql>
+      <useVariableSubstitution>F</useVariableSubstitution>
+      <sqlfromfile>F</sqlfromfile>
+      <sqlfilename/>
+      <sendOneStatement>F</sendOneStatement>
+      <connection>lmyk</connection>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>736</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>多店自营并集效验</name>
+      <description/>
+      <type>SQL</type>
+      <attributes/>
+      <sql>-- update sc.dw_多店自营并集1 set 收入=订单实付应结,退款=订单退款,跨月收入=次月订单实付应结,跨月退款=次月订单退款 where (left(账期状态,3) = '未发货'or 订单来源 is not null) and 实发数量 = '0'; --非样品未发货账单数据
+insert into dw_多店自营并集_对仗1(客户,网店订单号,款项类型,次月订单实付应结,次月订单退款,跨月动账年月) select 店铺,订单号,款项类型,订单实付应结,订单退款,动账年月
+from (select *,ROW_NUMBER()over(partition by 订单号,店铺,款项类型 order by 动账年月) 动账次序 
+from (select * from dw_多店合账 where 动账年月>='202302')a)a where 动账次序>2;-- 超过2次动账的账单数据列转行时没有加入总表现在补上
+
+
+
+
+drop table if exists dw_上下层效验;
+create table if not exists dw_上下层效验
+select distinct a.*,b收入/count(b收入)over(partition by 订单号) up收入,b退款/count(b退款)over(partition by 订单号) up退款
+,b跨月收入/count(b跨月收入)over(partition by 订单号) up跨月收入,b跨月退款/count(b跨月退款)over(partition by 订单号) up跨月退款
+,b上期收入/count(b上期收入)over(partition by 订单号) up上期收入,b上期退款/count(b上期退款)over(partition by 订单号) up上期退款
+,b上期跨月收入/count(b上期跨月收入)over(partition by 订单号) up上期跨月收入,b上期跨月退款/count(b上期跨月退款)over(partition by 订单号) up上期跨月退款
+from(
+select b.* from 
+(select 网店订单号,客户,动账年月,跨月动账年月,sum(ifnull(收入,0)) a收入,sum(ifnull(跨月收入,0)) a跨月收入
+,sum(ifnull(退款,0)) a退款,sum(ifnull(跨月退款,0)) a跨月退款
+,sum(ifnull(上期收入,0)) a上期收入,sum(ifnull(上期跨月收入,0)) a上期跨月收入
+,sum(ifnull(上期退款,0)) a上期退款,sum(ifnull(上期跨月退款,0)) a上期跨月退款
+from sc.dw_多店自营并集_对仗1 
+where 客户 in('抖音生鲜店-sz','糕点放心购-sz','放心购自营-sz','榴芒一刻零食旗舰店','抖音旗舰店-sz','抖音零食店-sz','天猫旗舰店-sz','淘宝美食店-sz','拼多多糕点店-sz',
+'天猫美食-sz','榴芒企业店-sz','天猫三毛店-sz','拼多多旗舰店-sz','拼多多专卖店-sz','拼多多鲜果店-sz','天猫超市-sz','京东自营渠道-sz','京东自营店-sz'
+,'拼多多糕点-sz','小红书-sz','快手专卖店-sz','快手-sz','有赞美食店-sz','有赞店铺-sz','京东旗舰店-sz') 
+-- and(动账年月='202302' or 跨月动账年月='202302' or 发货年月='202302') 
+group by 网店订单号,客户,动账年月,跨月动账年月)a 
+right join
+(select 订单号,店铺,动账年月,跨月动账年月,sum(ifnull(订单实付应结,0)) b收入,sum(ifnull(次月订单实付应结,0)) b跨月收入
+,sum(ifnull(订单退款,0)) b退款,sum(ifnull(次月订单退款,0)) b跨月退款 
+,sum(ifnull(上期订单实付应结,0)) b上期收入,sum(ifnull(上期次月订单实付应结,0)) b上期跨月收入
+,sum(ifnull(上期订单退款,0)) b上期退款,sum(ifnull(上期次月订单退款,0)) b上期跨月退款 
+from sc.dw_多店合账hzl group by 订单号,店铺,动账年月,跨月动账年月)b
+on a.网店订单号=b.订单号 and a.动账年月=b.动账年月 and ifnull(a.跨月动账年月,'0')=ifnull(b.跨月动账年月,'0') 
+where a收入-b收入>1 or a收入-b收入&lt;-1 or a退款-b退款>1 or a退款-b退款&lt;-1 
+or a跨月收入-b跨月收入>1 or a跨月收入-b跨月收入&lt;-1 or a跨月退款-b跨月退款>1 or a退款-b退款&lt;-1
+or (a上期收入-b上期收入>1 and a.动账年月&lt;date_format(date_add(now(),interval -1 month),'%Y%m'))
+or (a上期收入-b上期收入&lt;-1 and a.动账年月&lt;date_format(date_add(now(),interval -1 month),'%Y%m'))
+or (a上期退款-b上期退款>1 and a.动账年月&lt;date_format(date_add(now(),interval -1 month),'%Y%m'))
+or (a上期退款-b上期退款&lt;-1 and a.动账年月&lt;date_format(date_add(now(),interval -1 month),'%Y%m'))
+or (a上期跨月收入-b上期跨月收入>1 and a.跨月动账年月&lt;date_format(date_add(now(),interval -1 month),'%Y%m'))
+or (a上期跨月收入-b上期跨月收入&lt;-1 and a.跨月动账年月&lt;date_format(date_add(now(),interval -1 month),'%Y%m'))
+or (a上期跨月退款-b上期跨月退款>1 and a.跨月动账年月&lt;date_format(date_add(now(),interval -1 month),'%Y%m'))
+or (a上期跨月退款-b上期跨月退款&lt;-1 and a.跨月动账年月&lt;date_format(date_add(now(),interval -1 month),'%Y%m'))or a收入 is null) a
+left join (select 网店订单号,动账年月,跨月动账年月,`零售价-加工价税合计`,客户,物料编码 from dw_多店自营并集_对仗1) b on a.订单号=b.网店订单号 and a.动账年月=b.动账年月 and ifnull(a.跨月动账年月,'0')=ifnull(b.跨月动账年月,'0')  
+and (`零售价-加工价税合计` is not null or instr(客户,'有赞')>0 or 物料编码 is null);
+create table if not exists dw_多店自营并集_对仗_校验结果
+select 时间,单据编号,京自采购价,猫超采购价,客户,发货组织,单据状态,运输单号,收货人姓名,备注,联系电话,物料编码,物料名称,库存单位,实发数量,发货仓库,单价,价税合计,销售成本价,总成本,补主键号,关联应收金额,订单单号,关联应收数量
+,`未关联应收数量（计价单位）`,管易订单单号,平台单号,发货通知单号,是否已生成调拨单,订单类型,网店订单号,发货年月,b.动账年月,订单实付应结,订单退款,上期订单实付应结,上期订单退款,账期状态,b.跨月动账年月,次月订单实付应结,次月订单退款
+,上期次月订单实付应结,上期次月订单退款,跨月账期,款项类型,`零售价-加工价税合计`,订单状态,订单应付金额,选购商品,商品ID,收入税价占比,退款税价占比,跨月收入税价占比,跨月退款税价占比,上期收入税价占比,上期退款税价占比,上期跨月收入税价占比
+,上期跨月退款税价占比,订单来源,运费,ifnull(up收入,收入) 收入,ifnull(up退款,退款) 退款
+,ifnull(up上期收入,上期收入) 上期收入,ifnull(up上期退款,上期退款) 上期退款,ifnull(up跨月收入,跨月收入) 跨月收入
+,ifnull(up跨月退款,跨月退款) 跨月退款,ifnull(up上期跨月收入,上期跨月收入) 上期跨月收入,ifnull(up上期跨月退款,上期跨月退款) 上期跨月退款
+,深圳_成本,深圳_总运费 
+from dw_多店自营并集_对仗1 b left join dw_上下层效验 a 
+on b.网店订单号=a.订单号  and a.动账年月=b.动账年月 and ifnull(a.跨月动账年月,'0')=ifnull(b.跨月动账年月,'0')  and (`零售价-加工价税合计` is not null or instr(客户,'有赞')>0 or 物料编码 is null);
+update sc.dw_多店自营并集_对仗_校验结果 set 深圳_成本=0 where
+网店订单号 in (select 网店订单号 from sc.dw_多店自营并集_对仗 where 款项类型 is not null group by 网店订单号 having count(distinct 款项类型)>1)
+and 款项类型&lt;&gt;'账单' and 订单类型='售后发货';
+
+drop table if exists dw_多店自营并集_对仗1;
+drop table if exists dw_多店自营并集_对仗;
+-- 有一些缺失税价合计的数据无法正确的分配收入支出，在这里校准并平均分配；
+update dw_多店自营并集_对仗_校验结果  set 账期状态=concat(substring(动账年月,7,6),'发货',left(动账年月,6),'结账'),动账年月=left(动账年月,6)  where 款项类型='账单(入仓)';
+-- 京东旗舰包含了 京东入仓的一些数据在金蝶是没有发货记录的但还是属于已发货数据
+RENAME TABLE sc.dw_多店自营并集_对仗_校验结果 TO sc.dw_多店自营并集_对仗;-- 替换原表
+commit
+</sql>
+      <useVariableSubstitution>F</useVariableSubstitution>
+      <sqlfromfile>F</sqlfromfile>
+      <sqlfilename/>
+      <sendOneStatement>F</sendOneStatement>
+      <connection>lmyk</connection>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>848</xloc>
+      <yloc>192</yloc>
+      <attributes_kjc/>
+    </entry>
+  </entries>
+  <hops>
+    <hop>
+      <from>Start</from>
+      <to>自营-历史备份</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>自营-历史备份</from>
+      <to>金蝶吉客云初始化</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>金蝶吉客云初始化</from>
+      <to>多店合订</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>多店合订</from>
+      <to>多店合账</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>多店合账</from>
+      <to>多店自营并集</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>多店自营并集</from>
+      <to>多店自营并集效验</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>多店自营并集效验</from>
+      <to>成功</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+  </hops>
+  <notepads>
+  </notepads>
+  <attributes>
+    <group>
+      <name>METASTORE.pentaho</name>
+      <attribute>
+        <key>Default Run Configuration</key>
+        <value>{"namespace":"pentaho","id":"Default Run Configuration","name":"Default Run Configuration","description":"Defines a default run configuration","metaStoreName":null}</value>
+      </attribute>
+    </group>
+    <group>
+      <name>{"_":"Embedded MetaStore Elements","namespace":"pentaho","type":"Default Run Configuration"}</name>
+      <attribute>
+        <key>Pentaho local</key>
+        <value>{"children":[{"children":[],"id":"server","value":null},{"children":[],"id":"clustered","value":"N"},{"children":[],"id":"name","value":"Pentaho local"},{"children":[],"id":"description","value":null},{"children":[],"id":"pentaho","value":"N"},{"children":[],"id":"readOnly","value":"Y"},{"children":[],"id":"sendResources","value":"N"},{"children":[],"id":"logRemoteExecutionLocally","value":"N"},{"children":[],"id":"remote","value":"N"},{"children":[],"id":"local","value":"Y"},{"children":[],"id":"showTransformations","value":"N"}],"id":"Pentaho local","value":null,"name":"Pentaho local","owner":null,"ownerPermissionsList":[]}</value>
+      </attribute>
+    </group>
+  </attributes>
+</job>

@@ -1,0 +1,1300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="吉客云（非自营）缺省报价" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="mokuai"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="dianpu"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[sc]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select a.department,distribution_channel,product_summary,amount_of_money,delivery_time
+from(select distinct department,distribution_channel,product_summary,'${ny}' as delivery_time
+from rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询 where date_format(delivery_time,'%Y-%m')='${ny}'
+${if(len(mokuai) == 0,"","and department in ('" + mokuai + "')")}
+${if(len(dianpu) == 0,"","and distribution_channel in ('" + dianpu + "')")}) A
+left join (select distinct department,channel,commodity,amount_of_money,date 
+from (
+select *,max(date)over(partition by department, channel, commodity) new_money_date
+from sc.fill_非自营商品报价表 where date<='${ny}')a where date=new_money_date
+) AS B
+ON A.distribution_channel = B.channel 
+AND A.product_summary = B.commodity
+and a.department=b.department]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="店铺数据字典" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[2023-02]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="mokuai"/>
+<O>
+<![CDATA[分销]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="xsry"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[sc]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[ 
+select cc.部门,cc.渠道,cc.销售人员
+from 
+(
+select dmkh.归属 as 部门,dmkh.销售人员,A.渠道,A.商品,cast(A.吉客云报价 as decimal(10,2)),A.数据生成时间, 吉客云报价 from (
+select  distribution_channel 渠道,product_summary 商品, max(total_receivables)  吉客云报价	,
+''复核报价,order_time_ as 订单时间,'' 活动结束时间, update_time 数据生成时间,	'${ny}' 年月
+from rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询 
+where date_format(delivery_time,'%Y-%m')='${ny}' 
+and  department regexp('分销|线下|私域|抖音')
+and distribution_channel not rlike ('样品|天猫旗舰|榴芒企业|抖音旗舰|抖音生鲜|抖音零食|有赞')
+group by  department,distribution_channel,product_summary )A
+
+left join (select * from profit.dm_01财务_profit_客户中间表 group by 渠道) dmkh
+on A.渠道= dmkh.渠道 )cc
+where  1=1
+${if(len(mokuai) == 0,"","and 部门 in ('" + mokuai + "')")}
+${if(len(xsry) == 0,"","and 销售人员 in ('" + xsry + "')")}]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="模块数据字典" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[2023-02]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[sc]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select dmkh.归属,distribution_channel  from (select  distribution_channel
+from rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询
+where (
+department in('分销','线下','私域','抖音') 
+or distribution_channel in('天猫超市-sz','三夫-sz','抖音三毛店','京东线下')
+and date_format(delivery_time,'%Y-%m')='${ny}'
+) group by  distribution_channel)a
+left join (
+select * from profit.dm_01财务_profit_客户中间表 where 归属 != '自营') dmkh
+on a.distribution_channel = dmkh.渠道]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="关联结果" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="dcny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="mokuai"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[sc]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select A.*, 
+case when (b.复核报价 !='' or b.复核报价 is not null)   then  B.复核报价 
+	 when (b1.复核报价 !='' or b1.复核报价 is not null) then  B1.复核报价 
+else  B1.amount_of_money  end as 报价
+-- ,B.复核报价, B1.amount_of_money,B.amount_of_money,B1.复核报价  
+from (
+select * from rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询 where date_format(delivery_time,'%Y-%m')='${dcny}'
+${if(len(mokuai) == 0,"","and department = ('" + mokuai + "')")}
+) AS A 
+left join (select department,channel,commodity,amount_of_money,`date`,复核报价,活动开始时间 
+from sc.fill_非自营商品报价表 where date='${dcny}' and 活动开始时间 is not null) AS B
+ON A.distribution_channel = B.channel 
+AND A.product_summary = B.commodity 
+and date_format(A.delivery_time,'%Y-%m-%d')=B.活动开始时间
+and A.department=B.department
+left join (select department,channel,commodity,amount_of_money,`date`,复核报价,活动开始时间 
+from sc.fill_非自营商品报价表 where date='${dcny}' and (活动开始时间 is null )) AS B1
+ON A.distribution_channel = B1.channel 
+AND A.product_summary = B1.commodity 
+and date_format(A.delivery_time,'%Y-%m')=B1.`date`
+and A.department=B1.department]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="ds1" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="mokuai"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="dianpu"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[sc]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select department,channel,commodity,amount_of_money,`date`,活动开始时间,活动结束时间,数据生成时间,复核状态,复核报价 ,ID
+from 
+sc.fill_非自营商品报价表 where 1=1 
+and `date`='${ny}'
+${if(len(mokuai) == 0,"","and department in ('" + mokuai + "')")}
+${if(len(dianpu) == 0,"","and channel in ('" + dianpu + "')")}]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="升级版" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="mokuai"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="dianpu"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="xsry"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[sc]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[ 
+select cc.部门,cc.渠道,cc.销售人员,cc.商品,cast(cc.吉客云报价 as decimal(10,2)) 吉客云报价,cast(B.复核报价 as decimal(10,2)) 复核报价,
+case when B.活动开始时间 is not null then B.活动开始时间  else null end 活动开始时间,
+case when B.活动结束时间 is not null then B.活动结束时间 else null end  活动结束时间,
+'${ny}' 年月, 
+case when B.复核状态 regexp('true|TRUE') then 'true' else null end 复核状态 
+from 
+(
+select dmkh.归属 as 部门,dmkh.销售人员,A.渠道,A.商品,cast(A.吉客云报价 as decimal(10,2)),A.数据生成时间, 吉客云报价 from (
+select  distribution_channel 渠道,product_summary 商品, max(total_receivables)  吉客云报价	,
+''复核报价,order_time_ as 订单时间,'' 活动结束时间, update_time 数据生成时间,	'${ny}' 年月
+from rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询 
+where date_format(delivery_time,'%Y-%m')='${ny}' 
+and  department regexp('分销|线下|私域|抖音')
+and distribution_channel not rlike ('样品|天猫旗舰|榴芒企业|抖音旗舰|抖音生鲜|抖音零食|有赞')
+${if(len(dianpu) == 0,"","and distribution_channel in ('" + dianpu + "')")}
+group by  department,distribution_channel,product_summary )A
+
+left join (select * from profit.dm_01财务_profit_客户中间表 group by 渠道) dmkh
+on A.渠道= dmkh.渠道 )cc
+left join 
+(
+select distinct department,channel,commodity,复核报价,date ,活动开始时间,活动结束时间,复核状态
+from (
+select *,max(date)over(partition by department, channel, commodity) new_money_date
+from sc.fill_非自营商品报价表 where date<='${ny}' 
+and concat(`date`,'_',channel) not in ('2023-08_天猫超市-sz','2023-08_三夫-sz','2023-08_抖音三毛店-sz')
+
+)a where date=new_money_date)B
+ON cc.渠道 = B.channel 
+AND cc.商品 = B.commodity
+and cc.部门=b.department
+where  1=1
+${if(len(mokuai) == 0,"","and 部门 in ('" + mokuai + "')")}
+${if(len(xsry) == 0,"","and 销售人员 in ('" + xsry + "')")}]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="备份" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="mokuai"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="dianpu"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[sc]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[
+select cc.部门,cc.渠道,cc.商品,cast(cc.吉客云报价 as decimal(10,2)) 吉客云报价,cast(B.复核报价 as decimal(10,2)) 复核报价,
+case when B.活动开始时间 is not null then B.活动开始时间 	 else '' end 活动开始时间,
+case when B.活动结束时间 is not null then B.活动结束时间 else '' end  活动结束时间,
+cc.数据生成时间,	'${ny}' 年月, 
+case when B.复核状态 ='true' then 'true' else '' end 复核状态 
+from 
+
+(
+select dmkh.归属 as 部门,A.渠道,A.商品,cast(A.吉客云报价 as decimal(10,2)),A.数据生成时间, 吉客云报价 from (
+select  distribution_channel 渠道,product_summary 商品, max(total_receivables)  吉客云报价	,
+''复核报价,order_time_ as 订单时间,'' 活动结束时间, update_time 数据生成时间,	'${ny}' 年月
+from rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询 
+where date_format(delivery_time,'%Y-%m')='${ny}' 
+and date_format(delivery_time,'%Y-%m') !='2023-08'
+and distribution_channel not rlike ('样品|天猫旗舰|榴芒企业|抖音旗舰|抖音生鲜|抖音零食|抖音超市|有赞')
+   ${if(len(mokuai) == 0,"","and department in ('" + mokuai + "')")}
+   ${if(len(dianpu) == 0,"","and distribution_channel in ('" + dianpu + "')")}
+group by  department,distribution_channel,product_summary )A
+
+left join (select * from profit.dm_01财务_profit_客户中间表 where 归属 != '自营') dmkh
+on A.渠道= dmkh.渠道 )cc
+
+left join 
+
+(
+select distinct department,channel,commodity,复核报价,date ,活动开始时间,活动结束时间,复核状态
+from (
+select *,max(date)over(partition by department, channel, commodity) new_money_date
+from sc.fill_非自营商品报价表 where date<='${ny}')a where date=new_money_date)B
+ON cc.渠道 = B.channel 
+AND cc.商品 = B.commodity
+and cc.部门=b.department
+
+
+
+
+union all
+
+
+select A.部门,A.渠道,A.商品,cast(A.吉客云报价 as decimal(10,2)) 吉客云报价,cast(B.复核报价 as decimal(10,2)) 复核报价,
+case when B.活动开始时间 is not null then B.活动开始时间 	 else '' end 活动开始时间,
+case when B.活动结束时间 is not null then B.活动结束时间 else '' end  活动结束时间,
+A.数据生成时间,	'2023-08' 年月, 
+case when B.复核状态 ='true' then 'true' else '' end 复核状态 
+from (
+select department 部门,distribution_channel 渠道,product_summary 商品, max(total_receivables)  吉客云报价	,
+''复核报价,order_time_ as 订单时间,'' 活动结束时间, update_time 数据生成时间,	'2023-08' 年月, '' 复核状态
+from rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询 
+where date_format(delivery_time,'%Y-%m')='2023-08'  and distribution_channel not rlike ('天猫超市-sz|三夫|抖音三毛|京东线下|样品|天猫旗舰|榴芒企业|抖音旗舰|抖音生鲜|抖音零食|抖音超市|有赞')
+  ${if(len(mokuai) == 0,"","and department in ('" + mokuai + "')")}
+  ${if(len(dianpu) == 0,"","and distribution_channel in ('" + dianpu + "')")}
+group by  department,distribution_channel,product_summary )A
+left join 
+(
+select distinct department,channel,commodity,复核报价,date ,活动开始时间,活动结束时间,复核状态
+from (
+select *,max(date)over(partition by department, channel, commodity) new_money_date
+from sc.fill_非自营商品报价表 where date<='2023-08')a where date=new_money_date)B
+ON A.渠道 = B.channel 
+AND A.商品 = B.commodity
+and a.部门=b.department
+
+
+union all 
+
+select A.部门,A.渠道,A.商品,cast(A.吉客云报价 as decimal(10,2)) 吉客云报价,cast(B.复核报价 as decimal(10,2)) 复核报价,
+ DATE_FORMAT(A.发货时间,'%Y-%m-%d') 活动开始时间,
+case  when A.渠道 regexp('天猫超市-sz|三夫|抖音三毛|京东线下')  then '9999-99-99'
+else '' end  活动结束时间,
+A.数据生成时间,	'2023-08' 年月, 
+case when B.复核状态 ='true' then 'true' else '' end 复核状态 
+from (
+select department 部门,distribution_channel 渠道,product_summary 商品, total_receivables  吉客云报价	,
+''复核报价,delivery_time as 发货时间,'' 活动结束时间, update_time 数据生成时间,	'2023-08' 年月, '' 复核状态
+from rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询 
+where date_format(delivery_time,'%Y-%m')='2023-08'  
+and distribution_channel  regexp('天猫超市-sz|三夫|抖音三毛|京东线下') 
+   ${if(len(mokuai) == 0,"","and department in ('" + mokuai + "')")}
+   ${if(len(dianpu) == 0,"","and distribution_channel in ('" + dianpu + "')")}
+group by  department,distribution_channel,product_summary,'2023-08',DATE_FORMAT(delivery_time,'%Y-%m-%d') )A
+left join 
+(
+select distinct department,channel,commodity,复核报价,`date` ,复核状态,活动开始时间
+from (
+select *,max(date)over(partition by department, channel, commodity) new_money_date
+from sc.fill_非自营商品报价表 where date<='2023-08')a where date=new_money_date)B
+ON A.渠道 = B.channel 
+AND A.商品 = B.commodity
+and a.部门=b.department
+and DATE_FORMAT(A.发货时间,'%Y-%m-%d') =b.活动开始时间]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="销售人员" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="mokuai"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[sc]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select 销售人员 from 
+profit.dm_01财务_profit_客户中间表 where 
+1=1
+${if(len(mokuai) == 0,"","and 归属 in ('" + mokuai + "')")}
+and 销售人员 is not null]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ReportWebAttr>
+<ServerPrinter/>
+<WebWriteContent>
+<Listener event="startload">
+<JavaScript class="com.fr.js.Commit2DBJavaScript">
+<Parameters/>
+<Attributes dsName="sc" name="提交1"/>
+<DMLConfig class="com.fr.write.config.IntelliDMLConfig">
+<Table schema="" name="fill_非自营商品报价表"/>
+<ColumnConfig name="department" isKey="true" skipUnmodified="false">
+<ColumnRow column="0" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="channel" isKey="true" skipUnmodified="false">
+<ColumnRow column="1" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="commodity" isKey="true" skipUnmodified="false">
+<ColumnRow column="3" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="amount_of_money" isKey="false" skipUnmodified="false">
+<ColumnRow column="4" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="date" isKey="true" skipUnmodified="false">
+<ColumnRow column="8" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="活动开始时间" isKey="true" skipUnmodified="false">
+<ColumnRow column="6" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="活动结束时间" isKey="true" skipUnmodified="false">
+<ColumnRow column="7" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="复核状态" isKey="false" skipUnmodified="false">
+<ColumnRow column="9" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="复核报价" isKey="false" skipUnmodified="false">
+<ColumnRow column="5" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="销售人员" isKey="false" skipUnmodified="false">
+<ColumnRow column="2" row="1"/>
+</ColumnConfig>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<UpdateAttr updateStatus="true"/>
+</DMLConfig>
+<JavaScriptResourceInfo>
+<PathNode type="webConfig" value="加载起始"/>
+</JavaScriptResourceInfo>
+</JavaScript>
+</Listener>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.write.Verify">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Verify_Data')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[verify]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.ExcelO">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Export_Excel_Simple')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[excel]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.write.ImportExcelData">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Utils_Import_Excel_Data')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[excel]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.write.Submit">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Utils_Submit')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[submit]]></IconName>
+<Verify failVerifySubmit="false" value="true"/>
+<Sheet onlySubmitSelect="false"/>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<EditRowColor setColor="false"/>
+<WebWrite SheetPosition="3"/>
+<RptLocation isShowAtLeft="true"/>
+<UnloadCheck/>
+<ShowWidgets/>
+<OtherAttr autoStash="false"/>
+</WebWriteContent>
+</ReportWebAttr>
+<ReportExportAttr>
+<ExcelExportAttr hideColumn="false" hideRow="false" exportWaterMark="true"/>
+<PDFExportAttr/>
+<HTMLExportAttr/>
+<WordExportAttr exportWaterMark="true"/>
+<ImageExportAttr imageResolution="96" imageType="false" renderQuality="0" format="png"/>
+</ReportExportAttr>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR/>
+<FR/>
+<HC/>
+<FC/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1524000,1333500,723900,723900,723900,723900,723900,723900,723900,723900,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[2743200,4533900,5791200,17983200,3230880,4953000,4762500,4572000,3086100,4495800,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" s="0">
+<O>
+<![CDATA[部门]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="0" s="0">
+<O>
+<![CDATA[渠道]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="0" s="0">
+<O>
+<![CDATA[销售人员]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="0" s="0">
+<O>
+<![CDATA[商品]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="0" s="0">
+<O>
+<![CDATA[吉客云报价]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="0" s="0">
+<O>
+<![CDATA[复核报价]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="0" s="0">
+<O>
+<![CDATA[活动开始时间]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="0" s="0">
+<O>
+<![CDATA[活动结束时间]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="0" s="0">
+<O>
+<![CDATA[年月]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="0" s="0">
+<O>
+<![CDATA[复核状态]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="升级版" columnName="部门"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="升级版" columnName="渠道"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="升级版" columnName="销售人员"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="升级版" columnName="商品"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="1" s="2">
+<O t="DSColumn">
+<Attributes dsName="升级版" columnName="吉客云报价"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="1" s="2">
+<O t="DSColumn">
+<Attributes dsName="升级版" columnName="复核报价"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="1" s="3">
+<O t="DSColumn">
+<Attributes dsName="升级版" columnName="活动开始时间"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.DateEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr/>
+<widgetValue/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="1" s="3">
+<O t="DSColumn">
+<Attributes dsName="升级版" columnName="活动结束时间"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.DateEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr/>
+<widgetValue/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="1" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$ny]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="升级版" columnName="复核状态"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.CheckBox">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[已复核]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<widgetValue>
+<O t="B">
+<![CDATA[false]]></O>
+</widgetValue>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting/>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<ReportWriteAttr>
+<SubmitVisitor class="com.fr.report.write.BuiltInSQLSubmiter">
+<Name>
+<![CDATA[内置SQL1]]></Name>
+<Attributes dsName="sc"/>
+<DMLConfig class="com.fr.write.config.IntelliDMLConfig">
+<Table schema="" name="fill_非自营商品报价表"/>
+<ColumnConfig name="department" isKey="true" skipUnmodified="false">
+<ColumnRow column="0" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="channel" isKey="true" skipUnmodified="false">
+<ColumnRow column="1" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="commodity" isKey="true" skipUnmodified="false">
+<ColumnRow column="3" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="amount_of_money" isKey="false" skipUnmodified="false">
+<ColumnRow column="4" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="date" isKey="true" skipUnmodified="false">
+<ColumnRow column="8" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="活动开始时间" isKey="true" skipUnmodified="false">
+<ColumnRow column="6" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="活动结束时间" isKey="true" skipUnmodified="false">
+<ColumnRow column="7" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="复核状态" isKey="false" skipUnmodified="false">
+<ColumnRow column="9" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="复核报价" isKey="false" skipUnmodified="false">
+<ColumnRow column="5" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="销售人员" isKey="false" skipUnmodified="false">
+<ColumnRow column="2" row="1"/>
+</ColumnConfig>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<UpdateAttr updateStatus="true"/>
+</DMLConfig>
+</SubmitVisitor>
+</ReportWriteAttr>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="true" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="4"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+<ParameterUI class="com.fr.form.main.parameter.FormParameterUI">
+<Parameters/>
+<Layout class="com.fr.form.ui.container.WParameterLayout">
+<WidgetName name="para"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<FollowingTheme borderStyle="false"/>
+<Margin top="0" left="0" bottom="0" right="0"/>
+<Border>
+<border style="0" borderRadius="0" type="0" borderStyle="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+<WidgetTitle>
+<O>
+<![CDATA[新建标题]]></O>
+<FRFont name="SimSun" style="0" size="72"/>
+<Position pos="0"/>
+</WidgetTitle>
+<Alpha alpha="1.0"/>
+</Border>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-526086" hor="-1" ver="-1"/>
+</color>
+</Background>
+<LCAttr vgap="0" hgap="0" compInterval="0"/>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboBox">
+<WidgetName name="xsry"/>
+<WidgetID widgetID="75029cc3-8008-4dda-87e6-c06bdd22c5d0"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="销售人员" viName="销售人员"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[销售人员]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="504" y="16" width="98" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label2_c"/>
+<WidgetID widgetID="b0beec97-0a20-46a5-b24f-2301e93c3509"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[销售人员:]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="438" y="16" width="66" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.FreeButton">
+<Listener event="click" name="点击1">
+<JavaScript class="com.fr.plugin.largedatasetexcelexport.javascript.LargeDatasetExcelExportJavaScript" pluginID="com.fr.plugin.largedatasetexcelexport.v11" plugin-version="1.1.17">
+<Parameters>
+<Parameter>
+<Attributes name="dcny"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$dcny]]></Attributes>
+</O>
+</Parameter>
+</Parameters>
+<LargeDatasetExcelExportJS exportFileName="" dsName="关联结果" colNames="{platform=platform, brand=brand, query_date=query_date, department=department, sign=sign, order_number=order_number, order_status=order_status, settlement_status=settlement_status, distribution_channel=distribution_channel, processing_time_=processing_time_, payment_time=payment_time, shipment_warehouse=shipment_warehouse, logistics_company=logistics_company, logistics_bill_no=logistics_bill_no, online_store_order_number=online_store_order_number, delivery_time=delivery_time, order_type=order_type, total_receivables=total_receivables, quantity_of_goods=quantity_of_goods, product_summary=product_summary, customer_account=customer_account, consignee=consignee, mobile_phone=mobile_phone, shipping_address=shipping_address, merge_notes=merge_notes, review_time=review_time, order_time_=order_time_, order_creation_time=order_creation_time, terminal_actual_payment_amount=terminal_actual_payment_amount, payment_amount=payment_amount, update_time=update_time, 报价=报价}" exportFormat="excel" encodeFormat="UTF-8"/>
+</JavaScript>
+</Listener>
+<WidgetName name="ppjg"/>
+<WidgetID widgetID="bf0d28aa-bdaf-4e47-88e9-381d8989e2ec"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[匹配结果]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="1068" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="dcny"/>
+<WidgetID widgetID="aba9aa7c-e50c-4649-a5d7-0e94f1914562"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr format="yyyy-MM"/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=MONTHDELTA(todate(now()),-1)]]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="970" y="16" width="98" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboBox">
+<WidgetName name="mokuai"/>
+<WidgetID widgetID="75029cc3-8008-4dda-87e6-c06bdd22c5d0"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="归属" viName="归属"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[模块数据字典]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="291" y="16" width="98" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label2"/>
+<WidgetID widgetID="b0beec97-0a20-46a5-b24f-2301e93c3509"/>
+<WidgetAttr aspectRatioLocked="true" aspectRatioBackup="3.142857142857143" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[部门:]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="225" y="16" width="66" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboCheckBox">
+<WidgetName name="dianpu"/>
+<WidgetID widgetID="f754de83-bc8e-4d92-9d91-2c50a9d2f570"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="渠道" viName="渠道"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[店铺数据字典]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+<RAAttr delimiter="&apos;,&apos;" isArray="false"/>
+</InnerWidget>
+<BoundsAttr x="715" y="16" width="104" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label1"/>
+<LabelName name="销售人员:"/>
+<WidgetID widgetID="ec642b62-4b62-494e-a1ab-3444511085e3"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[渠道:]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="642" y="16" width="73" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label0"/>
+<WidgetID widgetID="ace2fb2c-bc76-443c-ad8f-6a5009ca537c"/>
+<WidgetAttr aspectRatioLocked="true" aspectRatioBackup="2.4285714285714284" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[年月:]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="43" y="16" width="51" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.parameter.FormSubmitButton">
+<WidgetName name="formSubmit0"/>
+<WidgetID widgetID="9b928c7b-4152-4914-9184-22cc546c9649"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[查询]]></Text>
+<Hotkeys>
+<![CDATA[enter]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="833" y="16" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="ny"/>
+<WidgetID widgetID="aba9aa7c-e50c-4649-a5d7-0e94f1914562"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr format="yyyy-MM"/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=MONTHDELTA(todate(now()),-1)]]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="94" y="16" width="98" height="21"/>
+</Widget>
+<ShowBookmarks showBookmarks="false"/>
+<Sorted sorted="false"/>
+<MobileWidgetList>
+<Widget widgetName="ny"/>
+<Widget widgetName="mokuai"/>
+<Widget widgetName="xsry"/>
+<Widget widgetName="dianpu"/>
+<Widget widgetName="formSubmit0"/>
+<Widget widgetName="dcny"/>
+<Widget widgetName="ppjg"/>
+</MobileWidgetList>
+<FrozenWidgets/>
+<MobileBookMarkStyle class="com.fr.form.ui.mobile.impl.DefaultMobileBookMarkStyle"/>
+<Display display="true"/>
+<DelayDisplayContent delay="true"/>
+<UseParamsTemplate use="true"/>
+<paramFireStopEdit fireEvent="false"/>
+<Position position="0"/>
+<Design_Width design_width="1208"/>
+<NameTagModified/>
+<WidgetNameTagMap/>
+<ParamAttr class="com.fr.report.mobile.DefaultMobileParamStyle"/>
+<ParamStyle class="com.fr.form.ui.mobile.impl.DefaultMobileParameterStyle"/>
+</Layout>
+<DesignAttr width="1208" height="75"/>
+</ParameterUI>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="1" size="88"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-5323777" hor="7" ver="2"/>
+</color>
+</Background>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="88"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="88"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.general.date.FineDateFormat">
+<![CDATA[yyyy-MM-dd]]></Format>
+<FRFont name="微软雅黑" style="0" size="88"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="2"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="模块数据字典" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="升级版" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="ds1" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="吉客云（非自营）缺省报价" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="销售人员" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="关联结果" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="备份" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="店铺数据字典" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.18.0.20230712">
+<TemplateCloudInfoAttrMark createTime="1680077233773"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="5fa7496f-ad43-4257-8543-84174db83404"/>
+</TemplateIdAttMark>
+</WorkBook>
