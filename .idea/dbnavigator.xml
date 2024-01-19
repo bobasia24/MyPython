@@ -31,7 +31,7 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="d3714f4b-3c08-4f04-8a56-0c837d817780">
-      <console name="BI" type="STANDARD" schema="profit" session="Main" />
+      <console name="BI" type="STANDARD" schema="profit" session="Main"><![CDATA[select]]></console>
       <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
@@ -39,7 +39,9 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="d3714f4b-3c08-4f04-8a56-0c837d817780" object-ref="consoles/BI" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="d3714f4b-3c08-4f04-8a56-0c837d817780" />
