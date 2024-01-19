@@ -36,7 +36,9 @@
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
-    <last-used-providers />
+    <last-used-providers>
+      <object-type object-type="VIEW" editor-provider="DATA" />
+    </last-used-providers>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files>
@@ -45,6 +47,9 @@
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="d3714f4b-3c08-4f04-8a56-0c837d817780" />
+  </component>
+  <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="d3714f4b-3c08-4f04-8a56-0c837d817780" dataset="profit.12月运费" active-filter-id="" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
