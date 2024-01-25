@@ -45,6 +45,6 @@ def connection_database():
 #test
 # 读取
 engine = connection_database()
-#mac1
+#mac test
 download_file_path = r"C:\Users\73769\Desktop\深圳组织间结算价目表.xlsx"
 file_dispose(download_file_path, engine)
