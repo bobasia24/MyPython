@@ -9,7 +9,7 @@ def send_message():
     message = client.messages.create(
         to="+8615302680534",  # 接受短信的手机号 注意写中国区号 +86
         from_="+16592175691",  # api参数 Number(领取的虚拟号码
-        body="\n每日鸡汤：\n——由小曹robot自动发送")  #自定义短信内容
+        body="\n亚洲：\n——新年快乐，恭喜发财啊，嘿嘿")  #自定义短信内容
     print('接收短信号码：'+message.to)
     # 打印发送时间和发送状态：
     print('发送时间：%s \n状态：发送成功！' % send_time)
