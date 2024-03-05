@@ -39,3 +39,11 @@ union all
 select '京东生鲜账单',count(1),'ods_01财务_rpa_0117财务对账_京东金融_收款管理_已收款账单' from rpa.ods_01财务_rpa_0117财务对账_京东金融_收款管理_已收款账单  where  fee_settlement_time like '%${do_date}%' and brand regexp('生鲜')
 union all
 select '账单',count(1),'ods_01财务_rpa_0121财务对账_京东自营_结算管理_应收应付对账单' from rpa.ods_01财务_rpa_0121财务对账_京东自营_结算管理_应收应付对账单  where document_date like '%${do_date}%'
+
+union all
+
+select '吉客云销售单',count(1),'ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询'  from  rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询 where delivery_time like '%${do_date}%'
+union all
+select '吉客云销售单明细',count(1),'ods_01财务_rpa_吉客云_销售明细单数据'  from  rpa.ods_01财务_rpa_吉客云_销售明细单数据 where delivery_time like '%${do_date}%'
+
+
