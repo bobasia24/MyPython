@@ -20,8 +20,8 @@ def file_dispose(file_path, engine):
             with z.open("销售单查询.xlsx") as f:
                 data_file = pd.read_excel(f, sheet_name="判断用")
     else:
-        data_file = pd.read_excel(file_path, sheet_name="Sheet1")
-    data_file.to_sql('ods_深圳组织间结算价目表_mac', con=engine, if_exists='replace', index=False, chunksize=500)
+        data_file = pd.read_excel(file_path, sheet_name="运费合计")
+    data_file.to_sql('ods_2402运费', con=engine, if_exists='replace', index=False, chunksize=500)
     print("数据插入完成")
 #replace，append
 
@@ -46,7 +46,7 @@ def connection_database():
 # 读取
 engine = connection_database()
 # window
-# download_file_path = r"C:\Users\73769\Desktop\深圳组织间结算价目表.xlsx"
+download_file_path = r"C:\Users\73769\Desktop\2月运费匹配.xlsx"
 # mac
-download_file_path = r"/Users/liyazhou/Desktop/公司桌面/深圳组织间结算价目表.xlsx"
+# download_file_path = r"/Users/liyazhou/Desktop/公司桌面/2024年02月深圳销售明细.xlsx"
 file_dispose(download_file_path, engine)
