@@ -1,0 +1,1198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="自更新渠道" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="qd"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="bm"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[
+ 
+select c.渠道列表_编号,c.渠道列表_负责部门,c.部门,
+c.名称,
+c.渠道_1,c.`区域/组别`,c.销售人员,c.管理报表渠道名称,c.归属,c.公司 from (
+
+select a.编号 as 渠道列表_编号,a.负责部门 as 渠道列表_负责部门, a.负责部门 as 部门,
+	 a.名称,substring_index(a.名称,'-',1) 渠道_1,
+b.`区域/组别`,
+case 
+	when a.负责部门销售人员 regexp('陈玉|吴晓君|刘媛玲|钟意珍|朱楚明|王倩') then substring_index(a.负责部门销售人员,'渠道',-1)
+else  b.销售人员 
+end 销售人员, 
+case 
+	when (b.管理报表渠道名称 is  null or b.管理报表渠道名称  ='') then
+	  case 
+	  	when a.负责部门 regexp('分销') then '分销'
+	    when a.负责部门 regexp('私域') then '私域代理'	    
+	  end
+	else b.管理报表渠道名称 
+end
+管理报表渠道名称,
+case 
+	when 负责部门 regexp('分销') then '分销'
+	when 负责部门 regexp('私域') then '私域'
+	when 负责部门 regexp('线下') then '线下'
+else b.归属 
+end
+归属,
+case when a.名称 regexp('-dg') then '东莞公司' else '关联方销售' end as 公司 
+from
+(select 编号,负责部门 负责部门销售人员,
+case 
+	when 名称 regexp('停用') then substr(名称,3) else 名称
+	end 名称,case 
+	 when 负责部门 regexp('物流信息中心|销售部') then '东莞业务部'
+	 when 负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍|朱楚明|王倩')  then 
+	 	case 	when 名称 regexp('有赞样品') then '私域事业部' else	 '分销事业部' end
+	 when 负责部门 regexp('快手|抖音') then '兴趣电商部'
+	 when 负责部门 regexp('京多部') then '京多事业部'
+	 when 负责部门 regexp('线下部') then '线下业务部'
+	 when 负责部门 regexp('市场部') then '市场部'
+	 when 负责部门 regexp('IT') then 'IT部门'
+	 when 负责部门 regexp('客服') then '客服部'
+	 when 负责部门 regexp('人力|人事|人政') then '人力行政部'
+	 when 负责部门 regexp('财务部') then '财务部'
+	 when 负责部门 regexp('法务部') then '法务部'
+	 when 负责部门 regexp('私域') then
+	 	case when 名称 regexp('有赞部|有赞店铺|有赞样品')  	then '私域事业部' else '分销事业部' end
+	 when 负责部门 regexp('天猫部') then '天猫事业部'
+	 when 负责部门 regexp('线下部') then '线下事业部'
+	 when 负责部门 regexp('渠道部') then 
+		case when 名称 regexp('样品') then '深圳样品部'
+			else '分销事业部'
+		end
+
+	 end  负责部门  from 
+profit.ods_渠道列表
+)a
+left  join 
+profit.dm_01财务_profit_客户中间表 b
+on  a.名称 =b.渠道
+where 1 =1 
+ 
+union 
+ 
+select b.渠道编码 as 渠道列表_编号,a.负责部门 as 渠道列表_负责部门, b.部门,
+	   b.渠道,substring_index(b.渠道,'-',1) 渠道_1,
+b.`区域/组别`,
+case 
+	when a.负责部门销售人员 regexp('陈玉|吴晓君|刘媛玲|钟意珍|朱楚明|王倩') then substring_index(a.负责部门销售人员,'渠道',-1)
+else  b.销售人员 
+end 销售人员, 
+case 
+	when (b.管理报表渠道名称 is  null or b.管理报表渠道名称  ='') then
+	  case 
+	  	when a.负责部门 regexp('分销') then '分销'
+	    when a.负责部门 regexp('私域') then '私域代理'	    
+	  end
+	else b.管理报表渠道名称 
+end
+管理报表渠道名称,
+case 
+	when 负责部门 regexp('分销') then '分销'
+	when 负责部门 regexp('私域') then '私域'
+	when 负责部门 regexp('线下') then '线下'
+else b.归属 
+end
+归属,
+case when a.名称 regexp('-dg') then '东莞公司' else '关联方销售' end as 公司 
+from
+(select 编号,负责部门 负责部门销售人员,
+case 
+	when 名称 regexp('停用') then substr(名称,3) else 名称
+	end 名称,case 
+	 when 负责部门 regexp('物流信息中心|销售部') then '东莞业务部'
+	 when 负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍|朱楚明|王倩') then 
+	 	case 	when 名称 regexp('有赞样品') then '私域事业部' else	 '分销事业部' end
+	 when 负责部门 regexp('快手|抖音') then '兴趣电商部'
+	 when 负责部门 regexp('京多部') then '京多事业部'
+	 when 负责部门 regexp('线下部') then '线下业务部'
+	 when 负责部门 regexp('市场部') then '市场部'
+	 when 负责部门 regexp('IT') then 'IT部门'
+	 when 负责部门 regexp('客服') then '客服部'
+	 when 负责部门 regexp('人力|人事|人政') then '人力行政部'
+	 when 负责部门 regexp('财务部') then '财务部'
+	 when 负责部门 regexp('法务部') then '法务部'
+	 when 负责部门 regexp('私域') then
+	 	case when 名称 regexp('有赞部|有赞店铺|有赞样品') then '私域事业部' else '分销事业部' end
+	 when 负责部门 regexp('天猫部') then '天猫事业部'
+	 when 负责部门 regexp('线下部') then '线下事业部'
+	 when 负责部门 regexp('渠道部') then 
+		case when 名称 regexp('样品') then '深圳样品部'
+			else '分销事业部'
+		end
+	 end  负责部门  from 
+profit.ods_渠道列表
+)a
+right  join 
+profit.dm_01财务_profit_客户中间表 b
+on  a.名称 =b.渠道
+where 1 =1 
+)c
+where 1 =1 
+ ${if(len(bm)=0,"","and 部门 in('"+bm+"')")}
+ ${if(len(qd)=0,"","and 名称 in('"+qd+"')")}
+group by c.名称
+
+
+]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="部门" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="bm"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select c.渠道列表_编号,c.渠道列表_负责部门,c.部门,
+-- c.名称,c.渠道,
+case when c.名称 is null then c.渠道
+when c.渠道 is null then c.名称 else c.名称 end 渠道,
+c.渠道_1,c.`区域/组别`,c.销售人员,c.管理报表渠道名称,c.归属,c.公司 from (
+select a.编号 as 渠道列表_编号,a.负责部门 as 渠道列表_负责部门, a.负责部门 as 部门,
+	 a.名称, b.渠道,substring_index(a.名称,'-',1) 渠道_1,
+b.`区域/组别`,
+case 
+	when a.负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍') then a.负责部门
+else  b.销售人员 
+end 销售人员, 
+case 
+	when (b.管理报表渠道名称 is  null or b.管理报表渠道名称  ='') then
+	  case 
+	  	when a.负责部门 regexp('分销') then '分销'
+	    when a.负责部门 regexp('私域') then '私域代理'	    
+	  end
+	else b.管理报表渠道名称 
+end
+管理报表渠道名称,
+case 
+	when 负责部门 regexp('分销') then '分销'
+	when 负责部门 regexp('私域') then '私域'
+	when 负责部门 regexp('线下') then '线下'
+else b.归属 
+end
+归属,
+case when a.名称 regexp('-dg') then '东莞公司' else '关联方销售' end as 公司 
+from
+(select 编号,
+case 
+	when 名称 regexp('停用') then substr(名称,3) else 名称
+	end 名称,case 
+	 when 负责部门 regexp('物流信息中心|销售部') then '东莞业务部'
+	 when 负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍') then '分销事业部'
+	 when 负责部门 regexp('快手|抖音') then '兴趣电商部'
+	 when 负责部门 regexp('京多部') then '京多事业部'
+	 when 负责部门 regexp('线下部') then '线下业务部'
+	 when 负责部门 regexp('市场部') then '市场部'
+	 when 负责部门 regexp('IT') then 'IT部门'
+	 when 负责部门 regexp('客服') then '客服部'
+	 when 负责部门 regexp('人力|人事|人政') then '人力行政部'
+	 when 负责部门 regexp('财务部') then '财务部'
+	 when 负责部门 regexp('法务部') then '法务部'
+	 when 负责部门 regexp('私域部') then '私域事业部'
+	 when 负责部门 regexp('天猫部') then '天猫事业部'
+	 when 负责部门 regexp('线下部') then '线下事业部'
+	 when 负责部门 regexp('渠道部') then 
+		case when 名称 regexp('样品') then '深圳样品部'
+			else '分销事业部'
+		end
+	 end  负责部门  from 
+profit.ods_渠道列表
+)a
+left  join 
+profit.dm_01财务_profit_客户中间表 b
+on  a.名称 =b.渠道
+where 1 =1 
+ 
+ union 
+ 
+ select b.渠道编码 as 渠道列表_编号,a.负责部门 as 渠道列表_负责部门, b.部门,
+	 a.名称  ,b.渠道,substring_index(b.渠道,'-',1) 渠道_1,
+b.`区域/组别`,
+case 
+	when a.负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍') then a.负责部门
+else  b.销售人员 
+end 销售人员, 
+case 
+	when (b.管理报表渠道名称 is  null or b.管理报表渠道名称  ='') then
+	  case 
+	  	when a.负责部门 regexp('分销') then '分销'
+	    when a.负责部门 regexp('私域') then '私域代理'	    
+	  end
+	else b.管理报表渠道名称 
+end
+管理报表渠道名称,
+case 
+	when 负责部门 regexp('分销') then '分销'
+	when 负责部门 regexp('私域') then '私域'
+	when 负责部门 regexp('线下') then '线下'
+else b.归属 
+end
+归属,
+case when a.名称 regexp('-dg') then '东莞公司' else '关联方销售' end as 公司 
+from
+(select 编号,
+case 
+	when 名称 regexp('停用') then substr(名称,3) else 名称
+	end 名称,case 
+	 when 负责部门 regexp('物流信息中心|销售部') then '东莞业务部'
+	 when 负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍') then '分销事业部'
+	 when 负责部门 regexp('快手|抖音') then '兴趣电商部'
+	 when 负责部门 regexp('京多部') then '京多事业部'
+	 when 负责部门 regexp('线下部') then '线下业务部'
+	 when 负责部门 regexp('市场部') then '市场部'
+	 when 负责部门 regexp('IT') then 'IT部门'
+	 when 负责部门 regexp('客服') then '客服部'
+	 when 负责部门 regexp('人力|人事|人政') then '人力行政部'
+	 when 负责部门 regexp('财务部') then '财务部'
+	 when 负责部门 regexp('法务部') then '法务部'
+	 when 负责部门 regexp('私域部') then '私域事业部'
+	 when 负责部门 regexp('天猫部') then '天猫事业部'
+	 when 负责部门 regexp('线下部') then '线下事业部'
+	 when 负责部门 regexp('渠道部') then 
+		case when 名称 regexp('样品') then '深圳样品部'
+			else '分销事业部'
+		end
+	 end  负责部门  from 
+profit.ods_渠道列表
+)a
+right  join 
+profit.dm_01财务_profit_客户中间表 b
+on  a.名称 =b.渠道
+where 1 =1 
+--  group by a.名称
+ )c
+ where 1 =1 
+ ${if(len(bm)=0,"","and 部门 in('"+bm+"')")}
+  group by c.渠道]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="渠道1" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select c.渠道列表_编号,c.渠道列表_负责部门,c.部门,
+c.名称,
+c.渠道_1,c.`区域/组别`,c.销售人员,c.管理报表渠道名称,c.归属,c.公司 from (
+select a.编号 as 渠道列表_编号,a.负责部门 as 渠道列表_负责部门, a.负责部门 as 部门,
+	 a.名称,substring_index(a.名称,'-',1) 渠道_1,
+b.`区域/组别`,
+case 
+	when a.负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍') then a.负责部门
+else  b.销售人员 
+end 销售人员, 
+case 
+	when (b.管理报表渠道名称 is  null or b.管理报表渠道名称  ='') then
+	  case 
+	  	when a.负责部门 regexp('分销') then '分销'
+	    when a.负责部门 regexp('私域') then '私域代理'	    
+	  end
+	else b.管理报表渠道名称 
+end
+管理报表渠道名称,
+case 
+	when 负责部门 regexp('分销') then '分销'
+	when 负责部门 regexp('私域') then '私域'
+	when 负责部门 regexp('线下') then '线下'
+else b.归属 
+end
+归属,
+case when a.名称 regexp('-dg') then '东莞公司' else '关联方销售' end as 公司 
+from
+(select 编号,
+case 
+	when 名称 regexp('停用') then substr(名称,3) else 名称
+	end 名称,case 
+	 when 负责部门 regexp('物流信息中心|销售部') then '东莞业务部'
+	 when 负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍') then '分销事业部'
+	 when 负责部门 regexp('快手|抖音') then '兴趣电商部'
+	 when 负责部门 regexp('京多部') then '京多事业部'
+	 when 负责部门 regexp('线下部') then '线下业务部'
+	 when 负责部门 regexp('市场部') then '市场部'
+	 when 负责部门 regexp('IT') then 'IT部门'
+	 when 负责部门 regexp('客服') then '客服部'
+	 when 负责部门 regexp('人力|人事|人政') then '人力行政部'
+	 when 负责部门 regexp('财务部') then '财务部'
+	 when 负责部门 regexp('法务部') then '法务部'
+	 when 负责部门 regexp('私域部') then '私域事业部'
+	 when 负责部门 regexp('天猫部') then '天猫事业部'
+	 when 负责部门 regexp('线下部') then '线下事业部'
+	 when 负责部门 regexp('渠道部') then 
+		case when 名称 regexp('样品') then '深圳样品部'
+			else '分销事业部'
+		end
+	 end  负责部门  from 
+profit.ods_渠道列表
+)a
+left  join 
+profit.dm_01财务_profit_客户中间表 b
+on  a.名称 =b.渠道
+where 1 =1 
+ 
+ union 
+ 
+ select b.渠道编码 as 渠道列表_编号,a.负责部门 as 渠道列表_负责部门, b.部门,
+	   b.渠道,substring_index(b.渠道,'-',1) 渠道_1,
+b.`区域/组别`,
+case 
+	when a.负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍') then a.负责部门
+else  b.销售人员 
+end 销售人员, 
+case 
+	when (b.管理报表渠道名称 is  null or b.管理报表渠道名称  ='') then
+	  case 
+	  	when a.负责部门 regexp('分销') then '分销'
+	    when a.负责部门 regexp('私域') then '私域代理'	    
+	  end
+	else b.管理报表渠道名称 
+end
+管理报表渠道名称,
+case 
+	when 负责部门 regexp('分销') then '分销'
+	when 负责部门 regexp('私域') then '私域'
+	when 负责部门 regexp('线下') then '线下'
+else b.归属 
+end
+归属,
+case when a.名称 regexp('-dg') then '东莞公司' else '关联方销售' end as 公司 
+from
+(select 编号,
+case 
+	when 名称 regexp('停用') then substr(名称,3) else 名称
+	end 名称,case 
+	 when 负责部门 regexp('物流信息中心|销售部') then '东莞业务部'
+	 when 负责部门 regexp('陈玉|吴晓君|刘媛玲|钟意珍') then '分销事业部'
+	 when 负责部门 regexp('快手|抖音') then '兴趣电商部'
+	 when 负责部门 regexp('京多部') then '京多事业部'
+	 when 负责部门 regexp('线下部') then '线下业务部'
+	 when 负责部门 regexp('市场部') then '市场部'
+	 when 负责部门 regexp('IT') then 'IT部门'
+	 when 负责部门 regexp('客服') then '客服部'
+	 when 负责部门 regexp('人力|人事|人政') then '人力行政部'
+	 when 负责部门 regexp('财务部') then '财务部'
+	 when 负责部门 regexp('法务部') then '法务部'
+	 when 负责部门 regexp('私域部') then '私域事业部'
+	 when 负责部门 regexp('天猫部') then '天猫事业部'
+	 when 负责部门 regexp('线下部') then '线下事业部'
+	 when 负责部门 regexp('渠道部') then 
+		case when 名称 regexp('样品') then '深圳样品部'
+			else '分销事业部'
+		end
+	 end  负责部门  from 
+profit.ods_渠道列表
+)a
+right  join 
+profit.dm_01财务_profit_客户中间表 b
+on  a.名称 =b.渠道
+where 1 =1 
+
+ )c
+ where 1 =1 
+  group by c.名称]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ReportWebAttr>
+<ServerPrinter/>
+<WebWriteContent>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.write.Submit">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Utils_Submit')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[submit]]></IconName>
+<Verify failVerifySubmit="false" value="true"/>
+<Sheet onlySubmitSelect="false"/>
+</Widget>
+<Widget class="com.fr.report.web.button.write.Verify">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Verify_Data')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[verify]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.NewPrint">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Print')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[print]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.Export">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Export')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[export]]></IconName>
+<Buttons pdf="true" excelP="true" excelO="true" excelS="true" word="true" image="true" html="true"/>
+</Widget>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+<Widget class="com.fr.report.web.button.write.AppendColumnRow">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Add_Record')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[appendrow]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.write.ShowCellValue">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue/>
+<LabelAttr verticalcenter="true" textalign="0" autoline="false"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</Widget>
+<Widget class="com.fr.report.web.button.write.ImportExcelData">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Utils_Import_Excel_Data')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[excel]]></IconName>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<EditRowColor setColor="true"/>
+<SelectedColor>
+<color>
+<FineColor color="-12211314" hor="-1" ver="-1"/>
+</color>
+</SelectedColor>
+<WebWrite SheetPosition="3"/>
+<RptLocation isShowAtLeft="true"/>
+<UnloadCheck/>
+<ShowWidgets/>
+<OtherAttr autoStash="false"/>
+</WebWriteContent>
+</ReportWebAttr>
+<ReportExportAttr>
+<ExcelExportAttr hideColumn="false" hideRow="false" exportWaterMark="true"/>
+<PDFExportAttr/>
+<HTMLExportAttr/>
+<WordExportAttr exportWaterMark="true"/>
+<ImageExportAttr imageResolution="96" imageType="false" renderQuality="0" format="png"/>
+</ReportExportAttr>
+<ReportFitAttr fitStateInPC="3" fitFont="false" minFontSize="0"/>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR F="0" T="0"/>
+<FR/>
+<HC/>
+<FC/>
+<UPFCR COLUMN="false" ROW="true"/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1714500,1295400,723900,723900,723900,723900,723900,723900,723900,723900,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[4032000,9144000,5472000,5472000,4032000,4032000,4032000,4032000,4032000,2743200,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" s="0">
+<O>
+<![CDATA[部门]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="0" s="0">
+<O>
+<![CDATA[渠道编码]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="0" s="0">
+<O>
+<![CDATA[渠道]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="0" s="0">
+<O>
+<![CDATA[渠道_1]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="0" s="0">
+<O>
+<![CDATA[区域/组别(单品表用）]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="0" s="0">
+<O>
+<![CDATA[销售人员]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="0" s="0">
+<O>
+<![CDATA[管理报表渠道（损益表用）]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="0" s="0">
+<O>
+<![CDATA[归属(非自营报价表用)]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="0" s="0">
+<O>
+<![CDATA[公司]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="自更新渠道" columnName="部门"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="自更新渠道" columnName="渠道列表_编号"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="自更新渠道" columnName="名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="自更新渠道" columnName="渠道_1"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="自更新渠道" columnName="区域/组别"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="自更新渠道" columnName="销售人员"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="自更新渠道" columnName="管理报表渠道名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="自更新渠道" columnName="归属"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="自更新渠道" columnName="公司"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.form.ui.TextEditor">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue/>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</Widget>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<FrozenColumnRow columnrow="A2"/>
+<PaperSetting/>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<ReportWriteAttr>
+<SubmitVisitor class="com.fr.report.write.BuiltInSQLSubmiter">
+<Name>
+<![CDATA[内置SQL1]]></Name>
+<Attributes dsName="profit"/>
+<DMLConfig class="com.fr.write.config.IntelliDMLConfig">
+<Table schema="" name="dm_01财务_profit_客户中间表"/>
+<ColumnConfig name="部门" isKey="false" skipUnmodified="false">
+<ColumnRow column="0" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="渠道" isKey="true" skipUnmodified="false">
+<ColumnRow column="2" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="渠道_1" isKey="false" skipUnmodified="false">
+<ColumnRow column="3" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="区域/组别" isKey="false" skipUnmodified="false">
+<ColumnRow column="4" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="销售人员" isKey="false" skipUnmodified="false">
+<ColumnRow column="5" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="管理报表渠道名称" isKey="false" skipUnmodified="false">
+<ColumnRow column="6" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="归属" isKey="false" skipUnmodified="false">
+<ColumnRow column="7" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="公司" isKey="false" skipUnmodified="false">
+<ColumnRow column="8" row="1"/>
+</ColumnConfig>
+<ColumnConfig name="渠道编码" isKey="false" skipUnmodified="false">
+<ColumnRow column="1" row="1"/>
+</ColumnConfig>
+<Condition class="com.fr.data.condition.ListCondition"/>
+</DMLConfig>
+</SubmitVisitor>
+</ReportWriteAttr>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="false" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="4"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+<ParameterUI class="com.fr.form.main.parameter.FormParameterUI">
+<Parameters/>
+<Layout class="com.fr.form.ui.container.WParameterLayout">
+<WidgetName name="para"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<FollowingTheme borderStyle="false"/>
+<Margin top="0" left="0" bottom="0" right="0"/>
+<Border>
+<border style="0" borderRadius="0" type="0" borderStyle="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+<WidgetTitle>
+<O>
+<![CDATA[新建标题]]></O>
+<FRFont name="SimSun" style="0" size="72"/>
+<Position pos="0"/>
+</WidgetTitle>
+<Alpha alpha="1.0"/>
+</Border>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-526086" hor="-1" ver="-1"/>
+</color>
+</Background>
+<LCAttr vgap="0" hgap="0" compInterval="0"/>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.TextEditor">
+<WidgetName name="textEditor0"/>
+<WidgetID widgetID="e7a83c81-05fc-4cde-8a0f-06291b7da141"/>
+<WidgetAttr disabled="true" aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<fontSize>
+<![CDATA[15]]></fontSize>
+<TextAttr/>
+<Reg class="com.fr.form.ui.reg.NoneReg"/>
+<widgetValue>
+<O>
+<![CDATA[****已停用得渠道，正常维护（不要修改为停用），不要删除 ****]]></O>
+</widgetValue>
+<MobileScanCodeAttr scanCode="true" textInputMode="0" isSupportManual="true" isSupportScan="true" isSupportNFC="false"/>
+</InnerWidget>
+<BoundsAttr x="645" y="7" width="493" height="71"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboCheckBox">
+<WidgetName name="bm"/>
+<LabelName name="部门："/>
+<WidgetID widgetID="aed548bf-1224-4023-b716-8b3b2aed2f1d"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="部门" viName="部门"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[部门]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+<RAAttr delimiter="&apos;,&apos;" isArray="false"/>
+</InnerWidget>
+<BoundsAttr x="147" y="32" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label0_c"/>
+<WidgetID widgetID="c3885a01-7d04-4203-8ad3-6fb839e2d7df"/>
+<WidgetAttr aspectRatioLocked="true" aspectRatioBackup="3.8095238095238093" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[部门:]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="68" y="32" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.parameter.FormSubmitButton">
+<WidgetName name="formSubmit0"/>
+<WidgetID widgetID="c5b0994e-6655-431b-aaaa-364bbe4333a3"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[查询]]></Text>
+<Hotkeys>
+<![CDATA[enter]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="489" y="32" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboBox">
+<WidgetName name="qd"/>
+<WidgetID widgetID="f625923d-72d0-4c57-ab31-0470610bbcbc"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="名称" viName="名称"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[渠道1]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="352" y="32" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label0"/>
+<LabelName name="部门:"/>
+<WidgetID widgetID="c3885a01-7d04-4203-8ad3-6fb839e2d7df"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[渠道:]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="272" y="32" width="80" height="21"/>
+</Widget>
+<ShowBookmarks showBookmarks="false"/>
+<Sorted sorted="false"/>
+<MobileWidgetList>
+<Widget widgetName="textEditor0"/>
+<Widget widgetName="bm"/>
+<Widget widgetName="qd"/>
+<Widget widgetName="formSubmit0"/>
+</MobileWidgetList>
+<FrozenWidgets/>
+<MobileBookMarkStyle class="com.fr.form.ui.mobile.impl.DefaultMobileBookMarkStyle"/>
+<Display display="true"/>
+<DelayDisplayContent delay="false"/>
+<UseParamsTemplate use="true"/>
+<paramFireStopEdit fireEvent="false"/>
+<Position position="0"/>
+<Design_Width design_width="1155"/>
+<NameTagModified/>
+<WidgetNameTagMap/>
+<ParamAttr class="com.fr.report.mobile.DefaultMobileParamStyle"/>
+<ParamStyle class="com.fr.form.ui.mobile.impl.DefaultMobileParameterStyle"/>
+</Layout>
+<DesignAttr width="1155" height="80"/>
+</ParameterUI>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="88">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-13719584" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="2"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="ds1" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="自更新渠道" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="渠道" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.18.0.20230712">
+<TemplateCloudInfoAttrMark createTime="1689651021762"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="89481585-65e1-417b-acb1-6af9d64b7211"/>
+</TemplateIdAttMark>
+</WorkBook>
