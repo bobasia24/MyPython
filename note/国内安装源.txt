@@ -1,8 +1,0 @@
-
-清华：https://pypi.tuna.tsinghua.edu.cn/simple
-阿里云：http://mirrors.aliyun.com/pypi/simple/
-华中理工大学：http://pypi.hustunique.com/
-山东理工大学：http://pypi.sdutlinux.org/?
-
-
-pip install Numpy -i https://pypi.tuna.tsinghua.edu.cn/simple pandas
