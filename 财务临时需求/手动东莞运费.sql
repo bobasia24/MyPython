@@ -21,6 +21,61 @@ order by c.序号
 
 )ddd
 
+-- 反向
+with mytest as (
+select
+    c.序号 as 序号,
+    c.运输单号 as 运输单号,
+    c.总成本含税 as 总成本含税,
+    a.总总成本含税 as 总总成本含税,
+    (c.总成本含税 / a.总总成本含税) as 比例,
+    ((c.总成本含税 / a.总总成本含税) * b.含税金额) as 含税运费,
+    (((c.总成本含税 / a.总总成本含税) * b.含税金额) / 1.06) as 不含税运费,
+    (((c.总成本含税 / a.总总成本含税) * b.含税金额) - (((c.总成本含税 / a.总总成本含税) * b.含税金额) / 1.06)) as 税额
+from
+    ((profit.ods_运费7月单品 c
+left join (
+    select
+        profit.ods_运费7月单品.序号 as 序号,
+        profit.ods_运费7月单品.运输单号 as 运输单号,
+        sum(profit.ods_运费7月单品.总成本含税) as 总总成本含税
+    from
+        profit.ods_运费7月单品
+    group by
+        profit.ods_运费7月单品.运输单号) a on
+    ((a.运输单号 = c.运输单号)))
+left join (
+    select
+        profit.ods_运费7月运费汇总.单号 as 运单号码,
+        sum(profit.ods_运费7月运费汇总.含税金额) as 含税金额
+    from
+        profit.ods_运费7月运费汇总
+    group by
+        profit.ods_运费7月运费汇总.单号) b on
+    ((a.运输单号 = b.运单号码)))
+order by
+    c.序号)
+select
+    b1.序号 as 序号,
+    b1.物流 as 物流,
+    b1.单号 as 运单号码,
+    b1.含税金额 as 含税金额,
+    a1.含税运费 as 含税运费
+from
+    (profit.ods_运费7月运费汇总 b1
+left join (
+    select
+        sum(mytest.含税运费) as 含税运费,
+        mytest.运输单号 as 运输单号
+    from
+        mytest
+    group by
+        mytest.运输单号) a1 on
+    ((a1.运输单号 = b1.单号)))
+order by
+    b1.序号;
+
+
 
 
 ------ 按成本均摊运费代码
