@@ -1,0 +1,1754 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="深圳线上" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[125.91.113.114_mysql]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[
+
+with a as 
+(select 产品名称
+,sum(case 	when 销售 = '销售' then 箱盒转换 end)实际销量_2024
+,sum(case 	when 销售 = '非销售' then 箱盒转换 end)寄样销量_2024
+from profit.dw_吉客云销售明细单_月饼下单
+where 下单时间 like '2024%' and  归属 regexp '线上' and 产品名称 not regexp '不取数'
+group by 产品名称)
+
+,b as(select 简称,max(目标数量_2024) 目标数量_2024  from profit.月饼目标简称转换_2024 where 渠道 = '线上' and  简称 != '不取数'   group by 简称) 
+
+select a.*,b.目标数量_2024 目标_2024 from  A  left join B on a.产品名称 = b.简称
+order by 目标_2024 desc
+]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="深圳线下" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[125.91.113.114_mysql]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with a as 
+(select 产品名称
+,sum(case 	when 销售 = '销售' then 箱盒转换 end)实际销量_2024
+,sum(case 	when 销售 = '非销售' then 箱盒转换 end)寄样销量_2024
+from profit.dw_吉客云销售明细单_月饼下单
+where 下单时间 like '2024%' and  归属 regexp '线下|分销' and 产品名称 not regexp '不取数'
+group by 产品名称)
+
+,b as(select 简称,sum(目标数量_2024) 目标数量_2024  from profit.月饼目标简称转换_2024 where 渠道 regexp '线下' and  简称 != '不取数'   group by 简称) 
+
+select a.*,b.目标数量_2024 目标_2024 from  A  left join B on a.产品名称 = b.简称
+order by 目标_2024 desc]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="东莞" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[125.91.113.114_mysql]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with a as 
+(select 产品名称
+,sum(case 	when 销售 = '销售' then 箱盒转换 end)实际销量_2024
+,sum(case 	when 销售 = '非销售' then 箱盒转换 end)寄样销量_2024
+from profit.dw_吉客云销售明细单_月饼下单
+where 下单时间 like '2024%' and   销售渠道 regexp '-dg'  and 产品名称 not regexp '不取数'
+group by 产品名称)
+
+,b as(select 简称,max(目标数量_2024) 目标数量_2024  from profit.月饼目标简称转换_2024 where 渠道 = '东莞' and  简称 != '不取数'   group by 简称) 
+
+select a.*,b.目标数量_2024 目标_2024 from  A  left join B on a.产品名称 = b.简称 
+order by 目标_2024 desc]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ReportWebAttr>
+<ServerPrinter/>
+<WebViewContent>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.PageSetup">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Page_Setup')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[pagesetup]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.PrintPreview">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_PrintP_Print_Preview')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[preview]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.NewPrint">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Print')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[print]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.Export">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Export')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[export]]></IconName>
+<Buttons pdf="false" excelP="false" excelO="true" excelS="false" word="false" image="false" html="true"/>
+</Widget>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<SortFuncCheck check="true"/>
+<ConditionFuncCheck check="true"/>
+<ListFuncCheck check="true"/>
+</WebViewContent>
+</ReportWebAttr>
+<ReportExportAttr>
+<ExcelExportAttr hideColumn="false" hideRow="false" exportWaterMark="true"/>
+<PDFExportAttr/>
+<HTMLExportAttr/>
+<WordExportAttr/>
+<ImageExportAttr imageResolution="96" imageType="false" renderQuality="0" format="png"/>
+</ReportExportAttr>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR/>
+<FR/>
+<HC/>
+<FC/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1485900,1295400,892800,723900,892800,748800,748800,748800,723900,723900,892800,748800,748800,748800,723900,723900,892800,748800,748800,748800,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[13792200,5524500,7200900,8115300,5472000,2743200,2743200,2743200,2743200,2743200,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" cs="5" s="0">
+<O>
+<![CDATA[2024冰皮月饼销售目标]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="1" cs="5" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[= "中秋节倒计时" + "	   "+	DATEDIF(NOW(),"2024/9/17","D") +"	   "	 + "天"]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="2" cs="5" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE("统计区间：","2024-05-01  至  ","2024-09-17"+" ")]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="4" cs="5" s="3">
+<O>
+<![CDATA[线上]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="4" s="4">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="4" s="4">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="9" r="4" s="4">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="4" s="4">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="4" s="4">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="5" s="5">
+<O>
+<![CDATA[产品名称]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="5" s="5">
+<O>
+<![CDATA[2024年实际销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="5" s="5">
+<O>
+<![CDATA[2024年目标销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="5" s="5">
+<O>
+<![CDATA[2024年寄样]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="5" s="6">
+<O>
+<![CDATA[目标达成率]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="5" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="6" r="5" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="7" r="5" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="8" r="5" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="9" r="5" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="5" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="5" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="6" s="8">
+<O t="DSColumn">
+<Attributes dsName="深圳线上" columnName="产品名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Scope val="1"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="6" s="9">
+<O t="DSColumn">
+<Attributes dsName="深圳线上" columnName="实际销量_2024"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="6" s="10">
+<O t="DSColumn">
+<Attributes dsName="深圳线上" columnName="目标_2024"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="6" s="8">
+<O t="DSColumn">
+<Attributes dsName="深圳线上" columnName="寄样销量_2024"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="6" s="11">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=IF(C7 = null ,"无目标值",B7/C7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="4">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-2151893" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性2]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="3">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-13408513" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="0">
+<O>
+<![CDATA[无目标值]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72"/>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="7" s="12">
+<O>
+<![CDATA[小计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="7" s="12">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(B7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="7" s="13">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="7" s="12">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(D7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="7" s="14">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=B8 / C8]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="4">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-2151893" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性2]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="3">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-13408513" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="10" cs="5" s="3">
+<O>
+<![CDATA[线下]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="11" s="5">
+<O>
+<![CDATA[产品名称]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="11" s="5">
+<O>
+<![CDATA[2024年实际销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="11" s="5">
+<O>
+<![CDATA[2024年目标销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="11" s="5">
+<O>
+<![CDATA[2024年寄样]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="11" s="6">
+<O>
+<![CDATA[目标达成率]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="11" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="6" r="11" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="7" r="11" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="8" r="11" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="9" r="11" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="11" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="11" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="12" s="8">
+<O t="DSColumn">
+<Attributes dsName="深圳线下" columnName="产品名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Scope val="1"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="12" s="15">
+<O t="DSColumn">
+<Attributes dsName="深圳线下" columnName="实际销量_2024"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="12" s="15">
+<O t="DSColumn">
+<Attributes dsName="深圳线下" columnName="目标_2024"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="12" s="15">
+<O t="DSColumn">
+<Attributes dsName="深圳线下" columnName="寄样销量_2024"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="12" s="11">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=IF(C13 = null ,"无目标值",B13 / C13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="4">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-2151893" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性2]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="3">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-13408513" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="0">
+<O>
+<![CDATA[无目标值]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72"/>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="13" s="12">
+<O>
+<![CDATA[小计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="13" s="12">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(B13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="13" s="13">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="13" s="12">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(D13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="13" s="14">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=B14 / C14]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="4">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-2151893" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性2]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="3">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-13408513" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="16" cs="5" s="16">
+<O>
+<![CDATA[东莞]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="17" s="17">
+<O>
+<![CDATA[产品名称]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="17" s="17">
+<O>
+<![CDATA[2024年实际销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="17" s="17">
+<O>
+<![CDATA[2024年目标销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="17" s="17">
+<O>
+<![CDATA[2024年寄样]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="17" s="18">
+<O>
+<![CDATA[目标达成率]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="17" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="6" r="17" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="7" r="17" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="8" r="17" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="9" r="17" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="17" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="17" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="18" s="19">
+<O t="DSColumn">
+<Attributes dsName="东莞" columnName="产品名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Scope val="1"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="18" s="20">
+<O t="DSColumn">
+<Attributes dsName="东莞" columnName="实际销量_2024"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="18" s="20">
+<O t="DSColumn">
+<Attributes dsName="东莞" columnName="目标_2024"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="18" s="20">
+<O t="DSColumn">
+<Attributes dsName="东莞" columnName="寄样销量_2024"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="18" s="21">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=IF(C19 = null ,"无目标值",B19 / C19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="4">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-2151893" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性2]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="3">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-13408513" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="0">
+<O>
+<![CDATA[无目标值]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72"/>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="19" s="22">
+<O>
+<![CDATA[小计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="19" s="22">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(B19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="19" s="23">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="19" s="22">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(D19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="19" s="24">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=B20 / C20]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="4">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-2151893" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性2]]></Name>
+<Condition class="com.fr.data.condition.ObjectCondition">
+<Compare op="3">
+<O>
+<![CDATA[0.5]]></O>
+</Compare>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.FRFontHighlightAction">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-13408513" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting/>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="true" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="0"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1" paddingLeft="0" paddingRight="0">
+<FRFont name="微软雅黑" style="1" size="144">
+<foreground>
+<FineColor color="-13266744" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="NullBackground"/>
+<Border>
+<Bottom style="5">
+<color>
+<FineColor color="-10243346" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="1" size="120">
+<foreground>
+<FineColor color="-1424335" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="4" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="88">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-16477509" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="120">
+<foreground>
+<FineColor color="-1424335" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0.00%]]></Format>
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="simhei" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#,##0]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0.00%]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0.00%]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#0]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="88">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-16477509" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0.00%]]></Format>
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#,##0]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0.00%]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0.00%]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="2"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="东莞" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="深圳线上" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="深圳线下" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.27.0.20240627">
+<TemplateCloudInfoAttrMark createTime="1721009912668"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="b3f0ab44-c56d-4ceb-b1d5-f297c08f54c8"/>
+</TemplateIdAttMark>
+</WorkBook>

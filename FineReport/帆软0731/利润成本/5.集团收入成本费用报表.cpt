@@ -1,0 +1,5079 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="职能部门渠道" class="com.fr.data.impl.EmbeddedTableData">
+<Parameters/>
+<DSName>
+<![CDATA[null]]></DSName>
+<ColumnNames>
+<![CDATA[渠道,,.,,公司]]></ColumnNames>
+<ColumnTypes>
+<![CDATA[java.lang.String,java.lang.String]]></ColumnTypes>
+<RowData ColumnTypes="java.lang.String,java.lang.String">
+<![CDATA[Hb++BZT5]APRoaPmgV34BSBY;7G;MIRZO9@_`Kiqg]A+uRsG_Q2Y0;l_`cSeQf<UaPNY,>R3?S
+(Ph2J#+9n?[l*cZf+Jm@&f,\,>LO7YD*K~
+]]></RowData>
+</TableData>
+<TableData name="销管财研" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny_end"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="jjp"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[
+select g.年度, g.月份 ,g.科目全名, g.借方金额,g.资产分类, 
+g.明细科目, 
+g.费用归属组, 
+case when 科目全名 like '%销售费用%' then CONCAT('1.',row_number()over(partition by 科目全名))
+      when 科目全名 like '%财务费用%' then CONCAT('2.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%管理费用%' then CONCAT('3.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%研发费用%' then CONCAT('4.',row_number()over(partition by 科目全名))	  
+end id
+,case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	    when 科目全名 like '%管理费用%' then '3'
+	    when 科目全名 like '%研发费用%' then '4'
+	 
+end 父id,
+
+sum( 金额)金额,
+业务主体
+from (
+
+#拿到其他
+select '分摊',c.年度, c.月份 ,c.科目全名, c.借方金额,c.资产分类, 
+c.明细科目, 
+c.费用归属组, 
+-- c.id ,c.父id,
+round(c.金额*d.比例,2) 金额,
+业务主体 from 
+(select 年度, 月份 ,科目全名, 借方金额,资产分类, 明细科目, 费用归属组, 
+
+sum(借方金额) 金额,业务主体,'深圳合计' ck ,季节性产品
+from profit.ods_dm_损益类科目 
+where 
+季节性产品 not rlike('冰粽|月饼|年货') 
+and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 费用归属组 not  in('财务部',
+'总经办',
+'市场部',
+'人力行政部',
+'客服部',
+'IT部门',
+'法务部',
+'产品部')
+and 科目全名='销售费用' 
+and 明细科目 not in('销售费用_代理推广佣金'
+,'销售费用_广告促销费'
+,'销售费用_劳务'
+,'销售费用_平台其他费用'
+,'销售费用_平台佣金'
+,'销售费用_售后扣款'
+,'销售费用_寄样成本'
+,'销售费用_寄样运费'
+,'销售费用_快递费')
+group by 明细科目,费用归属组) c
+
+
+left join 
+(
+#拿到比例
+select a.金额 总金额,b.金额 季节品金额,a.金额/b.金额 比例,a.费用归属组 from
+(
+#每个事业部单个季节品得不含税收入
+select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目,业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+费用归属组
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+-- and 季节性产品 in('其他','未分')
+and 科目全名 ='主营业务收入'
+group by 科目全名,费用归属组)a
+join 
+#每个事业部总的合计不含税收入
+(select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目,业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+费用归属组
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 科目全名 ='主营业务收入'
+group by 科目全名,费用归属组)b
+on a.费用归属组=b.费用归属组)d
+on c.费用归属组=d.费用归属组
+
+union all
+#进取其他未分得未参与分摊部分,并过滤三大类
+select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
+sum(ifnull(借方金额,0)) 金额,业务主体
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+-- 其他、未分季节品为空
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+ and 季节性产品 not in('年货','月饼','冰粽')
+and 明细科目 in('销售费用_代理推广佣金'
+,'销售费用_广告促销费'
+,'销售费用_劳务'
+,'销售费用_平台其他费用'
+,'销售费用_平台佣金'
+,'销售费用_售后扣款'
+,'销售费用_寄样成本'
+,'销售费用_寄样运费'
+,'销售费用_快递费')
+and 费用归属组 not in ('市场部','客服部')
+and 业务主体 != '东莞'
+group by  明细科目,费用归属组,业务主体
+
+
+union  all 
+-- 明细科目聚合
+-- 过滤'其他未分',不让'其他未分'与'其他未分'得分摊合并
+select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
+sum(ifnull(借方金额,0)) 金额,业务主体
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+-- 其他、未分季节品为空
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+and 季节性产品 not in('其他','未分')
+and 费用归属组 not in ('市场部','客服部')
+group by  明细科目,费用归属组,业务主体
+)g
+group by 明细科目,费用归属组
+
+
+
+
+union all
+
+-- 科目费用小计聚合
+select 年度 ,月份,科目全名,借方金额,资产分类
+,case when 科目全名 like '%销售费用%' then '销售费用小计'
+      when 科目全名 like '%财务费用%' then '财务费用小计'
+      when 科目全名 like '%管理费用%' then '管理费用小计'
+	  when 科目全名 like '%研发费用%' then '研发费用小计'
+
+end as 明细科目,费用归属组,
+case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	  when 科目全名 like '%管理费用%' then '3'
+	  when 科目全名 like '%研发费用%' then '4'
+	 
+end id
+,0 父id,
+-- sum(ifnull(借方金额,0)) 金额,
+'0' 金额,
+业务主体
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 费用归属组 not  in('财务部',
+'总经办',
+'市场部',
+'人力行政部',
+'客服部',
+'IT部门',
+'法务部',
+'产品部')
+and 业务主体 != '东莞'
+group by  
+case when 科目全名 like '%销售费用%' then '销售费用小计'
+      when 科目全名 like '%财务费用%' then '财务费用小计'
+      when 科目全名 like '%管理费用%' then '管理费用小计'
+	  when 科目全名 like '%研发费用%' then '研发费用小计'
+
+end ,费用归属组,业务主体
+union all
+
+--  职能部门
+select g.年度, g.月份 ,g.科目全名, g.借方金额,g.资产分类, 
+g.明细科目, 
+g.费用归属组, 
+case when 科目全名 like '%销售费用%' then CONCAT('1.',row_number()over(partition by 科目全名))
+      when 科目全名 like '%财务费用%' then CONCAT('2.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%管理费用%' then CONCAT('3.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%研发费用%' then CONCAT('4.',row_number()over(partition by 科目全名))	  
+end id
+,case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	    when 科目全名 like '%管理费用%' then '3'
+	    when 科目全名 like '%研发费用%' then '4'
+	 
+end 父id,
+
+sum( 金额)金额,
+业务主体
+from (
+
+#拿到其他
+select '分摊',c.年度, c.月份 ,c.科目全名, c.借方金额,c.资产分类, 
+c.明细科目, 
+c.费用归属组, 
+-- c.id ,c.父id,
+round(c.金额*d.比例,2) 金额,
+c.业务主体 from 
+(select 年度, 月份 ,科目全名, 借方金额,资产分类, 明细科目, 费用归属组, 
+
+sum(借方金额) 金额,业务主体,季节性产品
+from profit.ods_dm_损益类科目 
+where 
+季节性产品 not rlike('冰粽|月饼|年货') 
+and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 费用归属组  in('财务部',
+'总经办',
+'市场部',
+'人力行政部',
+'客服部',
+'IT部门',
+'法务部',
+'产品部')
+and 科目全名 regexp('管理费用|销售费用|研发费用|财务费用')
+and 明细科目 not in('销售费用_代理推广佣金'
+,'销售费用_广告促销费'
+,'销售费用_劳务'
+,'销售费用_平台其他费用'
+,'销售费用_平台佣金'
+,'销售费用_售后扣款'
+,'销售费用_寄样成本'
+,'销售费用_寄样运费'
+,'销售费用_快递费')
+and 业务主体 ='深圳'
+group by 明细科目,费用归属组) c
+
+
+left join 
+(
+#拿到比例
+select a.金额 总金额,b.金额 季节品金额,a.金额/b.金额 比例,a.业务主体 from
+(
+#拿到职能部门单个季节品,深圳合计不含税收入
+select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目, 业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+ 费用归属组
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+and 科目全名 ='主营业务收入'
+group by 科目全名,业务主体)a
+join 
+#职能部门总的合计不含税收入
+(select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目,业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+费用归属组
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 科目全名 ='主营业务收入'
+group by 科目全名,业务主体)b
+on a.业务主体=b.业务主体)d
+on c.业务主体=d.业务主体
+
+
+union all
+#获取其他未分得未参与分摊部分,并过滤三大类
+select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
+sum(ifnull(借方金额,0)) 金额,业务主体
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+-- 其他、未分季节品为空
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+ and 季节性产品 not in('年货','月饼','冰粽')
+and 明细科目 in('销售费用_代理推广佣金'
+,'销售费用_广告促销费'
+,'销售费用_劳务'
+,'销售费用_平台其他费用'
+,'销售费用_平台佣金'
+,'销售费用_售后扣款'
+,'销售费用_寄样成本'
+,'销售费用_寄样运费'
+,'销售费用_快递费')
+and 费用归属组 in('市场部','客服部')
+group by  明细科目,费用归属组,业务主体
+
+
+union  all 
+-- 三大类原有得
+-- 过滤'其他未分',不让'其他未分'与'其他未分'得分摊合并
+select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
+sum(ifnull(借方金额,0)) 金额,业务主体
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+-- 其他、未分季节品为空
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+-- and 季节性产品  in('月饼')
+and 费用归属组 in ('市场部','客服部')
+and 季节性产品 not in('其他','未分')
+group by  明细科目,费用归属组,业务主体
+)g
+group by 明细科目,费用归属组
+
+
+
+
+union all
+
+-- 制作数结构
+select 年度 ,月份,科目全名,借方金额,资产分类
+,case when 科目全名 like '%销售费用%' then '销售费用小计'
+      when 科目全名 like '%财务费用%' then '财务费用小计'
+      when 科目全名 like '%管理费用%' then '管理费用小计'
+	  when 科目全名 like '%研发费用%' then '研发费用小计'
+
+end as 明细科目,费用归属组,
+case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	  when 科目全名 like '%管理费用%' then '3'
+	  when 科目全名 like '%研发费用%' then '4'
+	 
+end id
+,0 父id,
+-- sum(ifnull(借方金额,0)) 金额,
+'0' 金额,
+业务主体
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 费用归属组  in('财务部',
+'总经办',
+'市场部',
+'人力行政部',
+'客服部',
+'IT部门',
+'法务部',
+'产品部')
+and 业务主体 != '东莞'
+group by  
+case when 科目全名 like '%销售费用%' then '销售费用小计'
+      when 科目全名 like '%财务费用%' then '财务费用小计'
+      when 科目全名 like '%管理费用%' then '管理费用小计'
+	  when 科目全名 like '%研发费用%' then '研发费用小计'
+
+end ,费用归属组,业务主体
+
+union all 
+-- 东莞
+select 年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组
+,case when 科目全名 like '%销售费用%' then CONCAT('1.',row_number()over(partition by 科目全名))
+      when 科目全名 like '%财务费用%' then CONCAT('2.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%管理费用%' then CONCAT('3.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%研发费用%' then CONCAT('4.',row_number()over(partition by 科目全名))	  
+end id
+,case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	    when 科目全名 like '%管理费用%' then '3'
+	    when 科目全名 like '%研发费用%' then '4'
+	 
+end 父id,sum(ifnull(借方金额,0)) 金额,业务主体
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+ ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+and 业务主体 ='东莞'
+group by  明细科目,费用归属组,业务主体
+union all
+
+-- 科目费用小计聚合
+select 年度 ,月份,科目全名,借方金额,资产分类
+,case when 科目全名 like '%销售费用%' then '销售费用小计'
+      when 科目全名 like '%财务费用%' then '财务费用小计'
+      when 科目全名 like '%管理费用%' then '管理费用小计'
+	  when 科目全名 like '%研发费用%' then '研发费用小计'
+
+end as 明细科目,费用归属组
+,case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	  when 科目全名 like '%管理费用%' then '3'
+	  when 科目全名 like '%研发费用%' then '4'
+	 
+end id
+,0 父id,sum(ifnull(借方金额,0)) 金额,业务主体
+from
+profit.ods_dm_损益类科目
+where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+ ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+and 业务主体 ='东莞'
+group by  
+case when 科目全名 like '%销售费用%' then '销售费用小计'
+      when 科目全名 like '%财务费用%' then '财务费用小计'
+      when 科目全名 like '%管理费用%' then '管理费用小计'
+	  when 科目全名 like '%研发费用%' then '研发费用小计'
+
+end ,费用归属组,业务主体
+]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="Tree1" class="com.fr.data.impl.RecursionTableData">
+<markFields>
+<![CDATA[8]]></markFields>
+<parentmarkFields>
+<![CDATA[9]]></parentmarkFields>
+<markFieldsName>
+<![CDATA[id]]></markFieldsName>
+<parentmarkFieldsName>
+<![CDATA[父id]]></parentmarkFieldsName>
+<originalTableDataName>
+<![CDATA[销管财研]]></originalTableDataName>
+</TableData>
+<TableData name="含税" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="jjp"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny_end"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[-- 含税
+select 
+科目全名,case when 资产分类 ='主营业务收入' then '主营业务收入(含税)' else 资产分类 end as 资产分类,明细科目,业务主体,
+case 
+	when 资产分类 regexp('主营业务收入') then sum(ifnull(贷方金额,0))
+end as 金额,
+费用归属组
+from
+profit.ods_dm_费用科目表
+where 科目全名 regexp ('主营业务收入|其他业务|营业税金|应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+group by 资产分类,费用归属组,业务主体]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="不含税" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="jjp"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny_end"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[-- 不含税
+select
+case when 科目全名 regexp ('其他业务成本|其他业务支出') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目,业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+费用归属组
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+group by 科目全名,费用归属组]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="营业外未分摊" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="jjp"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny_end"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[
+
+select 
+case when  明细科目 regexp('其他收入') then '营业外收入' 
+	 when  明细科目 regexp('其他支出') then '营业外支出'
+	else 明细科目 end 
+资产分类,
+费用归属组,case when 科目全名 like '%收入%'  then round(sum(ifnull(贷方金额,0)),2) else round(sum(ifnull(借方金额,0)),2) end 金额,
+业务主体 from profit.ods_dm_费用科目表 
+where 资产分类 regexp('营业外') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}'  
+ ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+group by 费用归属组,明细科目]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="资产减值损失" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="jjp"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny_end"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[
+#拿到其他
+select '分摊',c.年度, c.月份 ,c.科目全名, c.借方金额,c.资产分类, 
+c.明细科目, 
+c.费用归属组, 
+-- c.id ,c.父id,
+round(c.金额*d.比例,2) 金额,
+c.业务主体 from 
+(select 年度, 月份 ,科目全名, 借方金额,资产分类, 明细科目, 费用归属组, 
+
+sum(借方金额) 金额,业务主体,季节性产品
+from profit.ods_dm_损益类科目 
+where 
+季节性产品 not rlike('冰粽|月饼|年货') 
+and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 科目全名 regexp('资产减值损失')
+
+group by 明细科目,费用归属组) c
+
+
+left join 
+(
+#拿到比例
+select a.金额 总金额,b.金额 季节品金额,a.金额/b.金额 比例,a.业务主体 from
+(
+#拿到职能部门单个季节品,深圳合计不含税收入
+select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目, 业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+ 费用归属组
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+-- and 季节性产品 regexp('月饼|冰粽|其他|未分|年货')
+and 科目全名 ='主营业务收入'
+group by 科目全名,业务主体)a
+join 
+#职能部门总的合计不含税收入
+(select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目,业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+费用归属组
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 科目全名 ='主营业务收入'
+group by 科目全名,业务主体)b
+on a.业务主体=b.业务主体)d
+on c.业务主体=d.业务主体
+
+
+union all
+#获取其他未分得未参与分摊部分,并过滤三大类
+select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
+sum(ifnull(借方金额,0)) 金额,业务主体
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('资产减值损失') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+-- 其他、未分季节品为空
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+and 季节性产品 not in('年货','月饼','冰粽')
+and 明细科目 in('销售费用_代理推广佣金'
+,'销售费用_广告促销费'
+,'销售费用_劳务'
+,'销售费用_平台其他费用'
+,'销售费用_平台佣金'
+,'销售费用_售后扣款'
+,'销售费用_寄样成本'
+,'销售费用_寄样运费')
+and 费用归属组 in('市场部','客服部')
+group by  明细科目,费用归属组,业务主体
+
+
+union  all 
+-- 三大类原有得
+-- 过滤'其他未分',不让'其他未分'与'其他未分'得分摊合并
+select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
+sum(ifnull(借方金额,0)) 金额,业务主体
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('资产减值损失') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+-- 其他、未分季节品为空
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+
+and 季节性产品 not in('其他','未分')
+group by  明细科目,费用归属组,业务主体
+
+
+
+]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="线上渠道" class="com.fr.data.impl.EmbeddedTableData">
+<Parameters/>
+<DSName>
+<![CDATA[null]]></DSName>
+<ColumnNames>
+<![CDATA[渠道,,.,,公司]]></ColumnNames>
+<ColumnTypes>
+<![CDATA[java.lang.String,java.lang.String]]></ColumnTypes>
+<RowData ColumnTypes="java.lang.String,java.lang.String">
+<![CDATA[HeQ'm`O<b3VegcB[I%Ps$I3;=2a3e=RHs+#Q-XeX5M=TcAB-5Hi?u7g4C']AM6hk@cgWM#T(r
+FUc2a3cs+&dF9r[0cm@SaTO,(os~
+]]></RowData>
+</TableData>
+<TableData name="东莞渠道" class="com.fr.data.impl.EmbeddedTableData">
+<Parameters/>
+<DSName>
+<![CDATA[null]]></DSName>
+<ColumnNames>
+<![CDATA[渠道,,.,,公司]]></ColumnNames>
+<ColumnTypes>
+<![CDATA[java.lang.String,java.lang.String]]></ColumnTypes>
+<RowData ColumnTypes="java.lang.String,java.lang.String">
+<![CDATA[A^8U/_CuB&n?Y=O7(:;9ZUqKm$p+STBL1iJgOh0.2!J4H&!MOq?]Am'LJc`caj`M?18)=dJ\F
+*0FYW]A5(OC(`+B#It.+;UPr93m7rJE76bq6t*/Cc!$#LE\]A;(Yjc<2Sr[;Wb]A%e!SCJa!1b6
+VOQTrD;h(e(fB%YPMdWh$~
+]]></RowData>
+</TableData>
+<TableData name="销售明细科目排序" class="com.fr.data.impl.EmbeddedTableData">
+<Parameters/>
+<DSName>
+<![CDATA[null]]></DSName>
+<ColumnNames>
+<![CDATA[明细科目]]></ColumnNames>
+<ColumnTypes>
+<![CDATA[java.lang.String]]></ColumnTypes>
+<RowData ColumnTypes="java.lang.String">
+<![CDATA[F]A)FaJj9nFcR!WI1h%#s"='b>OXPo-<X`*,pd3WVm*%)kaHHHH48?ABdlfiM>BpEtM*,*u(I
+.LR'Q+]Al0jGSL_Wl:=<;knn$q$Mj(PO>0,OGTcJM&p4ZNp*?oC4K``&G-q&o\*.$ZT6_9\R>
+E)(cZf]A-^!&QY'a"Q1=PJ<[5f3qp1)>!Gb=3kI&Mpi7P7TPK735Eon#E0-%>9QohQEl'V1"@
+N,(g3&)AR#1AmSW27>><FsCQal4e60+'qV#5WmQ[YUUM:/V.OhA4.14BX.sQKL#%56:ZM:sp
+4hIY7H&C_gb%C6?Y-Q&?odYFsLAn(''/:<iABZst;A73p&/0:7(4^g9LZpl7I+ReM56KaSeG
+1be5oLV'7?8?:bNb]ADg:s4P/Y46?90X1PahY4.g2?-i'N~
+]]></RowData>
+</TableData>
+<TableData name="东莞线上" class="com.fr.data.impl.EmbeddedTableData">
+<Parameters/>
+<DSName>
+<![CDATA[null]]></DSName>
+<ColumnNames>
+<![CDATA[渠道,,.,,公司]]></ColumnNames>
+<ColumnTypes>
+<![CDATA[java.lang.String,java.lang.String]]></ColumnTypes>
+<RowData ColumnTypes="java.lang.String,java.lang.String">
+<![CDATA[HeQ(,7H9VFdrrHqddVA$3mK*7k.KoIa7XQQcDO=4To)"d^%c<nJu@@i63R>~
+]]></RowData>
+</TableData>
+<TableData name="税金及附加分摊逻辑" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="jjp"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny_end"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select 
+'分摊',c.年度, c.月份 ,c.科目全名, c.借方金额,c.资产分类, 
+c.明细科目, 
+c.费用归属组, 
+-- c.id ,c.父id,
+round(c.金额*d.比例,2) 金额,
+c.业务主体
+ from 
+-- 不含税
+(select 年度,月份,借方金额,
+case when 科目全名 regexp ('其他业务成本|其他业务支出') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目,业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+费用归属组
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 季节性产品 not rlike('冰粽|月饼|年货') 
+and 业务主体 ='深圳'
+group by 科目全名,费用归属组)c
+
+
+
+left join 
+
+
+
+(#拿到比例:
+select a.金额 总金额,b.金额 季节品金额,a.金额/b.金额 比例,a.业务主体 from
+(
+#拿到职能部门单个季节品,深圳合计不含税收入
+select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目, 业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+ 费用归属组
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+and 科目全名 ='主营业务收入'
+group by 科目全名,业务主体)a
+join 
+#职能部门总的合计不含税收入
+(select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目,业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+费用归属组
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 科目全名 ='主营业务收入'
+group by 科目全名,业务主体)b
+on a.业务主体=b.业务主体)d
+on d.业务主体 = c.业务主体
+
+union all
+
+# 季节品原有的
+select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
+sum(ifnull(借方金额,0)) 金额,业务主体
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('营业税金') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+-- 其他、未分季节品为空
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+and 季节性产品 not in('其他','未分')
+group by  明细科目,费用归属组,业务主体]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="营业外分摊" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="jjp"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny_end"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select 
+'分摊',c.年度, c.月份 ,c.科目全名, c.借方金额,c.资产分类, 
+c.明细科目, 
+c.费用归属组, 
+-- c.id ,c.父id,
+round(c.金额*d.比例,2) 金额,
+c.业务主体
+ from 
+-- 不含税
+(
+
+select 年度,月份 ,明细科目 ,借方金额,
+case  when 科目全名 regexp('其他业务成本') then '其他业务成本' 
+	  when 科目全名 regexp('其他业务收入') then '其他业务收入'
+else 科目全名 end 科目全名 ,资产分类,
+费用归属组,case when 科目全名 like '%收入%'  then round(sum(ifnull(贷方金额,0)),2) else round(sum(ifnull(借方金额,0)),2) end 金额,
+业务主体 from profit.ods_dm_费用科目表 
+where 资产分类 regexp('营业外') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}'   
+and 季节性产品 in('其他','未分')
+and 业务主体 = '深圳'
+group by 费用归属组,资产分类
+
+
+)c
+
+
+
+left join 
+
+
+
+(#拿到比例:
+select a.金额 总金额,b.金额 季节品金额,a.金额/b.金额 比例,a.业务主体 from
+(
+#拿到职能部门单个季节品,深圳合计不含税收入
+select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目, 业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+ 费用归属组
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+and 科目全名 ='主营业务收入'
+group by 科目全名,业务主体)a
+join 
+#职能部门总的合计不含税收入
+(select
+case when 科目全名 regexp ('其他业务成本') then '其他业务成本'
+	 when 科目全名 regexp ('其他业务收入') then '其他业务收入' else  科目全名 end  科目全名
+,case when 资产分类 ='主营业务收入' then '主营业务收入(不含税)' else 资产分类 end as 资产分类,明细科目,业务主体,
+case 
+	when 资产分类 regexp('收入') then sum(ifnull(贷方金额,0))
+	else  sum(ifnull(借方金额,0))
+end as 金额,
+费用归属组
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
+and 科目全名 ='主营业务收入'
+group by 科目全名,业务主体)b
+on a.业务主体=b.业务主体)d
+on d.业务主体 = c.业务主体
+
+
+
+
+
+
+union all
+
+# 季节品原有的
+
+
+select '自有',年度,月份,
+case  when 科目全名 regexp('其他业务成本') then '其他业务成本' 
+	  when 科目全名 regexp('其他业务收入') then '其他业务收入'
+else 科目全名 end 科目全名 ,借方金额,资产分类,明细科目,
+费用归属组,case when 科目全名 like '%收入%'  then round(sum(ifnull(贷方金额,0)),2) else round(sum(ifnull(借方金额,0)),2) end 金额,
+业务主体 from profit.ods_dm_费用科目表 
+where 资产分类 regexp('营业外') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}'   
+${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
+and 季节性产品 not in('其他','未分')
+and 业务主体 = '深圳'
+group by 费用归属组,资产分类]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="东莞线上收入" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="ny_end"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select 
+sum(金额) 主营业务收入 ,
+sum(价税合计) 主营业务收入（含税）,
+sum(总成本) 主营业务成本,
+客户属性 
+from 
+profit.dm_收入成本表 
+where left(日期,7) >= '${ny}' and left(日期,7) <= '${ny_end}' 
+and 数据源 != '分步式调出单'
+group by 客户属性]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ReportWebAttr>
+<ServerPrinter/>
+<WebViewContent>
+<Listener event="afterload">
+<JavaScript class="com.fr.js.JavaScriptImpl">
+<Parameters/>
+<Content>
+<![CDATA[_g().expandNodeLayer(1);]]></Content>
+</JavaScript>
+</Listener>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.PageSetup">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Page_Setup')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[pagesetup]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.PrintPreview">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_PrintP_Print_Preview')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[preview]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.NewPrint">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Print')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[print]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.Export">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Export')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[export]]></IconName>
+<Buttons pdf="true" excelP="true" excelO="true" excelS="true" word="true" image="true" html="true"/>
+</Widget>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<SortFuncCheck check="true"/>
+<ConditionFuncCheck check="true"/>
+<ListFuncCheck check="true"/>
+</WebViewContent>
+</ReportWebAttr>
+<ReportExportAttr>
+<ExcelExportAttr hideColumn="false" hideRow="false" exportWaterMark="true"/>
+<PDFExportAttr/>
+<HTMLExportAttr/>
+<WordExportAttr exportWaterMark="true"/>
+<ImageExportAttr imageResolution="96" imageType="false" renderQuality="0" format="png"/>
+</ReportExportAttr>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR F="3" T="4"/>
+<FR/>
+<HC F="0" T="1"/>
+<FC/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1905000,1146411,1037229,1524000,1296000,1440000,1440000,1296000,1440000,1296000,1296000,1296000,1440000,1440000,1440000,1440000,1440000,1440000,1440000,1440000,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[8648700,9144000,4457700,5067300,4457700,4572000,4000500,5219700,4457700,4032000,4457700,4457700,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" cs="12" s="0">
+<O>
+<![CDATA[集团收入成本费用表]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="1" cs="12" s="1">
+<O>
+<![CDATA[单位：元  ]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="2" cs="12" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE("期间：",$ny," 至  ",$ny_end)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="3" rs="2" s="2">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="3" cs="4" s="2">
+<O>
+<![CDATA[深圳]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="3" cs="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="东莞渠道" columnName="公司"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I4"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="3" cs="3" s="2">
+<O>
+<![CDATA[集团]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="3" s="3">
+<PrivilegeControl/>
+<CellGUIAttr showAsDefault="true"/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="4" s="4">
+<O>
+<![CDATA[深圳合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="4" s="4">
+<O t="DSColumn">
+<Attributes dsName="线上渠道" columnName="渠道"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<NameJavaScriptGroup>
+<NameJavaScript name="网络报表1">
+<JavaScript class="com.fr.js.ReportletHyperlink">
+<JavaScript class="com.fr.js.ReportletHyperlink">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$ny]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="jjp"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$jjp]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="ny_end"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$ny_end]]></Attributes>
+</O>
+</Parameter>
+</Parameters>
+<TargetFrame>
+<![CDATA[_blank]]></TargetFrame>
+<Features width="600" height="400"/>
+<ReportletName extendParameters="true" showPI="true">
+<![CDATA[/利润成本/6.各个事业部及职能部门渠道毛利表.cpt]]></ReportletName>
+<Attr>
+<DialogAttr class="com.fr.js.ReportletHyperlinkDialogAttr">
+<O>
+<![CDATA[]]></O>
+<Location center="true"/>
+</DialogAttr>
+</Attr>
+</JavaScript>
+</JavaScript>
+</NameJavaScript>
+</NameJavaScriptGroup>
+<Expand dir="1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="4" s="4">
+<O>
+<![CDATA[深圳职能部门合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="4" s="4">
+<O t="DSColumn">
+<Attributes dsName="职能部门渠道" columnName="渠道"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<NameJavaScriptGroup>
+<NameJavaScript name="网络报表1">
+<JavaScript class="com.fr.js.ReportletHyperlink">
+<JavaScript class="com.fr.js.ReportletHyperlink">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$ny]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="bm"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$$$]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="jjp"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$product]]></Attributes>
+</O>
+</Parameter>
+</Parameters>
+<TargetFrame>
+<![CDATA[_blank]]></TargetFrame>
+<Features width="600" height="400"/>
+<ReportletName showPI="true">
+<![CDATA[/利润成本/6.各个事业部及职能部门渠道毛利表.cpt]]></ReportletName>
+<Attr>
+<DialogAttr class="com.fr.js.ReportletHyperlinkDialogAttr">
+<O>
+<![CDATA[]]></O>
+<Location center="true"/>
+</DialogAttr>
+</Attr>
+</JavaScript>
+</JavaScript>
+</NameJavaScript>
+</NameJavaScriptGroup>
+<Expand dir="1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="4" s="4">
+<O>
+<![CDATA[东莞合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="4" s="4">
+<O t="DSColumn">
+<Attributes dsName="东莞线上" columnName="渠道"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="G5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="7" r="4" s="4">
+<O>
+<![CDATA[东莞职能部门合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="4" s="4">
+<O t="DSColumn">
+<Attributes dsName="东莞渠道" columnName="渠道"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="4" s="4">
+<O>
+<![CDATA[借方抵扣]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="4" s="4">
+<O>
+<![CDATA[贷方抵扣]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="4" s="4">
+<O>
+<![CDATA[集团合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="4" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="5" s="6">
+<O>
+<![CDATA[主营业务收入（含税）]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="A6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="5" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D6) + SUM(C6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="5" s="7">
+<O t="DSColumn">
+<Attributes dsName="含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="5" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="5" s="7">
+<O t="DSColumn">
+<Attributes dsName="含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="A6">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="5" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="5" s="7">
+<O t="DSColumn">
+<Attributes dsName="东莞线上收入" columnName="主营业务收入（含税）"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[客户属性]]></CNAME>
+<Compare op="0">
+<ColumnRow column="6" row="4"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="5" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="5" s="7">
+<O t="DSColumn">
+<Attributes dsName="含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="A6">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="5" s="7">
+<O t="DSColumn">
+<Attributes dsName="东莞线上收入" columnName="主营业务收入（含税）"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[客户属性]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联方销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="5" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="5" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=B6 + F6 - J6 + K6]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="5" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="6" s="6">
+<O>
+<![CDATA[主营业务收入]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="6" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D7) + SUM(C7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="2" r="6" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="6"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="6" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="6" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="6"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="6" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="6" s="7">
+<O t="DSColumn">
+<Attributes dsName="东莞线上收入" columnName="主营业务收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[客户属性]]></CNAME>
+<Compare op="0">
+<ColumnRow column="6" row="4"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="6" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="8" r="6" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="6"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="6" s="7">
+<O t="DSColumn">
+<Attributes dsName="东莞线上收入" columnName="主营业务收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[客户属性]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联方销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="6" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="6" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=B7 + F7 - J7 + K7]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="6" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="7" s="6">
+<O>
+<![CDATA[其他业务收入]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="7" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D8) + SUM(C8)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="7" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="7"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="7" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E8)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="7" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="7"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="7" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G8)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="7" s="7">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="7" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I8)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="7" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="7"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="7" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="7" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="7" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=B8 + F8 - J8 + K8]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="7" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="8" s="6">
+<O>
+<![CDATA[主营业务成本]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="8" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D9) + SUM(C9)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="8" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="8"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="8" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E9)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="8" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="8"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="8" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G9)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="8" s="7">
+<O t="DSColumn">
+<Attributes dsName="东莞线上收入" columnName="主营业务成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[客户属性]]></CNAME>
+<Compare op="0">
+<ColumnRow column="6" row="4"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="8" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I9)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="8" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="8"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="8" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="8" s="7">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="8" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=B9 + F9 + J9 - K9]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="8" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="9" s="6">
+<O>
+<![CDATA[其他业务成本]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="9" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D10) + SUM(C10)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="9" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="9"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E10"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="9" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E10)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E10"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="9" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="9"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E10"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="9" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G10)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="9" s="7">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="9" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I10)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="9" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="9"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E10"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="9" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="9" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="9" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=B10 + F10 + J10 - K10]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="9" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="10" s="6">
+<O>
+<![CDATA[营业税金及附加]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="10" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D11) + SUM(C11)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="10" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="10"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="10" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E11)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="10" s="7">
+<O t="DSColumn">
+<Attributes dsName="税金及附加分摊逻辑" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[资产分类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="10"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="10" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G11) + SUM(H11)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="10" s="7">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="10" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I11)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="10" s="7">
+<O t="DSColumn">
+<Attributes dsName="不含税" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="10"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="10" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="10" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="10" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=B11 + F11 + J11 - K11]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="10" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="11" s="8">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="FR_GEN_0"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.report.web.button.form.TreeNodeToggleButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</Widget>
+<Present class="com.fr.base.present.DictPresent">
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="id" viName="明细科目"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[销管财研]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+</Present>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="11" s="8">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D12) + SUM(C12)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="11" s="8">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(C13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B12"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="11" s="8">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E12)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B12"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="11" s="8">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="A12" upParentDefault="false" up="E5">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E12"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="11" s="8">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(H12) + SUM(G12)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="11" s="8">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="11" s="8">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I12)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="11" s="8">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="A12" upParentDefault="false" up="I5">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I12"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="11" s="8">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="11" s="8">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="11" s="8">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(B12) + SUM(F12)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="11" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="12" s="6">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="明细科目"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="9">
+<O>
+<![CDATA[小计]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[父id]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="11"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex reselect="true"/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.report.web.button.form.TreeNodeToggleButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</Widget>
+<Present class="com.fr.base.present.DictPresent">
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="id" viName="明细科目"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[销管财研]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+</Present>
+<Expand dir="0" leftParentDefault="false" left="A12">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="A13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="12" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D13) + SUM(C13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="12" s="7">
+<O t="DSColumn">
+<Attributes dsName="销管财研" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="12"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="12" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="12" s="7">
+<O t="DSColumn">
+<Attributes dsName="销管财研" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="12"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="12" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(H13) + SUM(G13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="12" s="7">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="12" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="12" s="7">
+<O t="DSColumn">
+<Attributes dsName="销管财研" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="12"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="12" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="12" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="12" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(B13) + SUM(F13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="12" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="13" s="6">
+<O>
+<![CDATA[资产减值损失]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="13" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D14) + SUM(C14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="13" s="7">
+<O t="DSColumn">
+<Attributes dsName="资产减值损失" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="13" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="13" s="7">
+<O t="DSColumn">
+<Attributes dsName="资产减值损失" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="13" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(H14) + SUM(G14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="13" s="7">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="13" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="13" s="7">
+<O t="DSColumn">
+<Attributes dsName="资产减值损失" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="13"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I14"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="13" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="13" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="13" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(B14) + SUM(F14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="13" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="14" s="6">
+<O>
+<![CDATA[营业利润]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="14" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(B7) + sum(B8) - sum(B9) - sum(B11) - sum(B12) - SUM(B14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="14" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C7) + sum(C8) - sum(C9) - sum(C11) - sum(C12) - SUM(C14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="14" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(D7) + sum(D8) - sum(D9) - sum(D11) - sum(D12) - SUM(D14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="14" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(E7) + sum(E8) - sum(E9) - sum(E11) - sum(E12) - SUM(E14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="14" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(F7) + sum(F8) - sum(F9) - sum(F11) - sum(F12) - SUM(F14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="14" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(G7) + sum(G8) - sum(G9) - sum(G11) - sum(G12) - SUM(G14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="7" r="14" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(H7) + sum(H8) - sum(H9) - sum(H11) - sum(H12) - SUM(H14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="14" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I7) + sum(I8) - sum(I9) - sum(I11) - sum(I12) - SUM(I14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="14" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="14" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="14" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(B15) + SUM(F15)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="14" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="15" s="6">
+<O t="DSColumn">
+<Attributes dsName="营业外分摊" columnName="资产分类"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[资产分类]]></CNAME>
+<Compare op="1">
+<O>
+<![CDATA[营业外支出]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="15" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D16) + SUM(C16)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="15" s="7">
+<O t="DSColumn">
+<Attributes dsName="营业外分摊" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[资产分类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="15"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="15" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E16)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="15" s="7">
+<O t="DSColumn">
+<Attributes dsName="营业外分摊" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[资产分类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="15"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="15" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G16) + SUM(H16)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="15" s="7">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="15" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I16)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="15" s="7">
+<O t="DSColumn">
+<Attributes dsName="营业外未分摊" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[资产分类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="15"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="15" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="15" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="15" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(B16) + SUM(F16)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="15" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="16" s="6">
+<O>
+<![CDATA[营业外支出]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="16" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D17) + SUM(C17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="16" s="7">
+<O t="DSColumn">
+<Attributes dsName="营业外分摊" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[资产分类]]></CNAME>
+<Compare op="10">
+<O>
+<![CDATA[营业外支出]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="16" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="16" s="7">
+<O t="DSColumn">
+<Attributes dsName="营业外分摊" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[资产分类]]></CNAME>
+<Compare op="10">
+<O>
+<![CDATA[营业外支出]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="16" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G17) + SUM(H17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="16" s="7">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="16" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="16" s="7">
+<O t="DSColumn">
+<Attributes dsName="营业外未分摊" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[业务主体]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="8" row="4"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[资产分类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="16"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="16" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="16" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="16" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(B17) + SUM(F17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="16" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="17" s="6">
+<O>
+<![CDATA[利润总额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="17" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(B15) + sum(B16) - sum(B17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="17" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C15) + sum(C16) - sum(C17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="17" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(D15) + sum(D16) - sum(D17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="17" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(E15) + sum(E16) - sum(E17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="17" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(F15) + sum(F16) - sum(F17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="17" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(G15) + sum(G16) - sum(G17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="7" r="17" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(H15) + sum(H16) - sum(H17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="17" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I15) + sum(I16) - sum(I17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="17" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="17" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="17" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(B18) + SUM(F18)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="17" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="18" s="6">
+<O>
+<![CDATA[所得税]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="18" s="9">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="18" s="9">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="3" r="18" s="9">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="18" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="5" r="18" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="18" s="9">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="18" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="18" s="7">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="9" r="18" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="18" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="18" s="7">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="18" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="19" s="6">
+<O>
+<![CDATA[净利润]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="19" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(B18) - sum(B19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="19" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C18) - sum(C19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="19" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(D18) - sum(D19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="19" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(E18) - sum(E19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="19" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(F18) - sum(F19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="19" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(G18) - sum(G19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="7" r="19" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(H18) - sum(H19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="19" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I18) - sum(I19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="19" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="10" r="19" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="11" r="19" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(B20) + SUM(F20)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="19" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting/>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="false" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="4"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+<ParameterUI class="com.fr.form.main.parameter.FormParameterUI">
+<Parameters/>
+<Layout class="com.fr.form.ui.container.WParameterLayout">
+<WidgetName name="para"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<FollowingTheme borderStyle="false"/>
+<Margin top="0" left="0" bottom="0" right="0"/>
+<Border>
+<border style="0" borderRadius="0" type="0" borderStyle="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+<WidgetTitle>
+<O>
+<![CDATA[新建标题]]></O>
+<FRFont name="SimSun" style="0" size="72"/>
+<Position pos="0"/>
+</WidgetTitle>
+<Alpha alpha="1.0"/>
+</Border>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-526086" hor="-1" ver="-1"/>
+</color>
+</Background>
+<LCAttr vgap="0" hgap="0" compInterval="0"/>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="ny_end"/>
+<WidgetID widgetID="6cc55bb2-4441-4879-a267-b6f4312f5216"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr format="yyyy-MM"/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=MONTHDELTA(todate(now()),-1)]]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="353" y="33" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="date_c"/>
+<WidgetID widgetID="80a7226f-695c-444b-b6d2-cdb35d7d7fd1"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[结束日期]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="273" y="33" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.parameter.FormSubmitButton">
+<WidgetName name="formSubmit0"/>
+<WidgetID widgetID="8f032025-96d5-4ecf-ace3-bdf03405ccd3"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[查询]]></Text>
+<Hotkeys>
+<![CDATA[enter]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="773" y="33" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboCheckBox">
+<WidgetName name="jjp"/>
+<WidgetID widgetID="fd59a369-6bb6-4d79-800e-e90d3add77e1"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.CustomDictionary">
+<CustomDictAttr>
+<Dict key="冰粽" value="冰粽"/>
+<Dict key="月饼" value="月饼"/>
+<Dict key="其他" value="其他"/>
+<Dict key="年货" value="年货"/>
+<Dict key="未分" value="未分"/>
+</CustomDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+<RAAttr delimiter="&apos;,&apos;" isArray="false"/>
+</InnerWidget>
+<BoundsAttr x="638" y="33" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="jjp_1"/>
+<LabelName name="开始日期"/>
+<WidgetID widgetID="93c5f4a1-e051-4b52-a593-f5140fafb9a7"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[季节性产品：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="558" y="33" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="ny"/>
+<WidgetID widgetID="6cc55bb2-4441-4879-a267-b6f4312f5216"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr format="yyyy-MM"/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=MONTHDELTA(todate(now()),-1)]]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="108" y="33" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="date"/>
+<WidgetID widgetID="80a7226f-695c-444b-b6d2-cdb35d7d7fd1"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[开始日期]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="28" y="33" width="80" height="21"/>
+</Widget>
+<ShowBookmarks showBookmarks="false"/>
+<Sorted sorted="false"/>
+<MobileWidgetList>
+<Widget widgetName="ny"/>
+<Widget widgetName="ny_end"/>
+<Widget widgetName="jjp"/>
+<Widget widgetName="formSubmit0"/>
+</MobileWidgetList>
+<FrozenWidgets/>
+<MobileBookMarkStyle class="com.fr.form.ui.mobile.impl.DefaultMobileBookMarkStyle"/>
+<Display display="true"/>
+<DelayDisplayContent delay="false"/>
+<UseParamsTemplate use="true"/>
+<paramFireStopEdit fireEvent="false"/>
+<Position position="0"/>
+<Design_Width design_width="960"/>
+<NameTagModified/>
+<WidgetNameTagMap/>
+<ParamAttr class="com.fr.report.mobile.DefaultMobileParamStyle"/>
+<ParamStyle class="com.fr.form.ui.mobile.impl.DefaultMobileParameterStyle"/>
+</Layout>
+<DesignAttr width="960" height="80"/>
+</ParameterUI>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1" paddingLeft="0" paddingRight="0">
+<FRFont name="微软雅黑" style="1" size="144">
+<foreground>
+<FineColor color="-13266744" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="NullBackground"/>
+<Border>
+<Bottom style="5">
+<color>
+<FineColor color="-10243346" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+</Border>
+</Style>
+<Style horizontal_alignment="4" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="96">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-13719584" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="simhei" style="0" size="96"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="88">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-13719584" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1" paddingLeft="0" paddingRight="0">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="80">
+<foreground>
+<FineColor color="-13421773" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1182733" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="2"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="主营业务类" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="营业利润" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="营业外分摊" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="税金" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="东莞线上收入" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="不含税" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="资产减值损失" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.18.0.20230712">
+<TemplateCloudInfoAttrMark createTime="1691550865944"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="769c330b-55c4-432c-bdf8-6e2dc103e716"/>
+</TemplateIdAttMark>
+</WorkBook>

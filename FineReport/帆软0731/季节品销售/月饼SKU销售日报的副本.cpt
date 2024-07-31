@@ -1,0 +1,2058 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="ds2" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select 下单时间,left(下单时间,7) 年月,sum(箱盒转换) 总销量,sum(分摊后金额)实付金额,销售,产品名称,大小盒,
+case 
+	when 下单时间 like '%2024-01%' then CONCAT('01.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+    when 下单时间 like '%2024-02%' then CONCAT('02.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+	when 下单时间 like '%2024-03%' then CONCAT('03.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+	when 下单时间 like '%2024-04%' then CONCAT('04.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+	when 下单时间 like '%2024-05%' then CONCAT('05.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+    when 下单时间 like '%2024-06%' then CONCAT('06.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+	when 下单时间 like '%2024-07%' then CONCAT('07.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+	when 下单时间 like '%2024-08%' then CONCAT('08.',row_number()over(partition by left(下单时间,7) order by 下单时间))	
+	when 下单时间 like '%2024-09%' then CONCAT('09.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+    when 下单时间 like '%2024-10%' then CONCAT('10.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+	when 下单时间 like '%2024-11%' then CONCAT('11.',row_number()over(partition by left(下单时间,7) order by 下单时间))
+	when 下单时间 like '%2024-12%' then CONCAT('12.',row_number()over(partition by left(下单时间,7) order by 下单时间))	
+end id
+,
+case when 下单时间 like '%2024-01%' then '01'
+     when 下单时间 like '%2024-02%' then '02'
+	 when 下单时间 like '%2024-03%' then '03'
+	 when 下单时间 like '%2024-04%' then '04'
+	 when 下单时间 like '%2024-05%' then '05'
+     when 下单时间 like '%2024-06%' then '06'
+	 when 下单时间 like '%2024-07%' then '07'
+	 when 下单时间 like '%2024-08%' then '08'
+	 when 下单时间 like '%2024-09%' then '09'
+     when 下单时间 like '%2024-10%' then '10'
+	 when 下单时间 like '%2024-11%' then '11'
+	 when 下单时间 like '%2024-12%' then '12'
+end 父id
+
+from  profit.dw_吉客云销售明细单_月饼下单 
+where 下单时间 regexp '2024' and  产品名称 != '不取数'
+group by 下单时间,销售,产品名称,大小盒
+order by 下单时间 asc]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="月汇总" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select left(下单时间,7) 年月,sum(箱盒转换) 总销量,sum(分摊后金额)实付金额,销售,产品名称,大小盒
+from  profit.dw_吉客云销售明细单_月饼下单  
+where 下单时间 regexp '2024' 
+group by left(下单时间,7) ,产品名称,销售,大小盒
+order by 下单时间,产品名称]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ReportWebAttr>
+<ServerPrinter/>
+<WebViewContent>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.PageSetup">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Page_Setup')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[pagesetup]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.PrintPreview">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_PrintP_Print_Preview')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[preview]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.NewPrint">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Print')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[print]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.Export">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Export')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[export]]></IconName>
+<Buttons pdf="false" excelP="false" excelO="true" excelS="false" word="false" image="false" html="true"/>
+</Widget>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<SortFuncCheck check="true"/>
+<ConditionFuncCheck check="true"/>
+<ListFuncCheck check="true"/>
+</WebViewContent>
+</ReportWebAttr>
+<ReportExportAttr>
+<ExcelExportAttr hideColumn="false" hideRow="false" exportWaterMark="true"/>
+<PDFExportAttr/>
+<HTMLExportAttr/>
+<WordExportAttr/>
+<ImageExportAttr imageResolution="96" imageType="false" renderQuality="0" format="png"/>
+</ReportExportAttr>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR F="0" T="1"/>
+<FR/>
+<HC F="0" T="2"/>
+<FC/>
+<UPFCR COLUMN="true" ROW="false"/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1485900,878400,734400,734400,734400,734400,734400,734400,723900,723900,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[5219700,5524500,9867900,3456000,3456000,4032000,4032000,3924300,3924300,2743200,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" cs="3" s="0">
+<O>
+<![CDATA[2024冰皮月饼全渠道分SKU销售日报 ]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="1" s="1">
+<O>
+<![CDATA[销售]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="1" s="1">
+<O>
+<![CDATA[大小盒]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="1" s="1">
+<O>
+<![CDATA[简称]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="1" cs="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="年月"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.report.web.button.form.TreeNodeToggleButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</Widget>
+<Present class="com.fr.base.present.DictPresent">
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="父id" viName="年月"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[ds2]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+</Present>
+<Expand dir="1" leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="1" cs="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="下单时间"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.report.web.button.form.TreeNodeToggleButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</Widget>
+<Present class="com.fr.base.present.DictPresent">
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="id" viName="总销量"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[ds2]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+</Present>
+<Expand dir="1" leftParentDefault="false" left="D2" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="F2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="7" r="1" cs="2" s="1">
+<O>
+<![CDATA[年度合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="2" cs="3" s="2">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="2" s="3">
+<O>
+<![CDATA[月销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="2" s="3">
+<O>
+<![CDATA[月销售额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="2" s="3">
+<O>
+<![CDATA[日销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="2" s="3">
+<O>
+<![CDATA[日销售额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="2" s="3">
+<O>
+<![CDATA[累计销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="2" s="3">
+<O>
+<![CDATA[累计销售额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="3" rs="2" s="4">
+<O>
+<![CDATA[销售]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="3" s="4">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="大小盒"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="3" s="5">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="产品名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="3" s="3">
+<O t="DSColumn">
+<Attributes dsName="月汇总" columnName="总销量"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[年月]]></CNAME>
+<Compare op="0">
+<ColumnRow column="3" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D4"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="3" s="3">
+<O t="DSColumn">
+<Attributes dsName="月汇总" columnName="实付金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[年月]]></CNAME>
+<Compare op="0">
+<ColumnRow column="3" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="3" s="3">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="总销量"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="5" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="1" upParentDefault="false" up="F2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="F4"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="3" s="3">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="实付金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="5" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="3" s="3">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D4)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand leftParentDefault="false" left="C4">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="H4"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="3" s="3">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E4)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand leftParentDefault="false" left="C4">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="H4"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="4" cs="2" s="6">
+<O>
+<![CDATA[合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="4" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D4)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B4" upParentDefault="false" up="D2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="4" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E4)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="4" s="6">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="总销量"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="5" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="C5" upParentDefault="false" up="F2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="F5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="4" s="8">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="实付金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="5" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="3"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand extendable="1" leftParentDefault="false" left="C5" upParentDefault="false" up="F2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="G5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="7" r="4" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D5)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="C5">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="H5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="4" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E5)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="C5">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="0" r="5" rs="2" s="4">
+<O>
+<![CDATA[非销售]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="5" s="4">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="大小盒"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="5" s="5">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="产品名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="5" s="3">
+<O t="DSColumn">
+<Attributes dsName="月汇总" columnName="总销量"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[年月]]></CNAME>
+<Compare op="0">
+<ColumnRow column="3" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="1" upParentDefault="false" up="D2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="5" s="3">
+<O t="DSColumn">
+<Attributes dsName="月汇总" columnName="实付金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[年月]]></CNAME>
+<Compare op="0">
+<ColumnRow column="3" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="5" s="3">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="总销量"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="5" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="1" upParentDefault="false" up="F2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="F4"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="5" s="3">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="实付金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="5" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="5" s="3">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand leftParentDefault="false" left="C6">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="H6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="5" s="3">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[row()%2=0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.BackgroundHighlightAction">
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand leftParentDefault="false" left="C6">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="6" cs="2" s="6">
+<O>
+<![CDATA[合计]]></O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B6">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B7"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="6" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B6" upParentDefault="false" up="D2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D7"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="6" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B6" upParentDefault="false" up="D2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E7"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="6" s="6">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="总销量"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="5" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="C7" upParentDefault="false" up="F2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="F7"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="6" s="8">
+<O t="DSColumn">
+<Attributes dsName="ds2" columnName="实付金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="5" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[产品名称]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="5"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand extendable="1" leftParentDefault="false" left="C7" upParentDefault="false" up="F2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="G7"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="7" r="6" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="C7">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="H7"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="6" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="C7">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I7"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="0" r="7" cs="3" s="9">
+<O>
+<![CDATA[总计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="7" s="9">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(D5 +D7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="D2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D8"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="7" s="10">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E5 + E7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="E2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E8"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="7" s="9">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(F5 + F7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="F2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="F8"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="7" s="10">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G5 + G7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="G2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="G8"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="7" r="7" s="9">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(H5+ H7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="H2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="H8"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="7" s="10">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(I5 + I7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand extendable="1" upParentDefault="false" up="I2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I8"/>
+</cellSortAttr>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting/>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="true" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="4"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1" paddingLeft="0" paddingRight="0">
+<FRFont name="微软雅黑" style="1" size="120">
+<foreground>
+<FineColor color="-13266744" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="NullBackground"/>
+<Border>
+<Bottom style="5">
+<color>
+<FineColor color="-10243346" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="1" size="80">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-16477509" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-3873033" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="2" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#,##0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#,##0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-12141632" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#,##0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-12141632" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="17">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="2"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="ds2" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="月汇总" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.28.0.20240723">
+<TemplateCloudInfoAttrMark createTime="1719296820239"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="8deeeccc-4436-4866-9aaa-f8ea0462ec82"/>
+</TemplateIdAttMark>
+</WorkBook>

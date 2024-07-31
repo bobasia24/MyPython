@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DBNavigator.Project.DataEditorManager">
     <record-view-column-sorting-type value="BY_INDEX" />
-    <value-preview-text-wrapping value="true" />
+    <value-preview-text-wrapping value="false" />
     <value-preview-pinned value="false" />
   </component>
   <component name="DBNavigator.Project.DataExportManager">
@@ -36,20 +36,25 @@
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
-    <last-used-providers />
+    <last-used-providers>
+      <object-type object-type="VIEW" editor-provider="DATA" />
+    </last-used-providers>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="d3714f4b-3c08-4f04-8a56-0c837d817780" object-ref="consoles/BI" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="d3714f4b-3c08-4f04-8a56-0c837d817780" />
+  </component>
+  <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="d3714f4b-3c08-4f04-8a56-0c837d817780" dataset="profit.12月运费" active-filter-id="" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
+    <mapping file-url="file://$PROJECT_DIR$/财务临时需求/手动东莞成本_料工费计算.sql" connection-id="d3714f4b-3c08-4f04-8a56-0c837d817780" session-id="MAIN" current-schema="profit" />
+    <mapping file-url="file://$PROJECT_DIR$/财务临时需求/月初跑数脚本.sql" connection-id="d3714f4b-3c08-4f04-8a56-0c837d817780" session-id="MAIN" current-schema="rpa" />
     <mapping file-url="file://$PROJECT_DIR$/财务临时需求/账单校验.sql" connection-id="d3714f4b-3c08-4f04-8a56-0c837d817780" session-id="MAIN" current-schema="rpa" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">

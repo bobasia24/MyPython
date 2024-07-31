@@ -428,8 +428,8 @@ case when distribution_channel in('零食放心购-sz','榴芒一刻零食旗舰
 ,unit_price_after_allocation 分摊后单价
 ,allocated_amount 分摊金额
 ,amount_after_allocation 分摊后金额
-,untaxed_gross_profit 未税毛利
-,gross_profit_rate_before_tax `未税毛利率(%)`
+--,untaxed_gross_profit 未税毛利
+--,gross_profit_rate_before_tax `未税毛利率(%)`
 ,delivery_time 发货时间
 ,creation_time 下单时间
 ,amount_of_money 报价

@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="abcz" class="com.fr.data.impl.EmbeddedTableData">
+<Parameters/>
+<DSName>
+<![CDATA[null]]></DSName>
+<ColumnNames>
+<![CDATA[ID,,.,,FG_13,,.,,SKU_13,,.,,TOT_SALE_AMT_13,,.,,TOT_SALE_AMT_团购_13,,.,,TOT_SALE_AMT_散客_13,,.,,PROFIT_AMT_13,,.,,BUY_AMT_13,,.,,RTN_AMT_13,,.,,STK_AMT_13,,.,,FG_14,,.,,SKU_14,,.,,TOT_SALE_AMT_13_1,,.,,TOT_SALE_AMT_14,,.,,TOT_SALE_AMT_团购_13_1,,.,,TOT_SALE_AMT_团购_14,,.,,TOT_SALE_AMT_散客_13_1,,.,,TOT_SALE_AMT_散客_14,,.,,PROFIT_AMT_13_1,,.,,PROFIT_AMT_14,,.,,BUY_AMT_13_1,,.,,BUY_AMT_14,,.,,RTN_AMT_13_1,,.,,RTN_AMT_14,,.,,STK_AMT_13_1,,.,,STK_AMT_14,,.,,DY]]></ColumnNames>
+<ColumnTypes>
+<![CDATA[java.math.BigDecimal,java.lang.String,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.lang.String,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.lang.String]]></ColumnTypes>
+<RowData ColumnTypes="java.math.BigDecimal,java.lang.String,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.lang.String,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.math.BigDecimal,java.lang.String">
+<![CDATA[X]AIZ'(,6B&-RU'kdJD`a!Y$u*T-+92LD3R(!^r$$`+_b5DLm;of]A,[M;>;Yb^&E1fhQpkON&
+CRIIXhCnlK6Q"deYrEVka5^V\l2<j:4<LFu0*c1/^.,J[N=k@"]A\1-@P+H>C<UNZV,`#Z'To
+XV?ie6lp?bqnf_Ck)8kp1N+_O"q-BA9N;iaf]A)2:$k5%HQANWDP-S3!>WM'-QS(RM)iBBYSd
+DotZ_8rfJm*eB!rBH*GRI>U>]AD_<\rou"T_-\4qEFMYaFXhB-Cjt<<NfjTo(ZDLn&tgQX[u\
+JpYA\6U`m`>^lL#Y>7c*icZVE"#cgqF?QlGGn#IaFucp`fFmmI'=c"ln"Js=u8;Y*n+c$`aY
+*m'([TUmnad"Hg\?G(YDCgGUGi.U.s-7kgN!9;h0*>n["?c4f^]A^SS>00.m;b@JnI`BEIrC*
+g6/$#\f.Y$F[+gLnKJg,?hR-^f@Q?-]AiP4*d@gU:b7N6jalDV+cj$&YEO$7_ZDS_5,_C6:g-
+hC,W2qnkN4unL.7(Yo>tc5hiPF8ZH85]A4Bnm60q_\[9aT1q<2<9+Xn\urQ$SledpNR,4;8G/
+t+T35W]AM;!k7$C]A1Ro#.gp>\5FR_7NaM:r8PleI$*.`s[!(+(KMWX*(9F4JPJo@FR4+VMgcg
+NU]A>f44Tf:C=b1N`CnW_*/qVAiU%0qDtC!:Mr'B^<BUZ/7\VUJ]AFR=X,3+G<8GV(OMSE).eO
+%\%?GR/,@3!Z)Bs9VqVeQU0[<#U5uj+hsMn,K_c!@-J(]AoUK+M7Fs#b!Fam&f;8hU_7Y@#'f
+_@:`Z>[!]A88*H1ZBt-^(:fuoHN4l66ut)k6do!3%JS"<qXBWmcMq9Ql4e35@gZN2QRZ/+?Be
+k*lq+1NNGatal4Um/9p?$L>bF_Y\M/::sXM!MC`s+c!&+qjnl;n7E?4'.88,D;u;4ZRbT!;S
+\hOgf]Ab"TViuZlG$nP8,h@stID`ECI7dusd+O22EIs,n<@:DP"6BWEi3oC#0iun@]AcK)E'X:
+upoQ$0I75;qk$LK%*E.VtN5bBCgiPOV['kN/QVtqjAj8!]AYQ>;#rLLbV1!j)NfP)\']ADg.kX
+H,#S2DMh!(HL[@2SGDsl!jO#bEB=/cA04i)>FRBp+QR[mr-=<[%#b^!G3q$`!<~
+]]></RowData>
+</TableData>
+</TableDataMap>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR/>
+<FR/>
+<HC/>
+<FC/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[5715000,2743200,2743200,2743200,1943100,1828800,2590800,1866900,2743200,2743200,2743200,2743200,2743200,2743200,2743200,2743200,2743200,2743200,2743200,2743200,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" s="0">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="1" s="1">
+<O>
+<![CDATA[库存量单位]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="1" s="2">
+<O>
+<![CDATA[0492bb]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="2" s="3">
+<O>
+<![CDATA[2014销售额等级]]></O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="K2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="2" s="2">
+<O>
+<![CDATA[00a4ea]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="3" s="4">
+<O t="DSColumn">
+<Attributes dsName="abcz" columnName="FG_13"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="K2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="3" s="2">
+<O>
+<![CDATA[c4e6f7]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="4" s="5">
+<O>
+<![CDATA[小合计]]></O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="K2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="4" s="2">
+<O>
+<![CDATA[92dcdb]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="5" s="6">
+<O>
+<![CDATA[大合计]]></O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="K2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="5" s="2">
+<O>
+<![CDATA[46bbc0]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="6" s="7">
+<O>
+<![CDATA[间隔配色]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="6" s="2">
+<O>
+<![CDATA[e3f9ff]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="7" s="8">
+<O>
+<![CDATA[框线]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="7" s="2">
+<O>
+<![CDATA[9ad4ea]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting/>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+</ReportAttrSet>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="true" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="0"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+</ReportParameterAttr>
+<StyleList>
+<Style style_name="默认" full="true" border_source="-1" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-16477509" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="SimSun" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-16734998" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-3873033" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-7152421" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-12141632" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1836545" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-6630166" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="0"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.27.0.20240627">
+<TemplateCloudInfoAttrMark createTime="1722306639231"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="f90fa823-2fb4-4e90-a638-879ef5550728"/>
+</TemplateIdAttMark>
+</WorkBook>
