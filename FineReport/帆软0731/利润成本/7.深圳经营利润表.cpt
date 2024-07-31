@@ -189,7 +189,7 @@ case
 end as 金额,明细科目,月份
 from
 profit.ods_dm_费用科目表
-where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外') 
+where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外|所得税费用') 
 ${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
 ${if(len(year)=0,"","and 年度 in ('"+year+"')")}
 group by 明细科目,月份
@@ -203,7 +203,7 @@ case
 end as 金额,明细科目,'1-3合计' 月份
 from
 profit.ods_dm_费用科目表
-where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外') 
+where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外|所得税费用') 
 ${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
 ${if(len(year)=0,"","and 年度 in ('"+year+"')")}
 and 月份 >=1 and 月份 <=3
@@ -219,7 +219,7 @@ case
 end as 金额,明细科目,'4-6合计' 月份
 from
 profit.ods_dm_费用科目表
-where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外') 
+where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外|所得税费用') 
 ${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
 ${if(len(year)=0,"","and 年度 in ('"+year+"')")}
 and 月份 >=4 and 月份 <=6
@@ -234,7 +234,7 @@ case
 end as 金额,明细科目,'7-9合计' 月份
 from
 profit.ods_dm_费用科目表
-where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外') 
+where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外|所得税费用') 
 ${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
 ${if(len(year)=0,"","and 年度 in ('"+year+"')")}
 and 月份 >=7 and 月份 <=9
@@ -249,7 +249,7 @@ case
 end as 金额,明细科目,'10-12合计' 月份
 from
 profit.ods_dm_费用科目表
-where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外') 
+where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外|所得税费用') 
 ${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
 ${if(len(year)=0,"","and 年度 in ('"+year+"')")}
 and 月份 >=10 and 月份 <=12
@@ -265,7 +265,7 @@ end as 金额,明细科目,
 concat(concat('1-',DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%m')),'合计') 月份
 from
 profit.ods_dm_费用科目表
-where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外') 
+where 科目全名 regexp ('主营业务|其他业务|营业税金|资产减值|营业外|所得税费用') 
 ${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
 ${if(len(year)=0,"","and 年度 in ('"+year+"')")}
 and 月份 between  1  and   DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%m')
@@ -315,6 +315,95 @@ group by 明细科目]]></Query>
 <PageQuery>
 <![CDATA[]]></PageQuery>
 </TableData>
+<TableData name="ds1" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="year"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="company"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[-- 含税
+select 
+sum(ifnull(借方金额,0)) 金额,年度,月份
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('所得税费用') 
+${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
+${if(len(year)=0,"","and 年度 in ('"+year+"')")}
+group by 资产分类,月份
+
+union all
+
+-- 含税
+select 
+sum(ifnull(借方金额,0)) 金额,年度,'1-3合计' 月份
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('所得税费用') 
+${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
+${if(len(year)=0,"","and 年度 in ('"+year+"')")}
+and 月份 >=1 and 月份 <=3
+group by 资产分类
+union all 
+
+
+select 
+sum(ifnull(借方金额,0)) 金额,年度,'4-6合计' 月份
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('所得税费用') 
+${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
+${if(len(year)=0,"","and 年度 in ('"+year+"')")}
+and 月份 >=4 and 月份 <=6
+group by 资产分类
+union all 
+
+select 
+sum(ifnull(借方金额,0)) 金额,年度,'7-9合计' 月份
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('所得税费用') 
+${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
+${if(len(year)=0,"","and 年度 in ('"+year+"')")}
+and 月份 >=7 and 月份 <=9
+group by 资产分类
+union all 
+select 
+sum(ifnull(借方金额,0)) 金额,年度,'10-12合计' 月份
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('所得税费用') 
+${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
+${if(len(year)=0,"","and 年度 in ('"+year+"')")}
+and 月份 >=10 and 月份 <=12
+group by 资产分类
+
+UNION ALL 
+select 
+sum(ifnull(借方金额,0)) 金额,年度,
+concat(concat('1-',DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%m')),'合计') 月份
+from
+profit.ods_dm_费用科目表
+where 资产分类 regexp ('所得税费用') 
+ ${if(len(company)=0,"","and 业务主体 in ('"+company+"')")}
+ ${if(len(year)=0,"","and 年度 in ('"+year+"')")}
+and 月份 between  1  and   DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%m')
+group by 资产分类]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
 </TableDataMap>
 <ReportExportAttr>
 <ExcelExportAttr hideColumn="false" hideRow="false" exportWaterMark="true"/>
@@ -339,7 +428,7 @@ group by 明细科目]]></Query>
 <RowHeight defaultValue="723900">
 <![CDATA[1345720,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,723900]]></RowHeight>
 <ColumnWidth defaultValue="2743200">
-<![CDATA[9144000,5472000,5472000,5472000,5472000,5472000,5181600,2743200,2743200,2743200,2743200]]></ColumnWidth>
+<![CDATA[9144000,5472000,5472000,5472000,5472000,5472000,5472000,2743200,2743200,2743200,2743200]]></ColumnWidth>
 <CellElementList>
 <C c="0" r="0" s="0">
 <O>
@@ -4224,7 +4313,9 @@ group by 明细科目]]></Query>
 <O>
 <![CDATA[营业外支出]]></O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="1" r="19" s="5">
 <O t="DSColumn">
@@ -4516,7 +4607,9 @@ group by 明细科目]]></Query>
 <![CDATA[=SUM(C17) + SUM(C18) + SUM(C19) - SUM(C20)]]></Attributes>
 </O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="3" r="20" s="5">
 <O t="XMLable" class="com.fr.base.Formula">
@@ -4524,7 +4617,9 @@ group by 明细科目]]></Query>
 <![CDATA[=SUM(D17) + SUM(D18) + SUM(D19) - SUM(D20)]]></Attributes>
 </O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="4" r="20" s="5">
 <O t="XMLable" class="com.fr.base.Formula">
@@ -4540,7 +4635,9 @@ group by 明细科目]]></Query>
 <![CDATA[=SUM(F17) + SUM(F18) + SUM(F19) - SUM(F20)]]></Attributes>
 </O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="6" r="20" s="5">
 <O t="XMLable" class="com.fr.base.Formula">
@@ -4556,47 +4653,259 @@ group by 明细科目]]></Query>
 <PrivilegeControl/>
 <Expand/>
 </C>
-<C c="1" r="21" s="6">
-<O t="BigDecimal">
-<![CDATA[0.00]]></O>
-<PrivilegeControl/>
-<Expand/>
-</C>
-<C c="2" r="21" s="6">
-<O t="I">
-<![CDATA[0]]></O>
+<C c="1" r="21" s="5">
+<O t="DSColumn">
+<Attributes dsName="主营业务成本和营业外" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="10">
+<O>
+<![CDATA[所得税费用]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[月份]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="0"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
 <PrivilegeControl/>
 <Expand>
 <cellSortAttr/>
 </Expand>
 </C>
-<C c="3" r="21" s="6">
-<O t="I">
-<![CDATA[0]]></O>
+<C c="2" r="21" s="5">
+<O t="DSColumn">
+<Attributes dsName="主营业务成本和营业外" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="10">
+<O>
+<![CDATA[所得税费用]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[月份]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="0"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
 <PrivilegeControl/>
 <Expand>
 <cellSortAttr/>
 </Expand>
 </C>
-<C c="4" r="21" s="6">
-<O t="I">
-<![CDATA[0]]></O>
+<C c="3" r="21" s="5">
+<O t="DSColumn">
+<Attributes dsName="主营业务成本和营业外" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="10">
+<O>
+<![CDATA[所得税费用]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[月份]]></CNAME>
+<Compare op="0">
+<ColumnRow column="3" row="0"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
 <PrivilegeControl/>
 <Expand>
 <cellSortAttr/>
 </Expand>
 </C>
-<C c="5" r="21" s="6">
-<O t="I">
-<![CDATA[0]]></O>
+<C c="4" r="21" s="5">
+<O t="DSColumn">
+<Attributes dsName="主营业务成本和营业外" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="10">
+<O>
+<![CDATA[所得税费用]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[月份]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="0"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
 <PrivilegeControl/>
 <Expand>
 <cellSortAttr/>
 </Expand>
 </C>
-<C c="6" r="21" s="6">
-<O t="I">
-<![CDATA[0]]></O>
+<C c="5" r="21" s="5">
+<O t="DSColumn">
+<Attributes dsName="主营业务成本和营业外" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="10">
+<O>
+<![CDATA[所得税费用]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[月份]]></CNAME>
+<Compare op="0">
+<ColumnRow column="5" row="0"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="21" s="5">
+<O t="DSColumn">
+<Attributes dsName="主营业务成本和营业外" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[明细科目]]></CNAME>
+<Compare op="10">
+<O>
+<![CDATA[所得税费用]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[月份]]></CNAME>
+<Compare op="0">
+<ColumnRow column="6" row="0"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
 <PrivilegeControl/>
 <Expand>
 <cellSortAttr/>
@@ -4625,7 +4934,9 @@ group by 明细科目]]></Query>
 <![CDATA[=round((SUM(C21) - SUM(C22)),2)]]></Attributes>
 </O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="3" r="22" s="5">
 <O t="XMLable" class="com.fr.base.Formula">
@@ -4633,7 +4944,9 @@ group by 明细科目]]></Query>
 <![CDATA[=round((SUM(D21) - SUM(D22)),2)]]></Attributes>
 </O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="4" r="22" s="5">
 <O t="XMLable" class="com.fr.base.Formula">
@@ -4641,7 +4954,9 @@ group by 明细科目]]></Query>
 <![CDATA[=round((SUM(E21) - SUM(E22)),2)]]></Attributes>
 </O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="5" r="22" s="5">
 <O t="XMLable" class="com.fr.base.Formula">
@@ -5041,38 +5356,6 @@ group by 明细科目]]></Query>
 </Right>
 </Border>
 </Style>
-<Style horizontal_alignment="0" imageLayout="1">
-<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
-<![CDATA[#0.00]]></Format>
-<FRFont name="微软雅黑" style="0" size="72"/>
-<Background name="ColorBackground">
-<color>
-<FineColor color="-1" hor="-1" ver="-1"/>
-</color>
-</Background>
-<Border>
-<Top style="3">
-<color>
-<FineColor color="-2500135" hor="-1" ver="-1"/>
-</color>
-</Top>
-<Bottom style="3">
-<color>
-<FineColor color="-2500135" hor="-1" ver="-1"/>
-</color>
-</Bottom>
-<Left style="3">
-<color>
-<FineColor color="-2500135" hor="-1" ver="-1"/>
-</color>
-</Left>
-<Right style="3">
-<color>
-<FineColor color="-2500135" hor="-1" ver="-1"/>
-</color>
-</Right>
-</Border>
-</Style>
 </StyleList>
 <DesignerVersion DesignerVersion="LAA"/>
 <PreviewType PreviewType="2"/>
@@ -5082,6 +5365,7 @@ group by 明细科目]]></Query>
 <StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
 <StrategyConfigs>
 <StrategyConfig dsName="ds2" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="ds1" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
 <StrategyConfig dsName="ds3" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
 <StrategyConfig dsName="自更新至上月累计" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
 </StrategyConfigs>

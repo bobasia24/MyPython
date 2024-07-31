@@ -1,0 +1,643 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="线上销售大盒" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with  a  as (select 下单时间,left(下单时间,7) 年月,sum(数量) 总销量,sum(分摊后金额)实付金额,销售,销售渠道,大小盒,管理报表渠道名称
+from  profit.dw_吉客云销售明细单_月饼下单 
+where 下单时间 regexp '2024' and 归属 = '线上' 
+group by 销售渠道,大小盒,下单时间,管理报表渠道名称
+order by 销售,下单时间 asc)
+
+,b as (select * from profit.人工导入自营店铺平台分类 group by 渠道)
+
+select a.*,b.平台 from a  left join b on a.销售渠道 = b.渠道  
+]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="月汇总" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with  a  as (select left(下单时间,7) 年月,sum(数量) 总销量,sum(分摊后金额)实付金额,销售,销售渠道,大小盒,管理报表渠道名称
+from  profit.dw_吉客云销售明细单_月饼下单 
+where 下单时间 regexp '2024' and 归属 ='线上'
+group by left(下单时间,7) ,销售,大小盒,销售渠道,管理报表渠道名称
+order by 下单时间,销售 desc)
+
+,b as (select * from profit.人工导入自营店铺平台分类 group by 渠道)
+
+select a.*,b.平台 from a  left join b on a.销售渠道 = b.渠道  
+]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR/>
+<FR/>
+<HC/>
+<FC/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1485900,1333500,1028700,723900,723900,723900,723900,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[4114800,3848100,5829300,6362700,5943600,5472000,4724400,5029200,2743200,2743200,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" cs="4" s="0">
+<O>
+<![CDATA[2024冰皮月饼线上销售日报]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="0" s="1">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="0" s="1">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="6" r="0" s="1">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="7" r="0" s="1">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="0" r="1" s="2">
+<O>
+<![CDATA[销售]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="1" s="2">
+<O>
+<![CDATA[大小盒]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="1" s="2">
+<O>
+<![CDATA[部门]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="1" s="2">
+<O>
+<![CDATA[渠道]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="1" cs="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="线上销售大盒" columnName="年月"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.report.web.button.form.TreeNodeToggleButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</Widget>
+<Present class="com.fr.base.present.DictPresent">
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="父id" viName="年月"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[线上销售大盒]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+</Present>
+<Expand dir="1" leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="1" cs="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="线上销售大盒" columnName="下单时间"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.report.web.button.form.TreeNodeToggleButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</Widget>
+<Present class="com.fr.base.present.DictPresent">
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="id" viName="总销量"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[线上销售大盒]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+</Present>
+<Expand dir="1" leftParentDefault="false" left="E2" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="G2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="0" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="线上销售大盒" columnName="销售"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="A3"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="线上销售大盒" columnName="大小盒"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="线上销售大盒" columnName="平台"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="线上销售大盒" columnName="销售渠道"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="月汇总" columnName="总销量"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[年月]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售渠道]]></CNAME>
+<Compare op="0">
+<ColumnRow column="3" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E3"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="月汇总" columnName="实付金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[年月]]></CNAME>
+<Compare op="0">
+<ColumnRow column="4" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售渠道]]></CNAME>
+<Compare op="0">
+<ColumnRow column="3" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="F3"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="线上销售大盒" columnName="总销量"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售渠道]]></CNAME>
+<Compare op="0">
+<ColumnRow column="3" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="6" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="G2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="G3"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="7" r="2" s="3">
+<O t="DSColumn">
+<Attributes dsName="线上销售大盒" columnName="实付金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[大小盒]]></CNAME>
+<Compare op="0">
+<ColumnRow column="1" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[销售渠道]]></CNAME>
+<Compare op="0">
+<ColumnRow column="3" row="2"/>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[下单时间]]></CNAME>
+<Compare op="0">
+<ColumnRow column="6" row="1"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="H3"/>
+</cellSortAttr>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting/>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="true" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="0"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1" paddingLeft="0" paddingRight="0">
+<FRFont name="微软雅黑" style="1" size="144">
+<foreground>
+<FineColor color="-13266744" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="NullBackground"/>
+<Border>
+<Bottom style="5">
+<color>
+<FineColor color="-10243346" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+</Border>
+</Style>
+<Style style_name="默认" full="true" border_source="-1" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="1" size="96">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-14839601" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-5000269" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="2"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="线上销售大盒的副本" enabled="false" useGlobal="false" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="ds2" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="线上销售小盒的副本" enabled="false" useGlobal="false" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="月汇总" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.27.0.20240627">
+<TemplateCloudInfoAttrMark createTime="1719296820239"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="8deeeccc-4436-4866-9aaa-f8ea0462ec82"/>
+</TemplateIdAttMark>
+</WorkBook>

@@ -1,0 +1,1452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="样品成本" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[SELECT *,case 渠道
+when '分销团购样品-sz' then '分销事业部'
+when '分销社群样品-sz' then '分销事业部'
+when '分销福利样品-sz' then '分销事业部'
+when '分销社交样品-sz' then '分销事业部'
+when '小红书样品-sz' then '市场部'
+when '有赞样品-sz' then '私域事业部'
+when '人政样品-sz' then '人力行政部'
+when '线下样品-sz' then '线下业务部'
+when '市场样品-sz' then '市场部'
+when '东莞样品-dg' then '东莞销售部'
+when '快手样品-sz' then '兴趣电商部'
+when '客服样品-sz' then '客服部'
+when '抖音样品-sz' then '兴趣电商部'
+when '京多样品-sz' then '京多事业部'
+when '天猫样品-sz' then '天猫事业部'
+when '分销组样品-sz' then '分销事业部'
+when '检验样品-dg' then '东莞销售部'
+end as 部门大类
+,concat(right(年月,2)+0,'月成本') yf FROM dm_样品成本明细底稿 where 1=1 
+${if(len(ny)>0,"and left(年月,4)=left('"+ ny +"',4)",'')}
+${if(len(ny)>0,"and 年月<='"+ ny +"'",'')}]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="收入" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="ny"/>
+<O>
+<![CDATA[2023-06]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[sc]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select b.部门,concat(left(a.发货年月,4),'-',right(a.发货年月,2)) 发货年月
+,sum(ifnull(a.收入,0)+ifnull(a.跨月收入,0)) 收入
+from dw_多店自营并集_对仗 a
+left join profit.dm_01财务_profit_客户中间表 b on a.客户=b.渠道
+where -- 动账年月='${ny}' or 跨月动账年月='${ny}'
+发货年月 in (
+replace('${ny}','-','')
+,date_format(concat('${ny}','-01') - interval 1 month,'%Y%m')
+)
+group by b.部门,a.发货年月
+having 部门 is not null]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR/>
+<FR/>
+<HC/>
+<FC/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1333500,876300,876300,723900,1333500,876300,876300,876300,876300,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[3733800,3695700,3695700,4876800,0,4800600,0,0,0,5676900,5753100,5676900,5753100,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" s="0">
+<O>
+<![CDATA[部门]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="0" s="1">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="yf"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B1"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="2" r="0" s="2">
+<O>
+<![CDATA[年累计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="0" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE('1-',right($ny,2) + 0,'月累计构成占比')]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="0" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE(right($ny,2) + 0,'月累计构成占比')]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="0" s="0">
+<O>
+<![CDATA[部门]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="0" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE(right($ny,2) + 0,'月总收入')]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B7"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="10" r="0" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE(right(left(MONTHDELTA(CONCATENATE($ny,'-01'),-1),7),2) + 0,'月总收入')]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C7"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="11" r="0" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE(right($ny,2) + 0,'月样品占收入比')]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="0" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE(right(left(MONTHDELTA(CONCATENATE($ny,'-01'),-1),7),2) + 0,'月样品占收入比')]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="1" s="0">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="部门大类"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="1" s="3">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="东莞成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="1" s="3">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="东莞成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="1" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=C2 / C3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="1" s="3">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="东莞成本"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="1" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=E2 / E3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="1" s="3">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="东莞成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[年月]]></CNAME>
+<Compare op="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$ny]]></Attributes>
+</O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="1" s="3">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="东莞成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[年月]]></CNAME>
+<Compare op="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=left(MONTHDELTA(CONCATENATE($ny,'-01'),-1),7)]]></Attributes>
+</O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="1" s="0">
+<O t="DSColumn">
+<Attributes dsName="收入" columnName="部门"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=A2]]></Attributes>
+</O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="1" s="3">
+<O t="DSColumn">
+<Attributes dsName="收入" columnName="收入"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[发货年月]]></CNAME>
+<Compare op="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$ny]]></Attributes>
+</O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=A2]]></Attributes>
+</O>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[线下收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '线下业务部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 线下收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[分销收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '分销事业部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 分销收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[len(I2)==0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O>
+<![CDATA[]]></O>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="1" s="3">
+<O t="DSColumn">
+<Attributes dsName="收入" columnName="收入"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[发货年月]]></CNAME>
+<Compare op="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=left(MONTHDELTA(CONCATENATE($ny,'-01'),-1),7)]]></Attributes>
+</O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=A2]]></Attributes>
+</O>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[线下收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '线下业务部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 线下收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[分销收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '分销事业部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 分销收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[len(I2)==0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O>
+<![CDATA[]]></O>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="1" s="5">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=G2/j2]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[线下收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '线下业务部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 线下收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[分销收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '分销事业部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 分销收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[len(I2)==0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O>
+<![CDATA[]]></O>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="1" s="5">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=H2/k2]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[线下收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '线下业务部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 线下收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[分销收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '分销事业部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 分销收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[len(I2)==0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O>
+<![CDATA[]]></O>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="2" s="6">
+<O>
+<![CDATA[汇总]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="2" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(B2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="2" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="2" s="6">
+<O>
+<![CDATA[100%]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="2" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(E2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="2" s="6">
+<O>
+<![CDATA[100%]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="2" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(G2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="2" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(H2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="2" s="6">
+<O>
+<![CDATA[汇总]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="2" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(J2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[线下收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '线下业务部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 线下收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[分销收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '分销事业部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 分销收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[len(I2)==0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O>
+<![CDATA[]]></O>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="2" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(K2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[线下收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '线下业务部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 线下收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[分销收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '分销事业部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 分销收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[len(I2)==0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O>
+<![CDATA[]]></O>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="2" s="5">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=G3/J3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[线下收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '线下业务部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 线下收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[分销收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '分销事业部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 分销收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[len(I2)==0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O>
+<![CDATA[]]></O>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="2" s="5">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=H3/K3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[线下收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '线下业务部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 线下收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[分销收入获取]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[A2 = '分销事业部']]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sql("profit",CONCATENATE("select 分销收入 from ods_dm_分销线下总收入记录 where 年月='",$ny,"'"),1,1)]]></Attributes>
+</O>
+</HighlightAction>
+</Highlight>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性3]]></Name>
+<Condition class="com.fr.data.condition.FormulaCondition">
+<Formula>
+<![CDATA[len(I2)==0]]></Formula>
+</Condition>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ValueHighlightAction">
+<O>
+<![CDATA[]]></O>
+</HighlightAction>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="4" s="0">
+<O>
+<![CDATA[分类]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="4" s="1">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="yf"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B1"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="2" r="4" s="2">
+<O>
+<![CDATA[年累计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="4" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE('1-',right($ny,2) + 0,'月累计构成占比')]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="4" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=CONCATENATE(right($ny,2) + 0,'月累计构成占比')]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="5" s="0">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="分类"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="5" s="3">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="东莞成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="5" s="3">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="东莞成本"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="5" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=C6 / C7]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="5" s="3">
+<O t="DSColumn">
+<Attributes dsName="样品成本" columnName="东莞成本"/>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="5" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=E6 / E7]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="6" s="6">
+<O>
+<![CDATA[汇总]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="6" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(B6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="6" s="6">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="6" s="6">
+<O>
+<![CDATA[100%]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="6" s="7">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(E6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="6" s="6">
+<O>
+<![CDATA[100%]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting>
+<PaperSize width="57600000" height="42768000"/>
+<Margin top="986400" left="2743200" bottom="986400" right="2743200"/>
+</PaperSetting>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="false" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="4"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+<ParameterUI class="com.fr.form.main.parameter.FormParameterUI">
+<Parameters/>
+<Layout class="com.fr.form.ui.container.WParameterLayout">
+<WidgetName name="para"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<FollowingTheme borderStyle="false"/>
+<Margin top="0" left="0" bottom="0" right="0"/>
+<Border>
+<border style="0" borderRadius="0" type="0" borderStyle="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+<WidgetTitle>
+<O>
+<![CDATA[新建标题]]></O>
+<FRFont name="SimSun" style="0" size="72"/>
+<Position pos="0"/>
+</WidgetTitle>
+<Alpha alpha="1.0"/>
+</Border>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-526086" hor="-1" ver="-1"/>
+</color>
+</Background>
+<LCAttr vgap="0" hgap="0" compInterval="0"/>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.parameter.FormSubmitButton">
+<WidgetName name="formSubmit0"/>
+<WidgetID widgetID="90352706-003f-49a4-b800-779c4d371ada"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[查询]]></Text>
+<Hotkeys>
+<![CDATA[enter]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="242" y="31" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="label0"/>
+<WidgetID widgetID="3c479488-649b-4159-9cfe-b08f4e98362a"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[年月:]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="49" y="31" width="80" height="21"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="ny"/>
+<WidgetID widgetID="08f54bc5-652f-46a1-b459-50f5cdeb9898"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<allowBlank>
+<![CDATA[false]]></allowBlank>
+<DirectEdit>
+<![CDATA[false]]></DirectEdit>
+<DateAttr format="yyyy-MM"/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=MONTHDELTA(todate(now()),-1)]]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="129" y="31" width="80" height="21"/>
+</Widget>
+<ShowBookmarks showBookmarks="false"/>
+<Sorted sorted="false"/>
+<MobileWidgetList>
+<Widget widgetName="ny"/>
+<Widget widgetName="formSubmit0"/>
+</MobileWidgetList>
+<FrozenWidgets/>
+<MobileBookMarkStyle class="com.fr.form.ui.mobile.impl.DefaultMobileBookMarkStyle"/>
+<Display display="true"/>
+<DelayDisplayContent delay="false"/>
+<UseParamsTemplate use="true"/>
+<paramFireStopEdit fireEvent="false"/>
+<Position position="0"/>
+<Design_Width design_width="960"/>
+<NameTagModified/>
+<WidgetNameTagMap/>
+<ParamAttr class="com.fr.report.mobile.DefaultMobileParamStyle"/>
+<ParamStyle class="com.fr.form.ui.mobile.impl.DefaultMobileParameterStyle"/>
+</Layout>
+<DesignAttr width="960" height="80"/>
+</ParameterUI>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1535195" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-5310486" hor="1" ver="2"/>
+</color>
+</Background>
+<Border>
+<Top style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-12211314" hor="1" ver="3"/>
+</color>
+</Background>
+<Border>
+<Top style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0%]]></Format>
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0.00%]]></Format>
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-5388583" hor="0" ver="2"/>
+</color>
+</Background>
+<Border>
+<Top style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="2">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style style_name="默认" full="true" border_source="-1" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="0"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="收入" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="样品成本" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="0928a813-0dc7-4e12-93e3-d973c66a67a7"/>
+</TemplateIdAttMark>
+</WorkBook>

@@ -46,7 +46,7 @@ end as 金额
 where 业务主体  ='深圳'
 and 年度 ='${year}' 
 and '含税' = '${shui}'
-and 明细科目 regexp('管理|研发|销售|财务|主营业务收入|主营业务成本|税金|减值损失|营业外')
+and 明细科目 regexp('管理|研发|销售|财务|主营业务收入|主营业务成本|税金|减值损失|营业外|所得税费用')
 group by concat(月份,'月') ,case when 明细科目  regexp('管理|研发|销售|财务') then left(明细科目,4) else  明细科目 end
 
 
@@ -960,7 +960,9 @@ group by 年度]]></Query>
 <O>
 <![CDATA[营业外支出]]></O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="1" r="21" s="6">
 <O t="I">
@@ -1014,7 +1016,9 @@ group by 年度]]></Query>
 <O>
 <![CDATA[非流动资产处置净损失]]></O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="1" r="22" s="6">
 <O t="I">
@@ -1042,7 +1046,9 @@ group by 年度]]></Query>
 <O>
 <![CDATA[五、利润总额]]></O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="1" r="23" s="4">
 <O t="I">
@@ -1074,7 +1080,7 @@ group by 年度]]></Query>
 </C>
 <C c="0" r="24" s="5">
 <O>
-<![CDATA[所得税]]></O>
+<![CDATA[所得税费用]]></O>
 <PrivilegeControl/>
 <Expand>
 <cellSortAttr/>
@@ -1089,16 +1095,38 @@ group by 年度]]></Query>
 </Expand>
 </C>
 <C c="2" r="24" s="6">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[科目全名]]></CNAME>
+<Compare op="10">
 <O>
-<![CDATA[--]]></O>
+<![CDATA[所得税费用]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
 <PrivilegeControl/>
 <Expand>
 <cellSortAttr/>
 </Expand>
 </C>
 <C c="3" r="24" s="6">
-<O>
-<![CDATA[--]]></O>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C25)]]></Attributes>
+</O>
 <PrivilegeControl/>
 <Expand>
 <cellSortAttr/>
@@ -1108,7 +1136,9 @@ group by 年度]]></Query>
 <O>
 <![CDATA[未确认的投资损失]]></O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="1" r="25" s="6">
 <O t="I">
@@ -1128,7 +1158,9 @@ group by 年度]]></Query>
 <O>
 <![CDATA[ --]]></O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="0" r="26" s="3">
 <O>

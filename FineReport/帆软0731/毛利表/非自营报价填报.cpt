@@ -915,7 +915,6 @@ and 销售人员 is not null]]></Query>
 <ColumnRow column="2" row="1"/>
 </ColumnConfig>
 <Condition class="com.fr.data.condition.ListCondition"/>
-<UpdateAttr updateStatus="true"/>
 </DMLConfig>
 </SubmitVisitor>
 </ReportWriteAttr>

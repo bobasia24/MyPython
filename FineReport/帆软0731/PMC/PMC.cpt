@@ -1,0 +1,1527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="ds1" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="month"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="year"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="aname"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="channel"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="mrchannel"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="acode"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="region"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="sproducts"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select * from profit.ods_东莞pmc
+where 1=1
+--${if(len(year)=0,"","and 年度 in('"+year+"')")}
+--${if(len(month)=0,"","and 月份 in('"+month+"')")}
+--${if(len(acode)=0,"","and 科目编码 in('"+acode+"')")}
+--${if(len(aname)=0,"","and 科目全名 in('"+aname+"')")}
+--${if(len(channel)=0,"","and 费用归属组 in('"+channel+"')")}
+--${if(len(mrchannel)=0,"","and 管理报表核算渠道名称 in('"+mrchannel+"')")}
+--${if(len(sproducts)=0,"","and 季节性产品 in('"+sproducts+"')")}
+--${if(len(region)=0,"","and 业务主体 in('"+region+"')")}]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="地区筛选" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="do_date"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="acode"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with
+-- 本年累计到当月得销量
+nian1 as (
+select 部门11,货品编号,货品名称,
+sum(case when 下单时间4 = '2023' then 销量 end) 年累计销量_23,
+sum(case when 下单时间4 = '2024' then 销量 end) 年累计销量_24
+from (select ifnull(部门c,'线下') 部门11,left(下单时间,4) 下单时间4 ,货品编号,货品名称,sum(数量)销量  from profit.dw_吉客云销售明细单_23下单 
+where 
+(
+(left(下单时间,10) >= DATE_SUB('${do_date}', INTERVAL DAYOFYEAR('${do_date}') - 1 DAY) and left(下单时间,10) <= '${do_date}')  --  2024-03-31
+or
+(left(下单时间,10) >=DATE_FORMAT(DATE_SUB('${do_date}', INTERVAL 1 YEAR), '%Y-01-01') and left(下单时间,10) <= DATE_SUB('${do_date}', INTERVAL 1 YEAR))  --  2023-03-31
+)
+group by ifnull(部门c,'线下'),下单时间4,货品名称,货品编号)asda  
+${if(len(acode)=0,"","where 部门11 in('"+acode+"')")}
+group by 货品编号
+)
+
+-- 当月销量
+
+,yue1 as (
+select 
+ifnull(sum(case when 部门1 = '线上'	 then ifnull(销量,0) end),0)  线上当月累计,
+ifnull(sum(case when 部门1 = '线下'	 then ifnull(销量,0) end),0)  线下当月累计,
+ifnull(sum(case when 部门1 = '东莞'	 then ifnull(销量,0) end),0) 东莞当月累计,
+货品编号,下单时间7
+from 
+(select ifnull(部门c,'线下') 部门1,left(下单时间,7) 下单时间7 ,货品编号,sum(数量)销量  from profit.dw_吉客云销售明细单_23下单 
+where left(下单时间,7)  = DATE_FORMAT('${do_date}', '%Y-%m')
+
+${if(len(acode)=0,"","and ifnull(部门c,'线下') in('"+acode+"')")}
+group by ifnull(部门c,'线下'),下单时间7,货品编号
+order by 下单时间7 desc,货品编号,部门1 )pl
+group by 货品编号,下单时间7
+)
+	
+-- 同期  
+,tongqi as (
+select 
+sum(case when 分区 ='线上' then 销量销量24同比 end) 线上同期,
+sum(case when 分区 ='线下' then 销量销量24同比 end) 线下同期,
+sum(case when 分区 ='东莞' then 销量销量24同比 end) 东莞同期,
+下单时间7,货品编号
+from  (
+select sum(数量)销量销量24同比,left(下单时间,7)下单时间7,货品编号,ifnull(部门c,'线下') 分区 
+from profit.dw_吉客云销售明细单_23下单
+where 下单时间 like CONCAT(DATE_FORMAT(DATE_SUB('${do_date}', INTERVAL 1 YEAR), '%Y-%m'), '%')  -- 2023-03%
+${if(len(acode)=0,"","and ifnull(部门c,'线下') in('"+acode+"')")}
+group by left(下单时间,7),货品编号,ifnull(部门c,'线下')
+)p
+group by 货品编号
+)
+
+-- 环期 
+,huanqi as (
+select 
+sum(case when 分区 ='线上' then 销量销量24同比 end) 线上环期,
+sum(case when 分区 ='线下' then 销量销量24同比 end) 线下环期,
+sum(case when 分区 ='东莞' then 销量销量24同比 end) 东莞环期,
+下单时间7,货品编号
+from  (
+select sum(数量)销量销量24同比,left(下单时间,7)下单时间7,货品编号,ifnull(部门c,'线下') 分区 
+from profit.dw_吉客云销售明细单_23下单
+where 下单时间 like CONCAT(DATE_FORMAT(DATE_SUB('${do_date}', INTERVAL 1 MONTH), '%Y-%m'), '%')
+${if(len(acode)=0,"","and ifnull(部门c,'线下') in('"+acode+"')")}
+group by left(下单时间,7),货品编号,ifnull(部门c,'线下')
+)p
+group by 货品编号
+)
+,kucun as (
+select 
+货品编号,sum(ifnull(case when 仓库1 = '华南仓+工厂' then 库存 end,0) ) '华南仓_工厂',sum(ifnull(case when 仓库1 = '外仓' then 库存 end,0) ) '外仓',sum(在途)  在途,sum(订购量)订购量
+from (select 仓库1,sum(库存数量)库存,sum(调拨在途)在途,sum(订购量)订购量 , 货品编号   from (
+select 货品名称,仓库,库存数量,可用库存,调拨在途,近7天销量,近14天销量,近30天销量,货品编号,订购量,
+case 
+	when 仓库 in ('榴芒一刻华南仓','成品仓','安泰冷库仓','顺丰常平仓','普冷东莞仓','驰聘东莞仓') then '华南仓+工厂'
+	else '外仓'
+end
+仓库1 from profit.人工导入20240531吉客云分仓库存查询
+where 仓库 not regexp '报废|残次|样品|原材料|停用|旧|物料|特快' )kk
+group by kk.仓库1,货品编号)ccd group by 货品编号
+)
+
+select huopin.*,ifnull(nian1.年累计销量_23,0)年累计销量_23 ,ifnull(nian1.年累计销量_24,0)年累计销量_24 ,(nian1.年累计销量_24-nian1.年累计销量_23)/nian1.年累计销量_23 增长率 ,
+kucun.华南仓_工厂,kucun.外仓,kucun.在途,kucun.订购量,'月预估除以当月多少天数_DAY(LAST_DAY(''${do_date}''))'日均预估销量,'当月累计除以当月至今天数_DAY(''${do_date}'')'日均实际销量,'合计库存除以日均实际销量'周转天数,
+ifnull( tongqi.线上同期,0)线上同期,ifnull( tongqi.线下同期,0)线下同期,ifnull( tongqi.东莞同期,0)东莞同期,ifnull( huanqi.线上环期,0)线上环期,ifnull( huanqi.线下环期,0)线下环期,ifnull(huanqi.东莞环期 ,0)东莞环期,''同比,''环比,
+ifnull( yue1.线上当月累计,0)线上当月累计,ifnull(yue1.线下当月累计 ,0)线下当月累计,ifnull( yue1.东莞当月累计,0)东莞当月累计
+from profit.人工导入pmc货品 huopin
+left join nian1 
+on huopin.货品编码 = nian1.货品编号
+left join yue1 
+on huopin.货品编码 = yue1.货品编号
+left join kucun
+on huopin.货品编码 = kucun.货品编号
+left join tongqi
+on huopin.货品编码 = tongqi.货品编号
+left join huanqi
+on huopin.货品编码 = huanqi.货品编号
+-- where huopin.货品编码 regexp 'pddllqc01'
+
+
+
+]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ReportWebAttr>
+<ServerPrinter/>
+<WebPageContent>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.page.First">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_ReportServerP_First')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[first]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.page.Previous">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_ReportServerP_Previous')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[previous]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.page.PageNavi">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+</Widget>
+<Widget class="com.fr.report.web.button.page.Next">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_ReportServerP_Next')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[next]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.page.Last">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_ReportServerP_Last')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[last]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.NewPrint">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Print')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[print]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.Export">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Export')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[export]]></IconName>
+<Buttons pdf="true" excelP="true" excelO="true" excelS="true" word="true" image="true" html="true"/>
+</Widget>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<WebPage isPage="false" showAsImage="false" autoScale="false" tdHeavy="false" pageFixedRow="true" pageFixedRowCount="100"/>
+</WebPageContent>
+<WebViewContent>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.PageSetup">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Page_Setup')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[pagesetup]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.PrintPreview">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_PrintP_Print_Preview')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[preview]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.NewPrint">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Print')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[print]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.Export">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Export')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[export]]></IconName>
+<Buttons pdf="true" excelP="true" excelO="true" excelS="true" word="true" image="true" html="true"/>
+</Widget>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<SortFuncCheck check="true"/>
+<ConditionFuncCheck check="true"/>
+<ListFuncCheck check="true"/>
+</WebViewContent>
+<WebWriteContent>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+<Widget class="com.fr.report.web.button.write.ImportExcelData">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Utils_Import_Excel_Data')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[excel]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.ExcelO">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Export_Excel_Simple')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[excel]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.write.ShowCellValue">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue/>
+<LabelAttr verticalcenter="true" textalign="0" autoline="false"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<EditRowColor setColor="true"/>
+<SelectedColor>
+<color>
+<FineColor color="-12211314" hor="-1" ver="-1"/>
+</color>
+</SelectedColor>
+<WebWrite SheetPosition="3"/>
+<RptLocation isShowAtLeft="true"/>
+<UnloadCheck/>
+<ShowWidgets/>
+<OtherAttr autoStash="false"/>
+</WebWriteContent>
+</ReportWebAttr>
+<ReportExportAttr>
+<ExcelExportAttr hideColumn="false" hideRow="false" exportWaterMark="true"/>
+<PDFExportAttr/>
+<HTMLExportAttr/>
+<WordExportAttr exportWaterMark="true"/>
+<ImageExportAttr imageResolution="96" imageType="false" renderQuality="0" format="png"/>
+</ReportExportAttr>
+<ReportFitAttr fitStateInPC="1" fitFont="false" minFontSize="0"/>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR F="0" T="0"/>
+<FR/>
+<HC F="0" T="0"/>
+<FC/>
+<UPFCR COLUMN="true" ROW="true"/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1728000,1728000,723900,723900,723900,723900,723900,723900,1008000,1008000,1008000,1008000,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[4343400,4762500,6934200,4000500,4914900,2857500,4533900,4610100,4572000,3168000,2743200,4572000,3168000,3168000,3168000,4381500,4076700,3168000,2743200,3168000,3168000,3168000,2743200,3168000,3168000,3168000,3168000,3168000,2743200,4762500,4419600,4533900,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" s="0">
+<O>
+<![CDATA[货品类型]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="0" s="0">
+<O>
+<![CDATA[货品编码]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="0" s="0">
+<O>
+<![CDATA[货品名称]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="0" s="0">
+<O>
+<![CDATA[规格]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="0" s="0">
+<O>
+<![CDATA[单位]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="0" s="0">
+<O>
+<![CDATA[保质期_天]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="0" s="0">
+<O>
+<![CDATA[状态]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="0" s="0">
+<O>
+<![CDATA[年累计销量_23]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="0" s="0">
+<O>
+<![CDATA[年累计销量_24]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="0" s="0">
+<O>
+<![CDATA[增长率]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="0" s="0">
+<O>
+<![CDATA[库存合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="0" s="0">
+<O>
+<![CDATA[华南仓_工厂]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="0" s="0">
+<O>
+<![CDATA[外仓]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="13" r="0" s="0">
+<O>
+<![CDATA[在途]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="14" r="0" s="0">
+<O>
+<![CDATA[未发订单]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="15" r="0" s="0">
+<O>
+<![CDATA[日均预估销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="0" s="0">
+<O>
+<![CDATA[日均实际销量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="17" r="0" s="0">
+<O>
+<![CDATA[周转天数]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="18" r="0" s="0">
+<O>
+<![CDATA[同期合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="19" r="0" s="0">
+<O>
+<![CDATA[线上同期]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="20" r="0" s="0">
+<O>
+<![CDATA[线下同期]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="21" r="0" s="0">
+<O>
+<![CDATA[东莞同期]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="22" r="0" s="0">
+<O>
+<![CDATA[环期合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="23" r="0" s="0">
+<O>
+<![CDATA[线上环期]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="0" s="0">
+<O>
+<![CDATA[线下环期]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="25" r="0" s="0">
+<O>
+<![CDATA[东莞环期]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="26" r="0" s="0">
+<O>
+<![CDATA[同比]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="27" r="0" s="0">
+<O>
+<![CDATA[环比]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="28" r="0" s="0">
+<O>
+<![CDATA[当月合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="29" r="0" s="0">
+<O>
+<![CDATA[线上当月累计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="30" r="0" s="0">
+<O>
+<![CDATA[线下当月累计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="31" r="0" s="0">
+<O>
+<![CDATA[东莞当月累计 ]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="货品类型"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="货品编码"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="货品名称"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="规格"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="单位"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="保质期_天"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="状态"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="年累计销量_23"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="年累计销量_24"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="1" s="2">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="增长率"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="1" s="3">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(L2:N2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="华南仓_工厂"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="外仓"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="13" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="在途"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="14" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="订购量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="15" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="日均预估销量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="日均实际销量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="17" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="周转天数"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="18" r="1" s="3">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(T2:V2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="19" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="线上同期"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="20" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="线下同期"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="21" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="东莞同期"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="22" r="1" s="3">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(X2:Z2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="23" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="线上环期"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="线下环期"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="25" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="东莞环期"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="26" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="同比"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="27" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="环比"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="28" r="1" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(AD2:AF2)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="29" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="线上当月累计"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="30" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="线下当月累计"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="31" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="地区筛选" columnName="东莞当月累计"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper">
+<Attr divideMode="1"/>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="8" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="9" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="10" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="11" s="6">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<FrozenColumnRow columnrow="B2"/>
+<PaperSetting>
+<PaperSize width="129600000" height="43200000"/>
+<Margin top="986400" left="2743200" bottom="986400" right="2743200"/>
+</PaperSetting>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<LayerReportAttr isPageQuery="true" clientPaging="false" engineState="1" countPerPage="30" enableRowCount="false"/>
+<ReportWriteAttr/>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="false" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="4"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+<ParameterUI class="com.fr.form.main.parameter.FormParameterUI">
+<Parameters/>
+<Layout class="com.fr.form.ui.container.WParameterLayout">
+<WidgetName name="para"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<FollowingTheme borderStyle="false"/>
+<Margin top="0" left="0" bottom="0" right="0"/>
+<Border>
+<border style="0" borderRadius="0" type="0" borderStyle="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+<WidgetTitle>
+<O>
+<![CDATA[新建标题]]></O>
+<FRFont name="SimSun" style="0" size="72"/>
+<Position pos="0"/>
+</WidgetTitle>
+<Alpha alpha="1.0"/>
+</Border>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-526086" hor="-1" ver="-1"/>
+</color>
+</Background>
+<LCAttr vgap="0" hgap="0" compInterval="0"/>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="do_date"/>
+<WidgetID widgetID="6cc55bb2-4441-4879-a267-b6f4312f5216"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=MONTHDELTA(todate(now()),-1)]]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="201" y="20" width="81" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="acode_1_c"/>
+<LabelName name="年度："/>
+<WidgetID widgetID="74ae0fd7-6d8b-406f-9acc-8372cc6b70f5"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[地区：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="4" autoline="true"/>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="523" y="20" width="67" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboCheckBox">
+<WidgetName name="acode"/>
+<LabelName name="地区："/>
+<WidgetID widgetID="79cafef0-4eb0-44b9-ab72-b2d8fa9117c9"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.CustomDictionary">
+<CustomDictAttr>
+<Dict key="线上" value="线上"/>
+<Dict key="线下" value="线下"/>
+<Dict key="东莞" value="东莞"/>
+</CustomDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[]]></O>
+</widgetValue>
+<RAAttr delimiter="&apos;,&apos;" isArray="false"/>
+</InnerWidget>
+<BoundsAttr x="590" y="20" width="93" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="year_1_c"/>
+<WidgetID widgetID="74ae0fd7-6d8b-406f-9acc-8372cc6b70f5"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[年度：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="4" autoline="true"/>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="140" y="20" width="61" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.parameter.FormSubmitButton">
+<WidgetName name="formSubmit0"/>
+<WidgetID widgetID="16e3c0b8-c867-4696-b204-39731c65eaab"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[查询]]></Text>
+<Hotkeys>
+<![CDATA[enter]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="896" y="20" width="80" height="25"/>
+</Widget>
+<ShowBookmarks showBookmarks="false"/>
+<Sorted sorted="false"/>
+<MobileWidgetList>
+<Widget widgetName="do_date"/>
+<Widget widgetName="acode"/>
+<Widget widgetName="formSubmit0"/>
+</MobileWidgetList>
+<FrozenWidgets/>
+<MobileBookMarkStyle class="com.fr.form.ui.mobile.impl.DefaultMobileBookMarkStyle"/>
+<Display display="true"/>
+<DelayDisplayContent delay="false"/>
+<UseParamsTemplate use="true"/>
+<paramFireStopEdit fireEvent="false"/>
+<Position position="0"/>
+<Design_Width design_width="1160"/>
+<NameTagModified/>
+<WidgetNameTagMap/>
+<ParamAttr class="com.fr.report.mobile.DefaultMobileParamStyle"/>
+<ParamStyle class="com.fr.form.ui.mobile.impl.DefaultMobileParameterStyle"/>
+</Layout>
+<DesignAttr width="1160" height="80"/>
+</ParameterUI>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="88">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-13719584" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Bottom style="14">
+<color>
+<FineColor color="-1579033" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0.00%]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-3618616" hor="3" ver="2"/>
+</color>
+</Background>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="2" imageLayout="1" paddingLeft="0" paddingRight="0">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="14">
+<color>
+<FineColor color="-1579033" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="14">
+<color>
+<FineColor color="-1579033" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+</Border>
+</Style>
+<Style imageLayout="1" paddingLeft="54" paddingRight="0">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="14">
+<color>
+<FineColor color="-1579033" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="14">
+<color>
+<FineColor color="-1579033" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="2"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="地区筛选" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="ds1" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="科目全名" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="管理报表渠道" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.18.0.20230712">
+<TemplateCloudInfoAttrMark createTime="1688967648866"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="830c26d4-4440-4b18-b242-cb0b2b9a4c32"/>
+</TemplateIdAttMark>
+</WorkBook>

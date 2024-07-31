@@ -109,7 +109,7 @@ case
 end as 金额,
 费用归属组
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
 -- and 季节性产品 in('其他','未分')
@@ -127,7 +127,7 @@ case
 end as 金额,
 费用归属组
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 and 科目全名 ='主营业务收入'
 group by 科目全名,费用归属组)b
@@ -139,7 +139,7 @@ union all
 select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
 sum(ifnull(借方金额,0)) 金额,业务主体
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 -- 其他、未分季节品为空
 ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
@@ -164,7 +164,7 @@ union  all
 select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
 sum(ifnull(借方金额,0)) 金额,业务主体
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 -- 其他、未分季节品为空
 ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
@@ -198,7 +198,7 @@ end id
 '0' 金额,
 业务主体
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 and 费用归属组 not  in('财务部',
 '总经办',
@@ -290,7 +290,7 @@ case
 end as 金额,
  费用归属组
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
 and 科目全名 ='主营业务收入'
@@ -307,7 +307,7 @@ case
 end as 金额,
 费用归属组
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('主营业务|其他业务|营业税金') and 科目全名 not rlike('应交税费') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 and 科目全名 ='主营业务收入'
 group by 科目全名,业务主体)b
@@ -320,7 +320,7 @@ union all
 select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
 sum(ifnull(借方金额,0)) 金额,业务主体
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 -- 其他、未分季节品为空
 ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
@@ -344,7 +344,7 @@ union  all
 select '自有',年度 ,月份,科目全名,借方金额,资产分类,明细科目,费用归属组,
 sum(ifnull(借方金额,0)) 金额,业务主体
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 -- 其他、未分季节品为空
 ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
@@ -379,7 +379,7 @@ end id
 '0' 金额,
 业务主体
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
 and 费用归属组  in('财务部',
 '总经办',
@@ -413,7 +413,7 @@ end id
 	 
 end 父id,sum(ifnull(借方金额,0)) 金额,业务主体
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
  ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
 and 业务主体 ='东莞'
@@ -436,7 +436,7 @@ end as 明细科目,费用归属组
 end id
 ,0 父id,sum(ifnull(借方金额,0)) 金额,业务主体
 from
-profit.ods_dm_费用科目表
+profit.ods_dm_损益类科目
 where 资产分类 regexp ('销售费用|管理费用|财务费用|研发费用') and concat(年度,'-',LPAD(月份,2,'0'))>='${ny}' and concat(年度,'-',LPAD(月份,2,'0'))<='${ny_end}' 
  ${if(len(jjp)=0,"","and 季节性产品 in('"+jjp+"')")}
 and 业务主体 ='东莞'
@@ -1125,9 +1125,8 @@ group by 客户属性]]></Query>
 <ReportPageAttr>
 <HR F="3" T="4"/>
 <FR/>
-<HC F="0" T="0"/>
+<HC F="0" T="1"/>
 <FC/>
-<UPFCR COLUMN="true" ROW="true"/>
 </ReportPageAttr>
 <ColumnPrivilegeControl/>
 <RowPrivilegeControl/>
@@ -1148,7 +1147,9 @@ group by 客户属性]]></Query>
 <O>
 <![CDATA[单位：元  ]]></O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="0" r="2" cs="12" s="1">
 <O t="XMLable" class="com.fr.base.Formula">
@@ -1156,7 +1157,9 @@ group by 客户属性]]></Query>
 <![CDATA[=CONCATENATE("期间：",$ny," 至  ",$ny_end)]]></Attributes>
 </O>
 <PrivilegeControl/>
-<Expand/>
+<Expand>
+<cellSortAttr/>
+</Expand>
 </C>
 <C c="0" r="3" rs="2" s="2">
 <PrivilegeControl/>
@@ -3136,6 +3139,8 @@ group by 客户属性]]></Query>
 <C c="0" r="12" s="6">
 <O t="DSColumn">
 <Attributes dsName="Tree1" columnName="明细科目"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
 <Condition class="com.fr.data.condition.CommonCondition">
 <CNUMBER>
 <![CDATA[0]]></CNUMBER>
@@ -3146,7 +3151,20 @@ group by 客户属性]]></Query>
 <![CDATA[小计]]></O>
 </Compare>
 </Condition>
-<Complex/>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[父id]]></CNAME>
+<Compare op="0">
+<ColumnRow column="0" row="11"/>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex reselect="true"/>
 <RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
 <Result>
 <![CDATA[$$$]]></Result>
@@ -4685,8 +4703,6 @@ group by 客户属性]]></Query>
 <Dict key="其他" value="其他"/>
 <Dict key="年货" value="年货"/>
 <Dict key="未分" value="未分"/>
-<Dict key="冰淇淋" value="冰淇淋"/>
-<Dict key="青团" value="青团"/>
 </CustomDictAttr>
 </Dictionary>
 <widgetValue>

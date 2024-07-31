@@ -1,0 +1,5139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="销管财研友媛数据不对版" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="startime"/>
+<O>
+<![CDATA[2023-07-01]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O>
+<![CDATA[2023-07-31]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with k1 as (
+-- 销管财研费用统计：
+-- 会计科目id
+select 
+年
+,月
+,case when 科目名称 like '%销售费用%' then '销售费用'
+      when 科目名称 like '%财务费用%' then '财务费用'
+	    when 科目名称 like '%管理费用%' then '管理费用'
+	    when 科目名称 like '%研发费用%' then '研发费用'
+
+end 科目名称
+,会计科目
+,渠道大类
+,sum(ifnull(借方金额,0)) 金额
+,case when 科目名称 like '%销售费用%' then CONCAT('1.',row_number()over(partition by 科目名称))
+      when 科目名称 like '%财务费用%' then CONCAT('2.',row_number()over(partition by 科目名称))
+	    when 科目名称 like '%管理费用%' then CONCAT('3.',row_number()over(partition by 科目名称))
+	    when 科目名称 like '%研发费用%' then CONCAT('4.',row_number()over(partition by 科目名称))
+	  
+end id
+,case when 科目名称 like '%销售费用%' then '1'
+      when 科目名称 like '%财务费用%' then '2'
+	  when 科目名称 like '%管理费用%' then '3'
+	  when 科目名称 like '%研发费用%' then '4'
+	 
+end 父id
+,case when 公司主体='深圳市榴芒一刻食品有限公司' then '深圳' else '东莞' end 公司
+from dm_部门科目费用
+where  科目名称 regexp ('销售费用|管理费用|财务费用|研发费用') and substr(日期,1,10) between '${startime}' and '${overtime}'
+and 会计科目 not in ('进项 转出未交增值税','销项_转出未交增值税','营业外收入_应交未交税金')
+
+group by 年,月,科目名称,会计科目,渠道大类
+
+union all
+
+-- 科目名称id
+select 
+年
+,月
+,case when 科目名称 like '%销售费用%' then '销售费用'
+      when 科目名称 like '%财务费用%' then '财务费用'
+	    when 科目名称 like '%管理费用%' then '管理费用'
+	    when 科目名称 like '%研发费用%' then '研发费用'
+	
+end 科目名称
+,case when 科目名称 like '%销售费用%' then '销售费用小计'
+      when 科目名称 like '%财务费用%' then '财务费用小计'
+      when 科目名称 like '%管理费用%' then '管理费用小计'
+	    when 科目名称 like '%研发费用%' then '研发费用小计'
+
+end 会计科目
+,'' 渠道大类
+,'' 金额
+,case when 科目名称 like '%销售费用%' then '1'
+      when 科目名称 like '%财务费用%' then '2'
+	  when 科目名称 like '%管理费用%' then '3'
+	  when 科目名称 like '%研发费用%' then '4'
+	 
+end id
+,0 父id
+,case when 公司主体='深圳市榴芒一刻食品有限公司' then '深圳' else '东莞' end 公司
+from dm_部门科目费用
+where  科目名称 regexp ('销售费用|管理费用|财务费用|研发费用') and substr(日期,1,10) between '${startime}' and '${overtime}'
+and 会计科目 not in ('进项 转出未交增值税','销项_转出未交增值税','营业外收入_应交未交税金')
+group by 年,月,
+case when 科目名称 like '%销售费用%' then '销售费用'
+     when 科目名称 like '%财务费用%' then '财务费用'
+	   when 科目名称 like '%管理费用%' then '管理费用'
+	   when 科目名称 like '%研发费用%' then '研发费用'
+end
+,case when 科目名称 like '%销售费用%' then '销售费用小计'
+      when 科目名称 like '%财务费用%' then '财务费用小计'
+      when 科目名称 like '%管理费用%' then '管理费用小计'
+	    when 科目名称 like '%研发费用%' then '研发费用小计'
+end ,渠道大类
+
+
+union all 
+
+-- 部门合计会计科目id
+select 
+年
+,月
+,case when 科目名称 like '%销售费用%' then '销售费用'
+      when 科目名称 like '%财务费用%' then '财务费用'
+	    when 科目名称 like '%管理费用%' then '管理费用'
+	    when 科目名称 like '%研发费用%' then '研发费用'
+
+end 科目名称
+,会计科目
+,case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计' 
+      when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','关联销售','对外销售','代加工','商品研发部','仓库管理部','公共费用') then '东莞部门合计' 
+end 渠道大类
+,sum(ifnull(借方金额,0)) 金额
+,case when 科目名称 like '%销售费用%' then CONCAT('1.',row_number()over(partition by 科目名称))
+      when 科目名称 like '%财务费用%' then CONCAT('2.',row_number()over(partition by 科目名称))
+	    when 科目名称 like '%管理费用%' then CONCAT('3.',row_number()over(partition by 科目名称))
+	    when 科目名称 like '%研发费用%' then CONCAT('4.',row_number()over(partition by 科目名称))	  
+end id
+,case when 科目名称 like '%销售费用%' then '1'
+      when 科目名称 like '%财务费用%' then '2'
+	    when 科目名称 like '%管理费用%' then '3'
+	    when 科目名称 like '%研发费用%' then '4'
+	 
+end 父id
+,case when 公司主体='深圳市榴芒一刻食品有限公司' then '深圳' else '东莞' end 公司
+from dm_部门科目费用
+where  科目名称 regexp ('销售费用|管理费用|财务费用|研发费用') and substr(日期,1,10) between '${startime}' and '${overtime}'
+and 会计科目 not in ('进项 转出未交增值税','销项_转出未交增值税','营业外收入_应交未交税金')
+and 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','公共费用','商品研发部','仓库管理部')
+group by 年,月,科目名称,会计科目,
+case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计' 
+      when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','关联销售','对外销售','代加工','商品研发部','仓库管理部','公共费用') then '东莞部门合计' 
+end
+
+union all 
+
+-- 公司合计会计科目id
+select 
+年
+,月
+,case when 科目名称 like '%销售费用%' then '销售费用'
+      when 科目名称 like '%财务费用%' then '财务费用'
+	  when 科目名称 like '%管理费用%' then '管理费用'
+	  when 科目名称 like '%研发费用%' then '研发费用'
+
+end 科目名称
+,会计科目
+,case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '深圳合计' 
+      when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','关联销售','对外销售','代加工','商品研发部','仓库管理部','公共费用') then '东莞合计' 
+			end 渠道大类
+,sum(ifnull(借方金额,0)) 金额
+,case when 科目名称 like '%销售费用%' then CONCAT('1.',row_number()over(partition by 科目名称))
+      when 科目名称 like '%财务费用%' then CONCAT('2.',row_number()over(partition by 科目名称))
+	  when 科目名称 like '%管理费用%' then CONCAT('3.',row_number()over(partition by 科目名称))
+	  when 科目名称 like '%研发费用%' then CONCAT('4.',row_number()over(partition by 科目名称))
+	  
+end id
+,case when 科目名称 like '%销售费用%' then '1'
+      when 科目名称 like '%财务费用%' then '2'
+	  when 科目名称 like '%管理费用%' then '3'
+	  when 科目名称 like '%研发费用%' then '4'
+	 
+end 父id
+,case when 公司主体='深圳市榴芒一刻食品有限公司' then '深圳' else '东莞' end 公司
+from dm_部门科目费用
+where  科目名称 regexp ('销售费用|管理费用|财务费用|研发费用') and  substr(日期,1,10) between '${startime}' and '${overtime}'
+and 会计科目 not in ('进项 转出未交增值税','销项_转出未交增值税','营业外收入_应交未交税金')
+-- and 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部')
+group by 年,月,科目名称,会计科目,case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '深圳合计' 
+      when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','关联销售','对外销售','代加工','商品研发部','仓库管理部','公共费用') then '东莞合计' 
+			end
+	)
+select * from k1 
+	]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="Tree1" class="com.fr.data.impl.RecursionTableData">
+<markFields>
+<![CDATA[6]]></markFields>
+<parentmarkFields>
+<![CDATA[7]]></parentmarkFields>
+<markFieldsName>
+<![CDATA[id]]></markFieldsName>
+<parentmarkFieldsName>
+<![CDATA[父id]]></parentmarkFieldsName>
+<originalTableDataName>
+<![CDATA[销管财研]]></originalTableDataName>
+</TableData>
+<TableData name="渠道部门" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="startime"/>
+<O>
+<![CDATA[2023-09-05]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O>
+<![CDATA[2023-09-05]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select 
+case when 渠道大类='关联销售' then '东莞' else 公司 end 公司,
+渠道大类 
+from(
+select distinct 
+case when 公司主体='深圳市榴芒一刻食品有限公司' then '深圳' else '东莞' end 公司,
+渠道大类
+from `dm_部门科目费用`
+where substr(日期,1,10) between '${startime}' and '${overtime}'
+and  渠道大类 not in('sz','月饼','月饼卡兑换','9月税金结转','发票已回','其他') 
+
+union
+select distinct
+case when 公司主体='深圳市榴芒一刻食品有限公司' then '深圳' else '东莞' end 公司,
+case when 公司主体='深圳市榴芒一刻食品有限公司' and 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计'
+when 公司主体='东莞市榴芒一刻食品有限公司' and 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部') then '东莞部门合计' end 渠道大类
+from `dm_部门科目费用`
+where substr(日期,1,10) between '${startime}' and '${overtime}'
+and  渠道大类 not in('sz','月饼','月饼卡兑换','9月税金结转','发票已回','其他') 
+union 
+select distinct
+case when 公司主体='深圳市榴芒一刻食品有限公司' then '深圳' else '东莞' end 公司,
+case when 公司主体='深圳市榴芒一刻食品有限公司' and 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '关联销售'
+     when 公司主体='东莞市榴芒一刻食品有限公司' and 渠道大类 in ('销售部') then '对外销售'
+		 when 公司主体='东莞市榴芒一刻食品有限公司' and 渠道大类 in ('成品发货组') then '代加工' end 渠道大类
+from `dm_部门科目费用`
+where substr(日期,1,10) between '${startime}' and '${overtime}'
+and  渠道大类 not in('sz','月饼','月饼卡兑换','9月税金结转','发票已回','其他') 
+union
+
+select distinct
+case when 公司主体='深圳市榴芒一刻食品有限公司' then '深圳' else '东莞' end 公司,
+case when 公司主体='深圳市榴芒一刻食品有限公司' then '深圳合计'
+     when 公司主体='东莞市榴芒一刻食品有限公司' then '东莞合计'
+		 end 渠道大类
+from `dm_部门科目费用`
+where substr(日期,1,10) between '${startime}' and '${overtime}'
+and  渠道大类 not in('sz','月饼','月饼卡兑换','9月税金结转','发票已回','其他') 
+) a
+where 渠道大类 is not null
+order by 
+FIELD(渠道大类,'深圳合计','兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部','深圳部门合计','客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','东莞合计','关联销售','对外销售','代加工','东莞部门合计','销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用')]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="ds1" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="startime"/>
+<O>
+<![CDATA[2023-07-01]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O>
+<![CDATA[2023-07-30]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[(select 
+年
+,月
+,case when 科目名称 like '%其他业务收入%' then '其他业务收入'
+      when 科目名称 like '%其他业务成本%' then '其他业务成本'
+	    when 科目名称 like '%营业外收入%' then '营业外收入'
+	    when 科目名称 like '%营业外支出%' then '营业外支出'
+	    when 科目名称 in ('主营业务收入','主营业务成本','营业税金及附加','减值资产损益','应交税费_应交增值税_销项税额') then 科目名称
+end 科目名称
+,渠道大类
+,case when 科目名称 like '%收入%' or  科目名称='应交税费_应交增值税_销项税额' then round(sum(ifnull(贷方金额,0)),2) else round(sum(ifnull(借方金额,0)),2) end 金额
+from dm_部门科目费用
+where 1=1
+and substr(日期,1,10) between '${startime}' and '${overtime}'
+and 会计科目 not in ('进项 转出未交增值税','销项_转出未交增值税')
+and 科目名称 regexp ('主营业务收入|主营业务成本|营业税金及附加|减值资产损益|其他业务收入|其他业务成本|营业外收入|营业外支出|应交税费_应交增值税_销项税额')
+group by 年,月,
+case when 科目名称 like '%其他业务收入%' then '其他业务收入'
+      when 科目名称 like '%其他业务成本%' then '其他业务成本'
+	    when 科目名称 like '%营业外收入%' then '营业外收入'
+	    when 科目名称 like '%营业外支出%' then '营业外支出'
+	    when 科目名称 in ('主营业务收入','主营业务成本','营业税金及附加','减值资产损益','应交税费_应交增值税_销项税额') then 科目名称
+end ,渠道大类
+)
+
+union all
+
+(
+select 年
+,月, 科目名称,渠道大类,sum(金额) 金额
+from(
+select 
+年
+,月
+,case when 科目名称 like '%其他业务收入%' then '其他业务收入'
+      when 科目名称 like '%其他业务成本%' then '其他业务成本'
+	    when 科目名称 like '%营业外收入%' then '营业外收入'
+	    when 科目名称 like '%营业外支出%' then '营业外支出'
+	    when 科目名称 in ('主营业务收入','主营业务成本','营业税金及附加','减值资产损益','应交税费_应交增值税_销项税额') then 科目名称
+end 科目名称
+,case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计' 
+      when 公司主体='东莞市榴芒一刻食品有限公司' or 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '东莞合计' end 渠道大类
+,case when 科目名称 like '%收入%' or  科目名称='应交税费_应交增值税_销项税额' then round(sum(ifnull(贷方金额,0)),2) else round(sum(ifnull(借方金额,0)),2) end 金额
+from dm_部门科目费用
+where substr(日期,1,10) between '${startime}' and '${overtime}'
+and 会计科目 not in ('进项 转出未交增值税','销项_转出未交增值税')
+and 科目名称 regexp ('主营业务收入|主营业务成本|营业税金及附加|减值资产损益|其他业务收入|其他业务成本|营业外收入|营业外支出|应交税费_应交增值税_销项税额')
+-- and (渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') or 公司主体='东莞市榴芒一刻食品有限公司')
+group by 年,月,
+case when 科目名称 like '%其他业务收入%' then '其他业务收入'
+      when 科目名称 like '%其他业务成本%' then '其他业务成本'
+	    when 科目名称 like '%营业外收入%' then '营业外收入'
+	    when 科目名称 like '%营业外支出%' then '营业外支出'
+	    when 科目名称 in ('主营业务收入','主营业务成本','营业税金及附加','减值资产损益','应交税费_应交增值税_销项税额') then 科目名称
+end 
+,渠道大类) c
+group by 年,月, 科目名称,渠道大类)
+
+union all 
+
+select 年
+,月,科目名称,渠道大类,sum(金额) 金额
+from(
+
+select 
+年
+,月
+,case when 科目名称 like '%其他业务收入%' then '其他业务收入'
+      when 科目名称 like '%其他业务成本%' then '其他业务成本'
+	    when 科目名称 like '%营业外收入%' then '营业外收入'
+	    when 科目名称 like '%营业外支出%' then '营业外支出'
+	    when 科目名称 in ('主营业务收入','主营业务成本','营业税金及附加','减值资产损益','应交税费_应交增值税_销项税额') then 科目名称
+end 科目名称
+,case when 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部','客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳合计' end 渠道大类
+,case when 科目名称 like '%收入%' or  科目名称='应交税费_应交增值税_销项税额' then round(sum(ifnull(贷方金额,0)),2) else round(sum(ifnull(借方金额,0)),2) end 金额
+from dm_部门科目费用
+where substr(日期,1,10) between '${startime}' and '${overtime}'
+and 会计科目 not in ('进项 转出未交增值税','销项_转出未交增值税')
+and 科目名称 regexp ('主营业务收入|主营业务成本|营业税金及附加|减值资产损益|其他业务收入|其他业务成本|营业外收入|营业外支出|应交税费_应交增值税_销项税额')
+and 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部','客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') 
+group by 年,月,
+case when 科目名称 like '%其他业务收入%' then '其他业务收入'
+      when 科目名称 like '%其他业务成本%' then '其他业务成本'
+	    when 科目名称 like '%营业外收入%' then '营业外收入'
+	    when 科目名称 like '%营业外支出%' then '营业外支出'
+	    when 科目名称 in ('主营业务收入','主营业务成本','营业税金及附加','减值资产损益','应交税费_应交增值税_销项税额') then 科目名称
+end 
+,渠道大类) a
+group by 年,月,渠道大类,科目名称]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="营业利润" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="startime"/>
+<O>
+<![CDATA[2023-07-01]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O>
+<![CDATA[2023-07-30]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="tax"/>
+<O>
+<![CDATA[含税]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with k1 as(
+select 公司主体,年,月,渠道大类
+,sum(case when 科目名称='主营业务收入' then 贷方金额 else 0 end) 营业收入不含税
+,sum(case when 科目名称 ='主营业务收入' or (科目名称='应交税费_应交增值税_销项税额' and 会计科目='主营业务收入') then 贷方金额 else 0 end) 营业收入含税
+,sum(case when 科目名称 regexp ('其他业务收入') then 贷方金额 else 0 end) 其他业务收入
+,sum(case when 科目名称 regexp ('其他业务成本') then 贷方金额 else 0 end) 其他业务成本
+,sum(case when 科目名称='主营业务成本' then 借方金额 else 0 end) 主营业务成本不含税
+,sum(case when 科目名称 ='主营业务成本' or (科目名称='应交税费_应交增值税_进项税额' and 会计科目='主营业务成本') then 借方金额 else 0 end) 主营业务成本含税
+,sum(case when 科目名称 ='营业税金及附加' then 借方金额 else 0 end) 税金及附加
+,sum(case when 科目名称 ='资产减值损失' then 借方金额 else 0 end) 资产减值损失
+,sum(case when 科目名称 ='营业外收入' then 贷方金额 else 0 end) 营业外收入
+,sum(case when 科目名称 ='营业外支出' then 借方金额 else 0 end) 营业外支出
+from dm_部门科目费用
+where 1=1
+and 科目名称 regexp ('主营业务收入|主营业务成本|营业税金及附加|减值资产损益|其他业务收入|其他业务成本|营业外收入|营业外支出|应交税费_应交增值税_销项税额|应交税费_应交增值税_进项税额')
+and 日期 between '${startime}' and '${overtime}'
+group by 公司主体,年,月,渠道大类
+
+union all
+
+select 公司主体,年,月
+,case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计' 
+      when 公司主体='东莞市榴芒一刻食品有限公司' or 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '东莞合计' end 渠道大类
+,sum(case when 科目名称='主营业务收入' then 贷方金额 else 0 end) 营业收入不含税
+,sum(case when 科目名称 ='主营业务收入' or (科目名称='应交税费_应交增值税_销项税额' and 会计科目='主营业务收入') then 贷方金额 else 0 end) 营业收入含税
+,sum(case when 科目名称 regexp ('其他业务收入') then 贷方金额 else 0 end) 其他业务收入
+,sum(case when 科目名称 regexp ('其他业务成本') then 贷方金额 else 0 end) 其他业务成本
+,sum(case when 科目名称='主营业务成本' then 借方金额 else 0 end) 主营业务成本不含税
+,sum(case when 科目名称 ='主营业务成本' or (科目名称='应交税费_应交增值税_进项税额' and 会计科目='主营业务成本') then 借方金额 else 0 end) 主营业务成本含税
+,sum(case when 科目名称 ='营业税金及附加' then 借方金额 else 0 end) 税金及附加
+,sum(case when 科目名称 ='资产减值损失' then 借方金额 else 0 end) 资产减值损失
+,sum(case when 科目名称 ='营业外收入' then 贷方金额 else 0 end) 营业外收入
+,sum(case when 科目名称 ='营业外支出' then 借方金额 else 0 end) 营业外支出
+from dm_部门科目费用
+where 1=1
+and 日期 between '${startime}' and '${overtime}'
+and 科目名称 regexp ('主营业务收入|主营业务成本|营业税金及附加|减值资产损益|其他业务收入|其他业务成本|营业外收入|营业外支出|应交税费_应交增值税_销项税额|应交税费_应交增值税_进项税额')
+group by 公司主体,年,月,case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计' 
+      when 公司主体='东莞市榴芒一刻食品有限公司' or 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '东莞合计' end
+
+union all
+
+select 公司主体,年,月
+,case when 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部','客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳合计' 
+ when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') then '东莞部门合计'
+ end 渠道大类
+,sum(case when 科目名称='主营业务收入' then 贷方金额 else 0 end) 营业收入不含税
+,sum(case when 科目名称 ='主营业务收入' or (科目名称='应交税费_应交增值税_销项税额' and 会计科目='主营业务收入') then 贷方金额 else 0 end) 营业收入含税
+,sum(case when 科目名称 regexp ('其他业务收入') then 贷方金额 else 0 end) 其他业务收入
+,sum(case when 科目名称 regexp ('其他业务成本') then 贷方金额 else 0 end) 其他业务成本
+,sum(case when 科目名称='主营业务成本' then 借方金额 else 0 end) 主营业务成本不含税
+,sum(case when 科目名称 ='主营业务成本' or (科目名称='应交税费_应交增值税_进项税额' and 会计科目='主营业务成本') then 借方金额 else 0 end) 主营业务成本含税
+,sum(case when 科目名称 ='营业税金及附加' then 借方金额 else 0 end) 税金及附加
+,sum(case when 科目名称 ='资产减值损失' then 借方金额 else 0 end) 资产减值损失
+,sum(case when 科目名称 ='营业外收入' then 贷方金额 else 0 end) 营业外收入
+,sum(case when 科目名称 ='营业外支出' then 借方金额 else 0 end) 营业外支出
+from dm_部门科目费用
+where 1=1
+and 日期 between '${startime}' and '${overtime}'
+group by 公司主体,年,月,case when 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部','客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳合计' 
+ when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') then '东莞部门合计' end
+
+
+union all
+
+select 公司主体,年,月
+,case when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') then '东莞部门合计' 
+      when 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部','市场部') then '关联销售'
+end 渠道大类
+,sum(case when 科目名称='主营业务收入' then 贷方金额 else 0 end) 营业收入不含税
+,sum(case when 科目名称 ='主营业务收入' or (科目名称='应交税费_应交增值税_销项税额' and 会计科目='主营业务收入') then 贷方金额 else 0 end) 营业收入含税
+,sum(case when 科目名称 regexp ('其他业务收入') then 贷方金额 else 0 end) 其他业务收入
+,sum(case when 科目名称 regexp ('其他业务成本') then 贷方金额 else 0 end) 其他业务成本
+,sum(case when 科目名称='主营业务成本' then 借方金额 else 0 end) 主营业务成本不含税
+,sum(case when 科目名称 ='主营业务成本' or (科目名称='应交税费_应交增值税_进项税额' and 会计科目='主营业务成本') then 借方金额 else 0 end) 主营业务成本含税
+,sum(case when 科目名称 ='营业税金及附加' then 借方金额 else 0 end) 税金及附加
+,sum(case when 科目名称 ='资产减值损失' then 借方金额 else 0 end) 资产减值损失
+,sum(case when 科目名称 ='营业外收入' then 贷方金额 else 0 end) 营业外收入
+,sum(case when 科目名称 ='营业外支出' then 借方金额 else 0 end) 营业外支出
+from dm_部门科目费用
+where 1=1
+and 日期 between '${startime}' and '${overtime}'
+and 科目名称 regexp ('主营业务收入|主营业务成本|营业税金及附加|减值资产损益|其他业务收入|其他业务成本|营业外收入|营业外支出|应交税费_应交增值税_销项税额|应交税费_应交增值税_进项税额')
+group by 公司主体,年,月,case when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') then '东莞部门合计' 
+      when 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部','市场部') then '关联销售'
+end
+)
+
+select 公司主体,年,月,渠道大类
+,case when '${tax}'='含税' then sum(营业收入含税) else sum(营业收入不含税) end 营业收入
+,case when '${tax}'='含税' then sum(主营业务成本含税) else sum(主营业务成本不含税) end 主营业务成本
+,round(sum(其他业务收入),2) 其他业务收入
+,round(sum(其他业务成本),2) 其他业务成本
+,round(sum(税金及附加),2) 税金及附加
+,round(sum(资产减值损失),2) 资产减值损失
+,round(sum(营业外收入),2) 营业外收入
+,round(sum(营业外支出),2) 营业外支出
+from k1 
+group by 公司主体,年,月,渠道大类]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="订单金额副本2" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="startime"/>
+<O>
+<![CDATA[2023-09-05]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O>
+<![CDATA[2023-09-05]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[SELECT 部门,sum(订单总额) 订单总额,sum(交易关闭) 交易关闭,sum(订单收入) 订单收入,sum(标准成本) 标准成本,sum(实际成本) 实际成本,
+sum(发货金额) 发货金额, sum(未发货金额) 未发货金额,sum(回款金额) 回款金额,sum(未回款金额) 未回款金额
+FROM dm_销售单日汇总
+where 1=1
+and 日期 between '${startime}' and '${overtime}'
+group by 部门
+ 
+union all 
+
+select 部门,sum(订单总额) 订单总额,sum(交易关闭) 交易关闭,sum(订单收入) 订单收入,sum(标准成本) 标准成本,sum(实际成本) 实际成本,sum(发货金额) 发货金额,sum(未发货金额) 未发货金额,sum(回款金额) 回款金额,sum(回款金额) 回款金额 from (
+SELECT
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN  '深圳部门合计'
+		 WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部' ) THEN  '关联销售' 	
+END 部门,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部')  THEN sum(订单总额) 
+		 WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(订单总额)
+END 订单总额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(交易关闭) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(交易关闭)
+END 交易关闭,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(订单收入) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(订单收入)
+END 订单收入,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(标准成本) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(标准成本)
+END 标准成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(实际成本)
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(实际成本)
+
+END 实际成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部')  THEN sum(发货金额) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(发货金额)
+END 发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(未发货金额) 
+		 WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未发货金额)    
+END 未发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(回款金额) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(回款金额) 
+END 回款金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(未回款金额) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未回款金额)  
+END 未回款金额
+FROM dm_销售单日汇总 a
+left join 
+rpa.ods_01财务_rpa_吉客云_销售明细单数据_日维度 b on a.店铺=b.distribution_channel
+where 日期 between '${startime}' and '${overtime}' and 店铺 not in ('天猫超市-sz','京东自营渠道-sz','京东入仓-sz','京东自营店-sz','京东pop仓-sz','有赞店铺-sz','有赞美食店-sz')
+and 部门 not in ('分销事业部','线下业务部')
+GROUP BY 
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN  '深圳部门合计'  
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN  '关联销售'
+END
+
+union all
+
+select b.部门,a.订单总额,a.交易关闭,a.订单收入,b.标准成本,b.实际成本,a.发货金额,a.未发货金额,c.回款金额,a.发货金额-c.回款金额 未回款金额
+from (
+select left(delivery_time,10) 日期,order_no 单据编号,online_store_order_number 平台订单号,distribution_channel 店铺, sum(ifnull(amount_of_money,0)) 订单总额,
+case when orderstatus in ('交易关闭') then sum(ifnull(amount_of_money,0)) end 交易关闭,
+case when orderstatus in ('发货在途','已完成') then sum(ifnull(amount_of_money,0)) end 订单收入,
+case when orderstatus in ('发货在途','已完成') then sum(ifnull(amount_of_money,0)) end 发货金额,
+case when orderstatus in ('发货在途','已完成') then sum(ifnull(amount_of_money,0)) end - case when orderstatus in ('发货在途','已完成') then sum(ifnull(amount_of_money,0)) end 未发货金额
+from rpa.ods_01财务_rpa_吉客云_销售明细单数据_日维度
+where distribution_channel in ('天猫超市-sz','京东自营渠道-sz','京东入仓-sz','京东自营店-sz','京东pop仓-sz','有赞店铺-sz','有赞美食店-sz')
+group by left(delivery_time,10) ,online_store_order_number) a 
+left join dm_金蝶销售出库单 b
+on a.日期=b.日期 and a.平台订单号=b.平台订单号 and a.店铺=b.客户
+left join (select left(date,10) 日期,payunit_f_name 店铺,sum(realrec_amount_for) 回款金额 from 
+profit.jindie_receipt_order a left join profit.dm_01财务_profit_客户中间表_tmp b on a.payunit_f_name=b.渠道  group by left(date,10),payunit_f_name
+) c on a.日期=c.日期 and a.店铺=c.店铺
+where a.日期 between '${startime}' and '${overtime}' and length(b.部门)<>0
+) a group by 部门
+union all 
+
+SELECT
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部')
+				 then '深圳合计'
+		 WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用' ) THEN  '东莞部门合计' 	
+END 部门,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部')  THEN sum(订单总额) 
+		 WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(订单总额)
+END 订单总额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(交易关闭) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(交易关闭)
+END 交易关闭,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(订单收入) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(订单收入)
+END 订单收入,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(标准成本) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(标准成本)
+END 标准成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(实际成本)
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(实际成本)
+
+END 实际成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部')  THEN sum(发货金额) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(发货金额)
+END 发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未发货金额) 
+		 WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(未发货金额)    
+END 未发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(回款金额) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(回款金额) 
+END 回款金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未回款金额) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(未回款金额)  
+END 未回款金额
+FROM dm_销售单日汇总
+where 日期 between '${startime}' and '${overtime}'
+GROUP BY 
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN  '深圳合计'  
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN  '东莞部门合计'
+END
+
+
+union all 
+
+SELECT
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN  '东莞合计'	
+END 部门,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工')  THEN sum(订单总额) 
+END 订单总额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(交易关闭) 
+END 交易关闭,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(订单收入) 
+END 订单收入,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(标准成本) 
+END 标准成本,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(实际成本)
+END 实际成本,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工')  THEN sum(发货金额) 
+END 发货金额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(未发货金额)   
+END 未发货金额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(回款金额) 
+END 回款金额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(未回款金额)  
+END 未回款金额
+FROM dm_销售单日汇总
+where 日期 between '${startime}' and '${overtime}'
+GROUP BY 
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN  '东莞合计'  
+END]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="营业外收入_应交未交税金" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="startime"/>
+<O>
+<![CDATA[2023-06-01]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O>
+<![CDATA[2023-06-30]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select 
+年,月,科目名称,渠道大类,会计科目
+,sum(借方金额) 金额
+from dm_部门科目费用
+where 1=1
+and 会计科目='营业外收入_应交未交税金'
+and substr(日期,1,10) between '${startime}' and '${overtime}'
+group by 年,月,科目名称,渠道大类
+
+union all 
+select 
+年,月,科目名称,
+case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') then '深圳合计' 
+when 公司主体='东莞市榴芒一刻食品有限公司' or 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '东莞合计' end 渠道大类
+,会计科目
+,sum(借方金额) 金额
+from dm_部门科目费用
+where 1=1
+and 会计科目='营业外收入_应交未交税金'
+and substr(日期,1,10) between '${startime}' and '${overtime}'
+group by 年,月,科目名称,case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') then '深圳合计' 
+when 公司主体='东莞市榴芒一刻食品有限公司' or 渠道大类 in ('兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '东莞合计' end
+
+union all 
+select 
+年,月,科目名称,
+case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计' 
+     when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') then '东莞部门合计' end 渠道大类
+,会计科目
+,sum(借方金额) 金额
+from dm_部门科目费用
+where 1=1
+and 会计科目='营业外收入_应交未交税金'
+and substr(日期,1,10) between '${startime}' and '${overtime}'
+group by 年,月,科目名称,case when 渠道大类 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计' 
+     when 渠道大类 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') then '东莞部门合计' end
+]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="订单金额副本1" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="startime"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[SELECT 部门,sum(订单总额) 订单总额,sum(交易关闭) 交易关闭,sum(订单收入) 订单收入,sum(标准成本) 标准成本,sum(实际成本) 实际成本,
+sum(发货金额) 发货金额, sum(未发货金额) 未发货金额,sum(回款金额) 回款金额,sum(未回款金额) 未回款金额
+FROM dm_销售单日汇总
+where 1=1
+and 日期 between '${startime}' and '${overtime}'
+group by 部门
+ 
+union all 
+
+SELECT
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN  '深圳部门合计'
+		 WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部' ) THEN  '关联销售' 	
+END 部门,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部')  THEN sum(订单总额) 
+		 WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(订单总额)
+END 订单总额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(交易关闭) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(交易关闭)
+END 交易关闭,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(订单收入) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(订单收入)
+END 订单收入,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(标准成本) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(标准成本)
+END 标准成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(实际成本)
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(实际成本)
+
+END 实际成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部')  THEN sum(发货金额) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(发货金额)
+END 发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(未发货金额) 
+		 WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未发货金额)    
+END 未发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(回款金额) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(回款金额) 
+END 回款金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(未回款金额) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未回款金额)  
+END 未回款金额
+FROM dm_销售单日汇总
+where 日期 between '${startime}' and '${overtime}'
+GROUP BY 
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN  '深圳部门合计'  
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN  '关联销售'
+END
+
+union all 
+
+SELECT
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部')
+				 then '深圳合计'
+		 WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用' ) THEN  '东莞部门合计' 	
+END 部门,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部')  THEN sum(订单总额) 
+		 WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(订单总额)
+END 订单总额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(交易关闭) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(交易关闭)
+END 交易关闭,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(订单收入) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(订单收入)
+END 订单收入,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(标准成本) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(标准成本)
+END 标准成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(实际成本)
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(实际成本)
+
+END 实际成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部')  THEN sum(发货金额) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(发货金额)
+END 发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未发货金额) 
+		 WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(未发货金额)    
+END 未发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(回款金额) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(回款金额) 
+END 回款金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未回款金额) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(未回款金额)  
+END 未回款金额
+FROM dm_销售单日汇总
+where 日期 between '${startime}' and '${overtime}'
+GROUP BY 
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN  '深圳合计'  
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN  '东莞部门合计'
+END
+
+
+union all 
+
+SELECT
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN  '东莞合计'	
+END 部门,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工')  THEN sum(订单总额) 
+END 订单总额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(交易关闭) 
+END 交易关闭,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(订单收入) 
+END 订单收入,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(标准成本) 
+END 标准成本,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(实际成本)
+END 实际成本,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工')  THEN sum(发货金额) 
+END 发货金额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(未发货金额)   
+END 未发货金额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(回款金额) 
+END 回款金额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(未回款金额)  
+END 未回款金额
+FROM dm_销售单日汇总
+where 日期 between '${startime}' and '${overtime}'
+GROUP BY 
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN  '东莞合计'  
+END]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="订单金额" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="startime"/>
+<O>
+<![CDATA[2023-07-01]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O>
+<![CDATA[2023-07-30]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[SELECT 部门,sum(订单总额) 订单总额,sum(交易关闭) 交易关闭,sum(订单收入) 订单收入,sum(标准成本) 标准成本,sum(实际成本) 实际成本,
+sum(发货金额) 发货金额, sum(未发货金额) 未发货金额,sum(回款金额) 回款金额,sum(未回款金额) 未回款金额
+FROM dm_销售单日汇总
+where 1=1
+and 日期 between '${startime}' and '${overtime}'
+group by 部门
+ 
+union all 
+
+select 部门,sum(订单总额) 订单总额,sum(交易关闭) 交易关闭,sum(订单收入) 订单收入,sum(标准成本) 标准成本,sum(实际成本) 实际成本,sum(发货金额) 发货金额,sum(未发货金额) 未发货金额,sum(回款金额) 回款金额,sum(回款金额) 回款金额 from (
+SELECT
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN  '深圳部门合计'
+		 WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部' ) THEN  '关联销售' 	
+END 部门,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部')  THEN sum(订单总额) 
+		 WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(订单总额)
+END 订单总额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(交易关闭) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(交易关闭)
+END 交易关闭,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(订单收入) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(订单收入)
+END 订单收入,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(标准成本) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(标准成本)
+END 标准成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(实际成本)
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(实际成本)
+
+END 实际成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部')  THEN sum(发货金额) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(发货金额)
+END 发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(未发货金额) 
+		 WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未发货金额)    
+END 未发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(回款金额) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(回款金额) 
+END 回款金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN sum(未回款金额) 
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未回款金额)  
+END 未回款金额
+FROM dm_销售单日汇总 a
+left join 
+rpa.ods_01财务_rpa_吉客云_销售明细单数据_日维度 b on a.店铺=b.distribution_channel
+where 日期 between '${startime}' and '${overtime}' and 店铺 not in ('天猫超市-sz','京东自营渠道-sz','京东入仓-sz','京东自营店-sz','京东pop仓-sz','有赞店铺-sz','有赞美食店-sz')
+and 部门 not in ('分销事业部','线下业务部')
+GROUP BY 
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') THEN  '深圳部门合计'  
+     WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN  '关联销售'
+END
+
+union all
+
+select b.部门,a.订单总额,a.交易关闭,a.订单收入,b.标准成本,b.实际成本,a.发货金额,a.未发货金额,c.回款金额,a.发货金额-c.回款金额 未回款金额
+from (
+select left(delivery_time,10) 日期,order_no 单据编号,online_store_order_number 平台订单号,distribution_channel 店铺,
+case when distribution_channel in ('京东自营渠道-sz','京东入仓-sz') then sum(ifnull(金额,0)) else sum(ifnull(amount_of_money,0)) end 订单总额,
+case when distribution_channel in ('京东自营渠道-sz','京东入仓-sz') then 0 when orderstatus in ('交易关闭') then sum(ifnull(amount_of_money,0)) end 交易关闭,
+case when  distribution_channel in ('京东自营渠道-sz','京东入仓-sz') then sum(ifnull(金额,0)) 
+     when orderstatus in ('发货在途','已完成') then sum(ifnull(amount_of_money,0)) end 订单收入,
+case when orderstatus in ('发货在途','已完成') then sum(ifnull(amount_of_money,0)) end 发货金额,
+case when orderstatus in ('发货在途','已完成') then sum(ifnull(amount_of_money,0)) end - case when orderstatus in ('发货在途','已完成') then sum(ifnull(amount_of_money,0)) end 未发货金额
+from (select * from rpa.ods_01财务_rpa_吉客云_销售明细单数据_日维度 
+where distribution_channel in ('天猫超市-sz','京东自营渠道-sz','京东入仓-sz','京东pop仓-sz','有赞店铺-sz','有赞美食店-sz')) a
+left join 
+(select 
+case when length(sku编码)<>0 then sum(income*0.25-(income-cost))
+else sum(income*0.05-(income-cost)) end 金额,a.create_time 日期,case when length(sku编码)<>0 then '京东入仓-sz'
+else '京东自营渠道-sz' end 店铺
+from rpa.ods_jd_self_support_sales_volume a
+left join 
+profit.京东入仓sku b on 
+-- left(a.create_time,7)=b.`时间(年月)` and 
+a.product_code=b.sku编码
+group by a.create_time,case when length(sku编码)<>0 then '京东入仓-sz'
+else '京东自营渠道-sz' end) b on left(a.delivery_time,10)=b.日期 and 
+a.distribution_channel=b.店铺
+group by left(delivery_time,10) ,online_store_order_number
+
+union all
+
+select left(delivery_time,10) 日期,order_no 单据编号,online_store_order_number 平台订单号,distribution_channel 店铺, sum(ifnull(quantity*商品价格,0)) 订单总额,
+case when orderstatus in ('交易关闭') then sum(ifnull(quantity*商品价格,0)) end 交易关闭,
+case when orderstatus in ('发货在途','已完成') then sum(ifnull(quantity*商品价格,0)) end 订单收入,
+case when orderstatus in ('发货在途','已完成') then sum(ifnull(quantity*商品价格,0)) end 发货金额,
+case when orderstatus in ('发货在途','已完成') then sum(ifnull(quantity*商品价格,0)) end - case when orderstatus in ('发货在途','已完成') then sum(ifnull(quantity*商品价格,0)) end 未发货金额
+from rpa.ods_01财务_rpa_吉客云_销售明细单数据_日维度 a
+left join 
+(select sku_id 商家编码,commodity_price 商品价格,creation_time 生效时间,lead(creation_time,1,'2999-12-30')over(partition by sku_id order by creation_time) 失效时间 from rpa.ods_抖音供应链管理平台_商品列表_月维度) b on a.item_barcode=b.商家编码  and (a.creation_time between b.生效时间 and b.失效时间)
+where distribution_channel='抖音超市-sz'
+group by left(delivery_time,10) ,online_store_order_number) a 
+left join profit.dm_金蝶销售出库单 b
+on a.日期=b.日期 and a.平台订单号=b.平台订单号 and a.店铺=b.客户
+left join (select left(date,10) 日期,payunit_f_name 店铺,sum(realrec_amount_for) 回款金额 from 
+profit.jindie_receipt_order a left join profit.dm_01财务_profit_客户中间表_tmp b on a.payunit_f_name=b.渠道  group by left(date,10),payunit_f_name
+) c on a.日期=c.日期 and a.店铺=c.店铺
+
+
+where a.日期 between '${startime}' and '${overtime}' and length(b.部门)<>0
+) a group by 部门
+union all 
+
+SELECT
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部')
+				 then '深圳合计'
+		 WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用' ) THEN  '东莞部门合计' 	
+END 部门,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部')  THEN sum(订单总额) 
+		 WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(订单总额)
+END 订单总额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(交易关闭) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(交易关闭)
+END 交易关闭,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(订单收入) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(订单收入)
+END 订单收入,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(标准成本) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(标准成本)
+END 标准成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(实际成本)
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(实际成本)
+
+END 实际成本,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部')  THEN sum(发货金额) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(发货金额)
+END 发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未发货金额) 
+		 WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(未发货金额)    
+END 未发货金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(回款金额) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(回款金额) 
+END 回款金额,
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN sum(未回款金额) 
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN sum(未回款金额)  
+END 未回款金额
+FROM dm_销售单日汇总
+where 日期 between '${startime}' and '${overtime}'
+GROUP BY 
+CASE WHEN 部门 IN ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部') THEN  '深圳合计'  
+     WHEN 部门 IN ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','商品研发部','仓库管理部','公共费用') THEN  '东莞部门合计'
+END
+
+
+union all 
+
+SELECT
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN  '东莞合计'	
+END 部门,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工')  THEN sum(订单总额) 
+END 订单总额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(交易关闭) 
+END 交易关闭,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(订单收入) 
+END 订单收入,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(标准成本) 
+END 标准成本,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(实际成本)
+END 实际成本,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工')  THEN sum(发货金额) 
+END 发货金额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(未发货金额)   
+END 未发货金额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(回款金额) 
+END 回款金额,
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN sum(未回款金额)  
+END 未回款金额
+FROM dm_销售单日汇总
+where 日期 between '${startime}' and '${overtime}'
+GROUP BY 
+CASE WHEN 部门 IN ('兴趣电商部','京多事业部','天猫事业部','私域事业部','分销事业部','线下业务部','对外销售','代加工') THEN  '东莞合计'  
+END]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+<TableData name="销管财研" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="startime"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[profit]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with k1 as (
+-- 销管财研费用统计：
+-- 明细科目id
+select 
+年度
+,月份
+,case when 科目全名 like '%销售费用%' then '销售费用'
+      when 科目全名 like '%财务费用%' then '财务费用'
+	    when 科目全名 like '%管理费用%' then '管理费用'
+	    when 科目全名 like '%研发费用%' then '研发费用'
+
+end 科目全名
+,明细科目
+,费用归属组
+,sum(ifnull(借方金额,0)) 金额
+,case when 科目全名 like '%销售费用%' then CONCAT('1.',row_number()over(partition by 科目全名))
+      when 科目全名 like '%财务费用%' then CONCAT('2.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%管理费用%' then CONCAT('3.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%研发费用%' then CONCAT('4.',row_number()over(partition by 科目全名))
+	  
+end id
+,case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	  when 科目全名 like '%管理费用%' then '3'
+	  when 科目全名 like '%研发费用%' then '4'
+	 
+end 父id
+,业务主体 公司
+from profit.ods_dm_费用科目表
+where  科目全名 regexp ('销售费用|管理费用|财务费用|研发费用') and substr(日期,1,10) between '${startime}' and '${overtime}'
+and 明细科目 not in ('进项 转出未交增值税','销项_转出未交增值税','营业外收入_应交未交税金')
+
+group by 年度,月份,科目全名,明细科目,费用归属组
+
+union all
+
+-- 科目全名id
+select 
+年度
+,月份
+,case when 科目全名 like '%销售费用%' then '销售费用'
+      when 科目全名 like '%财务费用%' then '财务费用'
+	    when 科目全名 like '%管理费用%' then '管理费用'
+	    when 科目全名 like '%研发费用%' then '研发费用'
+	
+end 科目全名
+,case when 科目全名 like '%销售费用%' then '销售费用小计'
+      when 科目全名 like '%财务费用%' then '财务费用小计'
+      when 科目全名 like '%管理费用%' then '管理费用小计'
+	    when 科目全名 like '%研发费用%' then '研发费用小计'
+
+end 明细科目
+,'' 费用归属组
+,'' 金额
+,case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	  when 科目全名 like '%管理费用%' then '3'
+	  when 科目全名 like '%研发费用%' then '4'
+	 
+end id
+,0 父id
+,业务主体 公司
+from profit.ods_dm_费用科目表
+where  科目全名 regexp ('销售费用|管理费用|财务费用|研发费用') and substr(日期,1,10) between '${startime}' and '${overtime}'
+and 明细科目 not in ('进项 转出未交增值税','销项_转出未交增值税','营业外收入_应交未交税金')
+group by 年度,月份,
+case when 科目全名 like '%销售费用%' then '销售费用'
+     when 科目全名 like '%财务费用%' then '财务费用'
+	   when 科目全名 like '%管理费用%' then '管理费用'
+	   when 科目全名 like '%研发费用%' then '研发费用'
+end
+,case when 科目全名 like '%销售费用%' then '销售费用小计'
+      when 科目全名 like '%财务费用%' then '财务费用小计'
+      when 科目全名 like '%管理费用%' then '管理费用小计'
+	    when 科目全名 like '%研发费用%' then '研发费用小计'
+end ,费用归属组
+
+
+union all 
+
+-- 部门合计明细科目id
+select 
+年度
+,月份
+,case when 科目全名 like '%销售费用%' then '销售费用'
+      when 科目全名 like '%财务费用%' then '财务费用'
+	    when 科目全名 like '%管理费用%' then '管理费用'
+	    when 科目全名 like '%研发费用%' then '研发费用'
+
+end 科目全名
+,明细科目
+,case when 费用归属组 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计' 
+      when 费用归属组 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','关联销售','对外销售','代加工','商品研发部','仓库管理部','公共费用') then '东莞部门合计' 
+end 费用归属组
+,sum(ifnull(借方金额,0)) 金额
+,case when 科目全名 like '%销售费用%' then CONCAT('1.',row_number()over(partition by 科目全名))
+      when 科目全名 like '%财务费用%' then CONCAT('2.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%管理费用%' then CONCAT('3.',row_number()over(partition by 科目全名))
+	    when 科目全名 like '%研发费用%' then CONCAT('4.',row_number()over(partition by 科目全名))	  
+end id
+,case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	    when 科目全名 like '%管理费用%' then '3'
+	    when 科目全名 like '%研发费用%' then '4'
+	 
+end 父id
+,业务主体 公司
+from profit.ods_dm_费用科目表
+where  科目全名 regexp ('销售费用|管理费用|财务费用|研发费用') and substr(日期,1,10) between '${startime}' and '${overtime}'
+and 明细科目 not in ('进项 转出未交增值税','销项_转出未交增值税','营业外收入_应交未交税金')
+and 费用归属组 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','公共费用','商品研发部','仓库管理部')
+group by 年度,月份,科目全名,明细科目,
+case when 费用归属组 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部') then '深圳部门合计' 
+      when 费用归属组 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','关联销售','对外销售','代加工','商品研发部','仓库管理部','公共费用') then '东莞部门合计' 
+end
+
+union all 
+
+-- 公司合计明细科目id
+select 
+年度
+,月份
+,case when 科目全名 like '%销售费用%' then '销售费用'
+      when 科目全名 like '%财务费用%' then '财务费用'
+	  when 科目全名 like '%管理费用%' then '管理费用'
+	  when 科目全名 like '%研发费用%' then '研发费用'
+
+end 科目全名
+,明细科目
+,case when 费用归属组 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '深圳合计' 
+      when 费用归属组 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','关联销售','对外销售','代加工','商品研发部','仓库管理部','公共费用') then '东莞合计' 
+			end 费用归属组
+,sum(ifnull(借方金额,0)) 金额
+,case when 科目全名 like '%销售费用%' then CONCAT('1.',row_number()over(partition by 科目全名))
+      when 科目全名 like '%财务费用%' then CONCAT('2.',row_number()over(partition by 科目全名))
+	  when 科目全名 like '%管理费用%' then CONCAT('3.',row_number()over(partition by 科目全名))
+	  when 科目全名 like '%研发费用%' then CONCAT('4.',row_number()over(partition by 科目全名))
+	  
+end id
+,case when 科目全名 like '%销售费用%' then '1'
+      when 科目全名 like '%财务费用%' then '2'
+	  when 科目全名 like '%管理费用%' then '3'
+	  when 科目全名 like '%研发费用%' then '4'
+	 
+end 父id
+,业务主体 公司
+from profit.ods_dm_费用科目表
+where  科目全名 regexp ('销售费用|管理费用|财务费用|研发费用') and  substr(日期,1,10) between '${startime}' and '${overtime}'
+and 明细科目 not in ('进项 转出未交增值税','销项_转出未交增值税','营业外收入_应交未交税金')
+-- and 费用归属组 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部')
+group by 年度,月份,科目全名,明细科目,case when 费用归属组 in ('客服部','市场部','财务部','IT部门','法务部','人力行政部','总经办','产品部','兴趣电商部','天猫事业部','京多事业部','分销事业部','私域事业部','线下业务部') then '深圳合计' 
+      when 费用归属组 in ('销售部','成品发货组','订单组','总经理办公室','财务管理部','人事行政部','采购部','关联销售','对外销售','代加工','商品研发部','仓库管理部','公共费用') then '东莞合计' 
+			end
+	)
+select * from k1]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR F="0" T="1"/>
+<FR/>
+<HC/>
+<FC/>
+<UPFCR COLUMN="false" ROW="true"/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1000664,1207698,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,723900,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,1152000,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[0,6970143,4968815,4520241,4347713,4382218,5417388,3278037,4347713,4347713,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" s="0">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="0" rs="2" s="1">
+<O>
+<![CDATA[经营利润表]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="0" s="1">
+<O t="DSColumn">
+<Attributes dsName="渠道部门" columnName="公司"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C1"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="0" s="1">
+<O>
+<![CDATA[门店]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="0" cs="3" s="1">
+<O>
+<![CDATA[集团]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="1" s="1">
+<O t="DSColumn">
+<Attributes dsName="渠道部门" columnName="渠道大类"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="1">
+<O>
+<![CDATA[深圳样品部]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="2">
+<O>
+<![CDATA[0]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="1">
+<O>
+<![CDATA[sz]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<NameJavaScriptGroup>
+<NameJavaScript name="网络报表1">
+<JavaScript class="com.fr.js.ReportletHyperlink">
+<JavaScript class="com.fr.js.ReportletHyperlink">
+<Parameters>
+<Parameter>
+<Attributes name="bm"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$$$]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="startime"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$startime]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="overtime"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$overtime]]></Attributes>
+</O>
+</Parameter>
+<Parameter>
+<Attributes name="tax"/>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=$tax]]></Attributes>
+</O>
+</Parameter>
+</Parameters>
+<TargetFrame>
+<![CDATA[_blank]]></TargetFrame>
+<Features width="600" height="400"/>
+<ReportletName showPI="true">
+<![CDATA[/利润成本/1.实时利润表-子级.cpt&op=write]]></ReportletName>
+<Attr>
+<DialogAttr class="com.fr.js.ReportletHyperlinkDialogAttr">
+<O>
+<![CDATA[]]></O>
+<Location center="true"/>
+</DialogAttr>
+</Attr>
+</JavaScript>
+</JavaScript>
+</NameJavaScript>
+</NameJavaScriptGroup>
+<Expand dir="1" leftParentDefault="false" upParentDefault="false" up="C1">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C2"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="1" s="1">
+<O>
+<![CDATA[门店]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="1" s="1">
+<O>
+<![CDATA[借方抵扣]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="1" s="1">
+<O>
+<![CDATA[贷方抵扣]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="1" s="1">
+<O>
+<![CDATA[集团合计]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="2" s="1">
+<O>
+<![CDATA[订单总额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="订单总额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C3"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="2" s="3">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="2" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="订单总额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="2" s="2">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I3) + sum(J3) - sum(E3) + sum(F3)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="2" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="订单总额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ColWidthHighlightAction"/>
+</Highlight>
+</HighlightList>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="2" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="订单总额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<HighlightList>
+<Highlight class="com.fr.report.cell.cellattr.highlight.DefaultHighlight">
+<Name>
+<![CDATA[条件属性1]]></Name>
+<Condition class="com.fr.data.condition.ListCondition"/>
+<HighlightAction class="com.fr.report.cell.cellattr.highlight.ColWidthHighlightAction"/>
+</Highlight>
+</HighlightList>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="3" s="1">
+<O>
+<![CDATA[交易关闭]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="3" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="交易关闭"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C4"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="3" s="3">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="3" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="交易关闭"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="3" s="2">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="3" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I4) + sum(J4) - sum(E4) + sum(F4)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="3" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="交易关闭"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="3" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="交易关闭"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J4"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="4" s="1">
+<O>
+<![CDATA[订单收入]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="订单收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="4" s="3">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="4" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="订单收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="4" s="2">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="4" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I5) + sum(J5) - sum(E5) + sum(F5)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="4" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="订单收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="4" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="订单收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="5" s="1">
+<O>
+<![CDATA[订单标准成本]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="标准成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="5" s="3">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="5" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="标准成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="5" s="2">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="5" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I6) + sum(J6) - sum(E6) + sum(F6)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="5" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="标准成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="5" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="标准成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="6" s="1">
+<O>
+<![CDATA[订单实际成本]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="6" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="实际成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="6" s="3">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="6" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="实际成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="6" s="2">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="6" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I7) + sum(J7) - sum(E7) + sum(F7)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="6" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="实际成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="6" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="实际成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="7" s="1">
+<O>
+<![CDATA[发货金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="7" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="发货金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="7" s="3">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="7" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="发货金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="7" s="2">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="7" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I8) + sum(J8) - sum(E8) + sum(F8)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="7" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="发货金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="7" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="发货金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="8" s="1">
+<O>
+<![CDATA[未发货金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="8" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="未发货金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="1" upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="8" s="3">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="8" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="未发货金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="8" s="2">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="8" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I9) + sum(J9) - sum(E9) + sum(F9)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="8" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="未发货金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="8" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="未发货金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="9" s="1">
+<O>
+<![CDATA[回款金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="9" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="回款金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="1" upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="9" s="3">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="9" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="回款金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="9" s="2">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="9" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I10) + sum(J10) - sum(E10) + sum(F10)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="9" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="回款金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="9" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="回款金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="10" s="1">
+<O>
+<![CDATA[未回款金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="10" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="未回款金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C6"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="10" s="3">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="10" s="2">
+<O t="DSColumn">
+<Attributes dsName="订单金额" columnName="未回款金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="10" s="2">
+<O t="I">
+<![CDATA[0]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="10" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I11) + sum(J11) - sum(E11) + sum(F11)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="10" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="未回款金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="10" s="4">
+<O t="DSColumn">
+<Attributes dsName="订单金额副本2" columnName="未回款金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[部门]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J5"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="2" r="11" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="3" r="11" s="5">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="11" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="5" r="11" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="6" r="11" s="5">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="12" s="1">
+<O>
+<![CDATA[主营业务收入]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="12" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="12" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B13">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="12" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="12" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B13">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="12" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I13) + sum(J13) - sum(E13) + sum(F13)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B13">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="G13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="12" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="12" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="0" r="13" s="0">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="A14"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="13" s="1">
+<O>
+<![CDATA[其他业务收入]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="A14"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="2" r="13" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="其他业务收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C14"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="13" s="2">
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" left="B14" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D14"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="13" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="其他业务收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[关联销售]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E14"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="13" s="2">
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" left="B14" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D14"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="13" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I14) + sum(J14) - sum(E14) + sum(F14)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="8" r="13" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="其他业务收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="13" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="其他业务收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="14" s="1">
+<O>
+<![CDATA[主营业务成本]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="14" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="主营业务成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C15"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="14" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B15">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D15"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="14" s="2">
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" left="B15">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E15"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="14" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="主营业务成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="F15"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="14" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I15) + sum(J15) - sum(E15) + sum(F15)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="14" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="主营业务成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="14" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="主营业务成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="15" s="1">
+<O>
+<![CDATA[其他业务成本]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="15" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="其他业务成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C15"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="15" s="6">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="15" s="6">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="15" s="6">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="15" s="6">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="15" s="0">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="其他业务成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="15" s="0">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="其他业务成本"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="16" s="1">
+<O>
+<![CDATA[营业税金及附加]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="16" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="税金及附加"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C15"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="16" s="7">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B17">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D17"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="16" s="2">
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" left="B17">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E17"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="16" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B17">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="F17"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="16" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I17) + sum(J17) - sum(E17) + sum(F17)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="16" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="税金及附加"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="16" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="税金及附加"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J13"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="17" s="1">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="FR_GEN_0"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.report.web.button.form.TreeNodeToggleButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</Widget>
+<Present class="com.fr.base.present.DictPresent">
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="id" viName="会计科目"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[销管财研友媛数据不对版]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+</Present>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="17" s="2">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B18" upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C18"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="17" s="2">
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D18"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="17" s="2">
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" left="B18">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E18"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="17" s="2">
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" left="B18">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E18"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="17" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I18) + sum(J18) - sum(E18) + sum(F18)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="17" s="4">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="1">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B18">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I18"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="17" s="4">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B18">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J18"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="18" s="1">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="会计科目"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[会计科目]]></CNAME>
+<Compare op="9">
+<O>
+<![CDATA[小计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Widget class="com.fr.report.web.button.form.TreeNodeToggleButton">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+</Widget>
+<Present class="com.fr.base.present.DictPresent">
+<Dictionary class="com.fr.data.impl.TableDataDictionary">
+<FormulaDictAttr kiName="id" viName="会计科目"/>
+<TableDataDictAttr>
+<TableData class="com.fr.data.impl.NameTableData">
+<Name>
+<![CDATA[销管财研友媛数据不对版]]></Name>
+</TableData>
+</TableDataDictAttr>
+</Dictionary>
+</Present>
+<Expand dir="0" leftParentDefault="false" left="B18">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B19"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="2" r="18" s="2">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B19" upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C19"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="18" s="2">
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D18"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="18" s="2">
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" left="B19">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E19"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="18" s="2">
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" left="B19">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E19"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="18" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I19) + sum(J19) - sum(E19) + sum(F19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="18" s="4">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="金额"/>
+<Condition class="com.fr.data.condition.ListCondition">
+<JoinCondition join="0">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+<JoinCondition join="1">
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+</JoinCondition>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B19">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I18"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="18" s="4">
+<O t="DSColumn">
+<Attributes dsName="Tree1" columnName="金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNAME>
+<![CDATA[费用归属组]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B19">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J18"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="19" s="1">
+<O>
+<![CDATA[资产减值损失]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="19" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="资产减值损失"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C20"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="19" s="6">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="19" s="6">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="19" s="6">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="19" s="6">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="19" s="0">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="资产减值损失"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I20"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="19" s="0">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="资产减值损失"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J24"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="20" s="1">
+<O>
+<![CDATA[营业利润]]></O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="B21"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="2" r="20" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C13) + SUM(C14) - SUM(C15) - SUM(C17) - SUM(C18)- sum(19)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand extendable="1" leftParentDefault="false" left="B21" upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C21"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="20" s="2">
+<PrivilegeControl/>
+<Expand extendable="1" leftParentDefault="false" left="B21">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C21"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="20" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(E13) + SUM(E14) - SUM(E15) - SUM(E17) - -SUM(E18)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand extendable="1" leftParentDefault="false" left="B21">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C21"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="20" s="2">
+<PrivilegeControl/>
+<Expand extendable="1" leftParentDefault="false" left="B21">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C21"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="20" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(C21) / 2]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand extendable="1" leftParentDefault="false" left="B21">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C21"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="20" s="0">
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="9" r="20" s="0">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="21" s="1">
+<O>
+<![CDATA[营业外收入]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="21" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业外收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C22"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="21" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B22">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D22"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="21" s="2">
+<PrivilegeControl/>
+<Expand dir="0" leftParentDefault="false" left="B22">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E22"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="21" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B22">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D22"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="21" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I22) + sum(J22) - sum(E22) + sum(F22)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B22">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="G22"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="21" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业外收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I20"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="21" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业外收入"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J24"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="22" s="1">
+<O>
+<![CDATA[营业外收入_应交未交税金]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="22" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业外收入_应交未交税金" columnName="金额"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C23"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="22" s="6">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B23">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D23"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="22" s="6">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B23">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D23"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="22" s="6">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B23">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D23"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="22" s="6">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B23">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D23"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="22" s="0">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="22" s="0">
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="23" s="1">
+<O>
+<![CDATA[营业外支出]]></O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="23" s="2">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业外支出"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<ColumnRow column="2" row="1"/>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C24"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="23" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B24">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D24"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="23" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B24">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="E24"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="23" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B24">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="D24"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="23" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(I24) + sum(J24) - sum(E24) + sum(F24)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B22">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="G22"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="8" r="23" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业外支出"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[深圳合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="I20"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="9" r="23" s="4">
+<O t="DSColumn">
+<Attributes dsName="营业利润" columnName="营业外支出"/>
+<Condition class="com.fr.data.condition.CommonCondition">
+<CNUMBER>
+<![CDATA[0]]></CNUMBER>
+<CNAME>
+<![CDATA[渠道大类]]></CNAME>
+<Compare op="0">
+<O>
+<![CDATA[东莞合计]]></O>
+</Compare>
+</Condition>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.SummaryGrouper">
+<FN>
+<![CDATA[com.fr.data.util.function.SumFunction]]></FN>
+</RG>
+<Result>
+<![CDATA[$$$]]></Result>
+<Parameters/>
+<cellSortAttr>
+<sortExpressions/>
+</cellSortAttr>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" upParentDefault="false">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="J24"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="24" s="1">
+<O>
+<![CDATA[利润总额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="24" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(C21) + SUM(C22) - SUM(C23) - SUM(C24)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B25" upParentDefault="false" up="C2">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C25"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="24" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B25">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C25"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="24" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=sum(E13) + SUM(E14) - SUM(E15) - SUM(E17) - SUM(E18) + SUM(E22) - SUM(E24)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B25">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C25"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="24" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B25">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C25"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="24" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(23) / 2]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B25">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C25"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="25" s="1">
+<O>
+<![CDATA[所得税费用]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="25" s="2">
+<O t="BigDecimal">
+<![CDATA[0.00]]></O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B26">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C26"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="25" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B26">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C26"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="25" s="2">
+<O t="BigDecimal">
+<![CDATA[0.00]]></O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B26">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C26"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="25" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B26">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C26"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="25" s="2">
+<O t="BigDecimal">
+<![CDATA[0.00]]></O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B26">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C26"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="1" r="26" s="1">
+<O>
+<![CDATA[净利润]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="26" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(C25) - SUM(C26)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B27">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C27"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="3" r="26" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B27">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C27"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="4" r="26" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(E25) - SUM(E26)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B27">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C27"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="5" r="26" s="2">
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B27">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C27"/>
+</cellSortAttr>
+</Expand>
+</C>
+<C c="6" r="26" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=SUM(G25) - SUM(G26)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand leftParentDefault="false" left="B27">
+<cellSortAttr>
+<sortExpressions/>
+<sortHeader sortArea="C27"/>
+</cellSortAttr>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting/>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="false" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="4"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+<ParameterUI class="com.fr.form.main.parameter.FormParameterUI">
+<Parameters/>
+<Layout class="com.fr.form.ui.container.WParameterLayout">
+<WidgetName name="para"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<FollowingTheme borderStyle="false"/>
+<Margin top="0" left="0" bottom="0" right="0"/>
+<Border>
+<border style="0" borderRadius="0" type="0" borderStyle="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+<WidgetTitle>
+<O>
+<![CDATA[新建标题]]></O>
+<FRFont name="SimSun" style="0" size="72"/>
+<Position pos="0"/>
+</WidgetTitle>
+<Alpha alpha="1.0"/>
+</Border>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-526086" hor="-1" ver="-1"/>
+</color>
+</Background>
+<LCAttr vgap="0" hgap="0" compInterval="0"/>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboBox">
+<WidgetName name="tax"/>
+<LabelName name="是否含税"/>
+<WidgetID widgetID="2aef883f-fe9e-44bf-a2c1-19f987a4ee86"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<CustomData>
+<![CDATA[false]]></CustomData>
+<Dictionary class="com.fr.data.impl.CustomDictionary">
+<CustomDictAttr>
+<Dict key="含税" value="含税"/>
+<Dict key="不含税" value="不含税"/>
+</CustomDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[含税]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="528" y="14" width="103" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.parameter.FormSubmitButton">
+<WidgetName name="formSubmit0_c"/>
+<WidgetID widgetID="da12e4fb-7927-49a7-a937-029c60ed3d2a"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[查询]]></Text>
+<Hotkeys>
+<![CDATA[enter]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="722" y="14" width="80" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="pcode_1_c"/>
+<LabelName name="结束时间："/>
+<WidgetID widgetID="74ae0fd7-6d8b-406f-9acc-8372cc6b70f5"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[是否含税：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="4" autoline="true"/>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="448" y="14" width="80" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="overtime"/>
+<LabelName name="发货时间"/>
+<WidgetID widgetID="032ff69f-243a-4b09-b985-6275a5a4fb86"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr/>
+<widgetValue>
+<O t="Date">
+<![CDATA[1696003200000]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="312" y="14" width="107" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="shiptime_1"/>
+<LabelName name="产品编码："/>
+<WidgetID widgetID="74ae0fd7-6d8b-406f-9acc-8372cc6b70f5"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[结束时间：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="4" autoline="true"/>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="232" y="14" width="80" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="startime"/>
+<LabelName name="下单时间"/>
+<WidgetID widgetID="032ff69f-243a-4b09-b985-6275a5a4fb86"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr/>
+<widgetValue>
+<O t="Date">
+<![CDATA[1693497600000]]></O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="99" y="14" width="107" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="ordertime_1"/>
+<LabelName name="渠道："/>
+<WidgetID widgetID="74ae0fd7-6d8b-406f-9acc-8372cc6b70f5"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[起始时间：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="4" autoline="true"/>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="19" y="14" width="80" height="25"/>
+</Widget>
+<ShowBookmarks showBookmarks="false"/>
+<Sorted sorted="false"/>
+<MobileWidgetList>
+<Widget widgetName="startime"/>
+<Widget widgetName="overtime"/>
+<Widget widgetName="tax"/>
+<Widget widgetName="formSubmit0_c"/>
+</MobileWidgetList>
+<FrozenWidgets/>
+<MobileBookMarkStyle class="com.fr.form.ui.mobile.impl.DefaultMobileBookMarkStyle"/>
+<Display display="true"/>
+<DelayDisplayContent delay="false"/>
+<UseParamsTemplate use="true"/>
+<paramFireStopEdit fireEvent="false"/>
+<Position position="0"/>
+<Design_Width design_width="960"/>
+<NameTagModified/>
+<WidgetNameTagMap/>
+<ParamAttr class="com.fr.report.mobile.DefaultMobileParamStyle"/>
+<ParamStyle class="com.fr.form.ui.mobile.impl.DefaultMobileParameterStyle"/>
+</Layout>
+<DesignAttr width="960" height="46"/>
+</ParameterUI>
+</ReportParameterAttr>
+<StyleList>
+<Style style_name="默认" full="true" border_source="-1" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="1" size="88"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-2826753" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="1">
+<color>
+<FineColor color="-4144960" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="1">
+<color>
+<FineColor color="-4144960" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="1">
+<color>
+<FineColor color="-4144960" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="1">
+<color>
+<FineColor color="-4144960" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#,##0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#,##0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#,##0.00]]></Format>
+<FRFont name="SimSun" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+<Style imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#,##0.00]]></Format>
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#,##0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="80"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="2"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="营业外收入_应交未交税金" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="营业利润" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="订单金额" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="订单金额副本1" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="dm_部门订单利润表底表" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="订单金额副本2" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="销管财研" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.18.0.20230712">
+<TemplateCloudInfoAttrMark createTime="1689645042364"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="da73fd67-b21b-42b5-8717-dfcd2dbf9c1d"/>
+</TemplateIdAttMark>
+</WorkBook>

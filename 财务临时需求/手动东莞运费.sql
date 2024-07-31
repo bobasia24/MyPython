@@ -60,7 +60,8 @@ select
     b1.物流 as 物流,
     b1.单号 as 运单号码,
     b1.含税金额 as 含税金额,
-    a1.含税运费 as 含税运费
+    a1.含税运费 as 含税运费,
+    a1.含税运费 - b1.含税金额 as 差异
 from
     (profit.ods_运费7月运费汇总 b1
 left join (

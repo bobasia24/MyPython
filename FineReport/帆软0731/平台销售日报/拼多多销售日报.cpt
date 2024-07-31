@@ -1,0 +1,2028 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20211223" releaseVersion="11.0.0">
+<TableDataMap>
+<TableData name="拼多多旗舰日报" class="com.fr.data.impl.DBTableData">
+<Parameters>
+<Parameter>
+<Attributes name="channel"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+<Parameter>
+<Attributes name="do_date"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</Parameters>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[125.91.113.114_mysql]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[with  jc  as (
+select left(统计时间,10)日期,商品访客数,商品浏览量,商品收藏用户数,成交金额,成交订单数,成交买家数,店铺 from sales.ods_拼多多_商品数据_商品概况 
+where 店铺 = '${channel}' and  date_format(统计时间,'%Y-%m') =  '${do_date}' )
+,sh as (select replace(substring_index(成功退款金额,'元',1),',','') 成功退款金额1,店铺,left(更新时间 ,10)日期 from sales.ods_拼多多_服务数据_售后概况 
+where 店铺 = '${channel}' and  date_format(更新时间,'%Y-%m') =  '${do_date}'  group by left(更新时间 ,10))
+,qztg as (select  日期,店铺,sum(`成交花费(元)`) 全站推广花费,sum(`交易额(元)`)全站推广交易额 ,sum(成交笔数) 全站推广成交笔数,sum(曝光量) 全站推广曝光量,sum(点击量) 全站推广点击量  
+from sales.ods_拼多多_推广中心_全站推广新 
+where 店铺 = '${channel}' and date_format(日期,'%Y-%m') =  '${do_date}' group by 日期)
+,bjtg as (select  日期,sum(`出价（元）`)标准推广出价 ,sum(`总花费(元)`)标准推广总花费 ,sum(`成交花费(元)`)标准推广成交花费,sum(成交笔数)标准推广成交笔数 ,sum(`交易额(元)`)标准推广交易额 ,sum(曝光量) 标准推广曝光量,sum(点击量) 标准推广点击量 
+from sales.ods_拼多多_推广中心_标准推广 
+where 店铺 = '${channel}' and date_format(日期,'%Y-%m') =  '${do_date}' group by 日期)
+, mxdp as (select sum(`花费(元)`)明星店铺花费 ,sum(`交易额(元)`)明星店铺交易额 ,sum(成交笔数) 明星店铺成交笔数,sum(曝光量) 明星店铺曝光量,sum(点击量) 明星店铺点击量,店铺,日期
+from  sales.ods_拼多多_推广中心_明星店铺 
+where 店铺 = '${channel}' and date_format(日期,'%Y-%m') =  '${do_date}' group by 日期)
+, ddjb as (
+select 成交时间 日期,sum(成交数量) 多多进宝成交数量,sum(`订单总金额（元）`)多多进宝订单总金额 ,sum(`预估支付佣金（元）`)多多进宝预估支付佣金 ,sum(`预估招商佣金（元）`) 多多进宝预估招商佣金,sum(`预估软件服务费（元）`)多多进宝预估软件服务费 ,店铺 
+from sales.ods_拼多多_推广中心_多多进宝      
+where 店铺 = '${channel}' and date_format(成交时间,'%Y-%m') =  '${do_date}' group by 成交时间
+)
+,zbtg as (select sum(`总花费(元)`)自播推广总花费 ,sum(`成交花费(元)`)自播推广成交花费 ,sum(`交易额(元)`)自播推广交易额 ,sum(成交笔数)自播推广成交笔数,sum(曝光量)自播推广曝光量,店铺,日期 
+from  sales.ods_拼多多_推广中心_直播推广 
+where 店铺 = '${channel}' and date_format(日期,'%Y-%m') =  '${do_date}' group by 日期)
+
+
+select jc.*,sh.成功退款金额1
+,ifnull(qztg.全站推广花费,0)全站推广花费,ifnull(qztg.全站推广交易额,0) 全站推广交易额,ifnull(qztg.全站推广成交笔数,0)全站推广成交笔数,ifnull(qztg.全站推广曝光量 , 0) 全站推广曝光量, ifnull(qztg.全站推广点击量,0)全站推广点击量
+,ifnull(bjtg.标准推广出价,0)标准推广出价,ifnull(bjtg.标准推广总花费,0) 标准推广总花费,ifnull(bjtg.标准推广成交花费,0)标准推广成交花费,ifnull(bjtg.标准推广成交笔数,0) 标准推广成交笔数,ifnull(bjtg.标准推广交易额,0) 标准推广交易额,ifnull(bjtg.标准推广曝光量,0)标准推广曝光量,ifnull(bjtg.标准推广点击量,0)标准推广点击量 
+,ifnull(mxdp.明星店铺花费,0)明星店铺花费,ifnull(mxdp.明星店铺交易额,0) 明星店铺交易额,ifnull(mxdp.明星店铺成交笔数,0)明星店铺成交笔数,ifnull(mxdp.明星店铺曝光量 , 0) 明星店铺曝光量, ifnull(mxdp.明星店铺点击量,0)明星店铺点击量
+,ifnull(ddjb.多多进宝成交数量,0)多多进宝成交数量,ifnull(ddjb.多多进宝订单总金额,0) 多多进宝订单总金额,ifnull(ddjb.多多进宝预估支付佣金,0)多多进宝预估支付佣金 ,ifnull(ddjb.多多进宝预估招商佣金,0)多多进宝预估招商佣金,ifnull(ddjb.多多进宝预估软件服务费,0)多多进宝预估软件服务费
+,ifnull(zbtg.自播推广总花费,0)自播推广总花费,ifnull(zbtg.自播推广成交花费,0) 自播推广成交花费,ifnull(zbtg.自播推广交易额,0)自播推广交易额,ifnull(zbtg.自播推广成交笔数,0)自播推广成交笔数,ifnull(zbtg.自播推广曝光量,0)自播推广曝光量
+from jc 
+left join sh on jc.日期 = sh.日期
+left join qztg on jc.日期 = qztg.日期
+left join bjtg on jc.日期 = bjtg.日期
+left join mxdp on jc.日期 = mxdp.日期
+left join ddjb on jc.日期 = ddjb.日期
+left join zbtg on jc.日期 = zbtg.日期
+order by jc.日期 asc
+]]></Query>
+<PageQuery>
+<![CDATA[]]></PageQuery>
+</TableData>
+</TableDataMap>
+<ReportWebAttr>
+<ServerPrinter/>
+<WebPageContent>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.page.First">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_ReportServerP_First')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[first]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.page.Previous">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_ReportServerP_Previous')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[previous]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.page.PageNavi">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+</Widget>
+<Widget class="com.fr.report.web.button.page.Next">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_ReportServerP_Next')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[next]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.page.Last">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_ReportServerP_Last')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[last]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.NewPrint">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Print')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[print]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.Export">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Export')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[export]]></IconName>
+<Buttons pdf="true" excelP="true" excelO="true" excelS="true" word="true" image="true" html="true"/>
+</Widget>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<WebPage isPage="false" showAsImage="false" autoScale="false" tdHeavy="false" pageFixedRow="true" pageFixedRowCount="500"/>
+</WebPageContent>
+<WebWriteContent>
+<ToolBars>
+<ToolBarManager>
+<Location>
+<Embed position="1"/>
+</Location>
+<ToolBar>
+<Widget class="com.fr.report.web.button.Email">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Email')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[email]]></IconName>
+<EmailButton customConsignee="true" consigneeByDepartment="false" consigneeByRole="false"/>
+</Widget>
+<Widget class="com.fr.report.web.button.write.ImportExcelData">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Report_Utils_Import_Excel_Data')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[excel]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.ExcelO">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[${i18n('Fine-Engine_Export_Excel_Simple')}]]></Text>
+<Hotkeys>
+<![CDATA[]]></Hotkeys>
+<IconName>
+<![CDATA[excel]]></IconName>
+</Widget>
+<Widget class="com.fr.report.web.button.write.ShowCellValue">
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue/>
+<LabelAttr verticalcenter="true" textalign="0" autoline="false"/>
+<FRFont name="SimSun" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</Widget>
+</ToolBar>
+</ToolBarManager>
+</ToolBars>
+<EditRowColor setColor="true"/>
+<SelectedColor>
+<color>
+<FineColor color="-12211314" hor="-1" ver="-1"/>
+</color>
+</SelectedColor>
+<WebWrite SheetPosition="3"/>
+<RptLocation isShowAtLeft="true"/>
+<UnloadCheck/>
+<ShowWidgets/>
+<OtherAttr autoStash="false"/>
+</WebWriteContent>
+</ReportWebAttr>
+<ReportExportAttr>
+<ExcelExportAttr hideColumn="false" hideRow="false" exportWaterMark="true"/>
+<PDFExportAttr/>
+<HTMLExportAttr/>
+<WordExportAttr exportWaterMark="true"/>
+<ImageExportAttr imageResolution="96" imageType="false" renderQuality="0" format="png"/>
+</ReportExportAttr>
+<ReportFitAttr fitStateInPC="3" fitFont="false" minFontSize="0"/>
+<ElementCaseMobileAttr>
+<ElementCaseMobileAttrProvider horizontal="1" vertical="1" zoom="true" refresh="false" isUseHTML="false" isMobileCanvasSize="false" appearRefresh="false" allowFullScreen="false" allowDoubleClickOrZoom="true" functionalWhenUnactivated="false"/>
+</ElementCaseMobileAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR/>
+<FR/>
+<HC F="0" T="0"/>
+<FC/>
+<UPFCR COLUMN="true" ROW="false"/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1371600,1371600,1409700,1008000,1008000,723900,723900,723900,723900,723900,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[3048000,4572000,4572000,4572000,4572000,4572000,4572000,2743200,4572000,4572000,4572000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,4320000,2743200,2743200,2743200,4320000,4320000,4320000,4320000,4320000,4320000,2743200,2743200,2743200,4320000,4320000,4320000,4320000,4320000,4320000,2743200,2743200,2743200,4320000,4320000,4320000,4320000,4320000,4320000,2743200,2743200,4320000,4876800,4608000,4914900,4320000,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" rs="2" s="0">
+<O>
+<![CDATA[日期]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="0" rs="2" s="0">
+<O>
+<![CDATA[商品访客数]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="0" rs="2" s="0">
+<O>
+<![CDATA[商品浏览量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="0" rs="2" s="0">
+<O>
+<![CDATA[商品收藏用户数]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="0" rs="2" s="0">
+<O>
+<![CDATA[成交金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="0" rs="2" s="0">
+<O>
+<![CDATA[成交订单数]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="0" rs="2" s="0">
+<O>
+<![CDATA[成交买家数]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="0" rs="2" s="0">
+<O>
+<![CDATA[转化]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="0" rs="2" s="0">
+<O>
+<![CDATA[店铺]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="0" rs="2" s="0">
+<O>
+<![CDATA[成功退款金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="0" rs="2" s="0">
+<O>
+<![CDATA[含税营收]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="0" cs="5" s="0">
+<O>
+<![CDATA[自然流量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="0" cs="8" s="0">
+<O>
+<![CDATA[推广整体]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="0" cs="9" s="0">
+<O>
+<![CDATA[全站推广]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="33" r="0" cs="9" s="0">
+<O>
+<![CDATA[标准推广]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="42" r="0" cs="9" s="0">
+<O>
+<![CDATA[明星店铺]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="51" r="0" cs="7" s="0">
+<O>
+<![CDATA[多多进宝]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="58" r="0" cs="5" s="0">
+<O>
+<![CDATA[自播推广]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="1" s="0">
+<O>
+<![CDATA[访客]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="1" s="0">
+<O>
+<![CDATA[自然流量占比]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="13" r="1" s="0">
+<O>
+<![CDATA[成交]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="14" r="1" s="0">
+<O>
+<![CDATA[订单]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="15" r="1" s="0">
+<O>
+<![CDATA[转化]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="1" s="0">
+<O>
+<![CDATA[销售费用（总推广消耗）]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="17" r="1" s="0">
+<O>
+<![CDATA[总广告产出]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="18" r="1" s="0">
+<O>
+<![CDATA[销售费用（站内消耗）]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="19" r="1" s="0">
+<O>
+<![CDATA[站内产出]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="20" r="1" s="0">
+<O>
+<![CDATA[总ROI]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="21" r="1" s="0">
+<O>
+<![CDATA[推广消耗占比]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="22" r="1" s="0">
+<O>
+<![CDATA[推广产出占比]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="23" r="1" s="0">
+<O>
+<![CDATA[站内点击单价]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="1" s="0">
+<O>
+<![CDATA[消耗费用]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="25" r="1" s="0">
+<O>
+<![CDATA[访客]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="26" r="1" s="0">
+<O>
+<![CDATA[销售额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="27" r="1" s="0">
+<O>
+<![CDATA[订单量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="28" r="1" s="0">
+<O>
+<![CDATA[曝光量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="29" r="1" s="0">
+<O>
+<![CDATA[点击单价]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="30" r="1" s="0">
+<O>
+<![CDATA[ROI]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="31" r="1" s="0">
+<O>
+<![CDATA[转化率]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="32" r="1" s="0">
+<O>
+<![CDATA[销售占比]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="33" r="1" s="0">
+<O>
+<![CDATA[销售费用]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="34" r="1" s="0">
+<O>
+<![CDATA[访客]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="35" r="1" s="0">
+<O>
+<![CDATA[销售额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="36" r="1" s="0">
+<O>
+<![CDATA[订单量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="37" r="1" s="0">
+<O>
+<![CDATA[曝光量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="38" r="1" s="0">
+<O>
+<![CDATA[点击单价]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="39" r="1" s="0">
+<O>
+<![CDATA[ROI]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="40" r="1" s="0">
+<O>
+<![CDATA[转化率]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="41" r="1" s="0">
+<O>
+<![CDATA[销售占比]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="42" r="1" s="0">
+<O>
+<![CDATA[销售费用]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="43" r="1" s="0">
+<O>
+<![CDATA[访客]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="44" r="1" s="0">
+<O>
+<![CDATA[销售额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="45" r="1" s="0">
+<O>
+<![CDATA[订单量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="46" r="1" s="0">
+<O>
+<![CDATA[曝光量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="47" r="1" s="0">
+<O>
+<![CDATA[点击单价]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="48" r="1" s="0">
+<O>
+<![CDATA[ROI]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="49" r="1" s="0">
+<O>
+<![CDATA[转化率]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="50" r="1" s="0">
+<O>
+<![CDATA[销售占比]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="51" r="1" s="0">
+<O>
+<![CDATA[成交数量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="52" r="1" s="0">
+<O>
+<![CDATA[订单总金额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="53" r="1" s="0">
+<O>
+<![CDATA[预估支付佣金]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="54" r="1" s="0">
+<O>
+<![CDATA[预估招商佣金]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="55" r="1" s="0">
+<O>
+<![CDATA[预估软件服务费]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="56" r="1" s="0">
+<O>
+<![CDATA[多多进宝ROI]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="57" r="1" s="0">
+<O>
+<![CDATA[销售占比]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="58" r="1" s="0">
+<O>
+<![CDATA[自播推广总花费]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="59" r="1" s="0">
+<O>
+<![CDATA[自播推广成交花费]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="60" r="1" s="0">
+<O>
+<![CDATA[自播推广交易额]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="61" r="1" s="0">
+<O>
+<![CDATA[自播推广成交笔数]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="62" r="1" s="0">
+<O>
+<![CDATA[自播推广曝光量]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="0" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="日期"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="1" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="商品访客数"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="2" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="商品浏览量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="3" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="商品收藏用户数"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="4" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="成交金额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="5" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="成交订单数"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="6" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="成交买家数"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="7" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=G3 / B3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="8" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="店铺"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="9" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="成功退款金额1"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="10" r="2" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=E3 - J3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="11" r="2" s="3">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=O3 / H3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="12" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=L3 / B3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="13" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=E3 - AA3 - AJ3 - AS3 - BA3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="14" r="2" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=F3 - AB3 - AK3 - AT3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="15" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=H3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="16" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=Y3 + AH3 + AQ3 + BB3 + BC3 + BD3 + BG3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="17" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AA3 + AJ3 + AS3 + BA3 + BI3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="18" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=Y3 + AH3 + AQ3 + BG3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="19" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AA3 + AJ3 + AS3 + BI3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="20" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=R3 / Q3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="21" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=Q3 / K3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="22" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=R3 / E3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="23" r="2" s="5">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=(Y3+AH3+AQ3+BG3)/(Z3+AI3+AR3)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="24" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="全站推广花费"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="25" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="全站推广点击量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="26" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="全站推广交易额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="27" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="全站推广成交笔数"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="28" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="全站推广曝光量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="29" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=Y3 / Z3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="30" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AA3 / Y3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="31" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AB3 / Z3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="32" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AA3 / E3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="33" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="标准推广总花费"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="34" r="2" s="6">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="标准推广点击量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="35" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="标准推广交易额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="36" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="标准推广成交笔数"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="37" r="2" s="1">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="标准推广曝光量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="38" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AH3 / AI3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="39" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AJ3 / AH3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="40" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AK3 / AI3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="41" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AJ3 / E3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="42" r="2" s="7">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="明星店铺花费"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="43" r="2" s="6">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="明星店铺点击量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="44" r="2" s="7">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="明星店铺交易额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="45" r="2" s="6">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="明星店铺成交笔数"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="46" r="2" s="6">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="明星店铺曝光量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="47" r="2" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AQ / AP]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="48" r="2" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AR / AP]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="49" r="2" s="1">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AS / AQ]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="50" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=AS3 / E3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="51" r="2" s="6">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="多多进宝成交数量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="52" r="2" s="7">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="多多进宝订单总金额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="53" r="2" s="7">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="多多进宝预估支付佣金"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="54" r="2" s="7">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="多多进宝预估招商佣金"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="55" r="2" s="7">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="多多进宝预估软件服务费"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="56" r="2" s="4">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=BA3 / (BB3 + BC3)]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="57" r="2" s="2">
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=BA3 / E3]]></Attributes>
+</O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="58" r="2" s="7">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="自播推广总花费"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="59" r="2" s="7">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="自播推广成交花费"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="60" r="2" s="7">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="自播推广交易额"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="61" r="2" s="6">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="自播推广成交笔数"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="62" r="2" s="6">
+<O t="DSColumn">
+<Attributes dsName="拼多多旗舰日报" columnName="自播推广曝光量"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+<cellSortAttr/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0">
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="55" r="9" s="8">
+<O>
+<![CDATA[  ]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+<C c="54" r="10" s="8">
+<O>
+<![CDATA[ ]]></O>
+<PrivilegeControl/>
+<Expand>
+<cellSortAttr/>
+</Expand>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings shrinkToFitMode="0" headerHeight="0" footerHeight="0">
+<FrozenColumnRow columnrow="B1"/>
+<PaperSetting>
+<PaperSize width="86400000" height="144000000"/>
+<Margin top="986400" left="2743200" bottom="986400" right="2743200"/>
+</PaperSetting>
+<FollowingTheme background="true"/>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Background>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<LayerReportAttr isPageQuery="true" clientPaging="false" engineState="1" countPerPage="30" enableRowCount="false"/>
+<ReportWriteAttr/>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="false" windowPosition="1" align="0" useParamsTemplate="true" currentIndex="4"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+<ParameterUI class="com.fr.form.main.parameter.FormParameterUI">
+<Parameters/>
+<Layout class="com.fr.form.ui.container.WParameterLayout">
+<WidgetName name="para"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<FollowingTheme borderStyle="false"/>
+<Margin top="0" left="0" bottom="0" right="0"/>
+<Border>
+<border style="0" borderRadius="0" type="0" borderStyle="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+<WidgetTitle>
+<O>
+<![CDATA[新建标题]]></O>
+<FRFont name="SimSun" style="0" size="72"/>
+<Position pos="0"/>
+</WidgetTitle>
+<Alpha alpha="1.0"/>
+</Border>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-526086" hor="-1" ver="-1"/>
+</color>
+</Background>
+<LCAttr vgap="0" hgap="0" compInterval="0"/>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.ComboCheckBox">
+<WidgetName name="channel"/>
+<WidgetID widgetID="497c19c8-59ae-4134-8b3b-5b52bea5ba4b"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Dictionary class="com.fr.data.impl.CustomDictionary">
+<CustomDictAttr>
+<Dict key="榴芒一刻旗舰店" value="榴芒一刻旗舰店"/>
+<Dict key="榴芒一刻专卖店" value="榴芒一刻专卖店"/>
+<Dict key="榴芒一刻水果店" value="榴芒一刻水果店"/>
+<Dict key="榴芒一刻糕点店" value="榴芒一刻糕点官方旗舰店"/>
+<Dict key="拼多多零食店-sz" value="榴芒一刻零食店"/>
+<Dict key="拼多多企业店-sz" value="榴芒一刻糕点店"/>
+</CustomDictAttr>
+</Dictionary>
+<widgetValue>
+<O>
+<![CDATA[榴芒一刻旗舰店]]></O>
+</widgetValue>
+<RAAttr/>
+</InnerWidget>
+<BoundsAttr x="478" y="26" width="84" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="year_1_c_c"/>
+<WidgetID widgetID="74ae0fd7-6d8b-406f-9acc-8372cc6b70f5"/>
+<WidgetAttr aspectRatioLocked="true" aspectRatioBackup="2.64" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[渠道：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="412" y="26" width="66" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.DateEditor">
+<WidgetName name="do_date"/>
+<WidgetID widgetID="ad4faea5-9988-4672-8c31-69421b0035a8"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<DateAttr format="yyyy-MM"/>
+<widgetValue>
+<O t="XMLable" class="com.fr.base.Formula">
+<Attributes>
+<![CDATA[=MONTHDELTA(todate(now()),0)]]></Attributes>
+</O>
+</widgetValue>
+</InnerWidget>
+<BoundsAttr x="219" y="26" width="109" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.parameter.FormSubmitButton">
+<WidgetName name="formSubmit0_c"/>
+<WidgetID widgetID="16e3c0b8-c867-4696-b204-39731c65eaab"/>
+<WidgetAttr aspectRatioLocked="false" aspectRatioBackup="-1.0" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<Text>
+<![CDATA[查询]]></Text>
+<Hotkeys>
+<![CDATA[enter]]></Hotkeys>
+</InnerWidget>
+<BoundsAttr x="749" y="26" width="80" height="25"/>
+</Widget>
+<Widget class="com.fr.form.ui.container.WAbsoluteLayout$BoundsWidget">
+<InnerWidget class="com.fr.form.ui.Label">
+<WidgetName name="year_1_c"/>
+<WidgetID widgetID="74ae0fd7-6d8b-406f-9acc-8372cc6b70f5"/>
+<WidgetAttr aspectRatioLocked="true" aspectRatioBackup="2.64" description="">
+<MobileBookMark useBookMark="false" bookMarkName="" frozen="false"/>
+<PrivilegeControl/>
+</WidgetAttr>
+<widgetValue>
+<O>
+<![CDATA[发货时间：]]></O>
+</widgetValue>
+<LabelAttr verticalcenter="true" textalign="0" autoline="true"/>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<border style="0">
+<color>
+<FineColor color="-723724" hor="-1" ver="-1"/>
+</color>
+</border>
+</InnerWidget>
+<BoundsAttr x="153" y="26" width="66" height="25"/>
+</Widget>
+<ShowBookmarks showBookmarks="false"/>
+<Sorted sorted="false"/>
+<MobileWidgetList>
+<Widget widgetName="do_date"/>
+<Widget widgetName="channel"/>
+<Widget widgetName="formSubmit0_c"/>
+</MobileWidgetList>
+<FrozenWidgets/>
+<MobileBookMarkStyle class="com.fr.form.ui.mobile.impl.DefaultMobileBookMarkStyle"/>
+<Display display="true"/>
+<DelayDisplayContent delay="false"/>
+<UseParamsTemplate use="true"/>
+<paramFireStopEdit fireEvent="false"/>
+<Position position="0"/>
+<Design_Width design_width="1156"/>
+<NameTagModified/>
+<WidgetNameTagMap/>
+<ParamAttr class="com.fr.report.mobile.DefaultMobileParamStyle"/>
+<ParamStyle class="com.fr.form.ui.mobile.impl.DefaultMobileParameterStyle"/>
+</Layout>
+<DesignAttr width="1156" height="77"/>
+</ParameterUI>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="88">
+<foreground>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</foreground>
+</FRFont>
+<Background name="ColorBackground">
+<color>
+<FineColor color="-13719584" hor="-1" ver="-1"/>
+</color>
+</Background>
+<Border>
+<Top style="14">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="14">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="14">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="14">
+<color>
+<FineColor color="-1" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#0.00%]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#0]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="6">
+<![CDATA[#0.00]]></Format>
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style horizontal_alignment="0" imageLayout="1">
+<Format class="com.fr.base.CoreDecimalFormat" roundingMode="4">
+<![CDATA[#0.00]]></Format>
+<FRFont name="微软雅黑" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Top>
+<Bottom style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Bottom>
+<Left style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Left>
+<Right style="3">
+<color>
+<FineColor color="-2500135" hor="-1" ver="-1"/>
+</color>
+</Right>
+</Border>
+</Style>
+<Style style_name="默认" full="true" border_source="-1" imageLayout="1">
+<FRFont name="simhei" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border/>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="LAA"/>
+<PreviewType PreviewType="2"/>
+<TemplateThemeAttrMark class="com.fr.base.iofile.attr.TemplateThemeAttrMark">
+<TemplateThemeAttrMark name="经典浅灰" dark="false"/>
+</TemplateThemeAttrMark>
+<StrategyConfigsAttr class="com.fr.esd.core.strategy.persistence.StrategyConfigsAttr">
+<StrategyConfigs>
+<StrategyConfig dsName="7业务主体" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="ds2" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="毛利分析1的副本" enabled="false" useGlobal="false" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="成本分析" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="科目全名" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+<StrategyConfig dsName="管理报表渠道" enabled="false" useGlobal="true" shouldMonitor="true" shouldEvolve="false" scheduleBySchema="false" timeToLive="1500000" timeToIdle="86400000" updateInterval="1500000" terminalTime="" updateSchema="0 0 8 * * ? *" activeInitiation="false"/>
+</StrategyConfigs>
+</StrategyConfigsAttr>
+<TemplateCloudInfoAttrMark class="com.fr.plugin.cloud.analytics.attr.TemplateInfoAttrMark" pluginID="com.fr.plugin.cloud.analytics.v11" plugin-version="3.18.0.20230712">
+<TemplateCloudInfoAttrMark createTime="1688967648866"/>
+</TemplateCloudInfoAttrMark>
+<TemplateIdAttMark class="com.fr.base.iofile.attr.TemplateIdAttrMark">
+<TemplateIdAttMark TemplateId="830c26d4-4440-4b18-b242-cb0b2b9a4c32"/>
+</TemplateIdAttMark>
+</WorkBook>
