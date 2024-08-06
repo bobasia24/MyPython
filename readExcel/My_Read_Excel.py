@@ -23,9 +23,9 @@ def file_dispose(file_path, engine):
                 data_file = pd.read_excel(f, sheet_name="数据库业务员目标")
     else:
         # 如果不是zip文件，则直接读取Excel文件中的数据，并指定工作表为"汇总运费表"
-        data_file = pd.read_excel(file_path, sheet_name="Sheet0")
+        data_file = pd.read_excel(file_path, sheet_name="Sheet1")
     # 将数据插入到数据库中的"人工导入202402运费汇总"表中，如果表已存在则替换原有数据，不插入索引，每次插入500行数据 append|replace
-    data_file.to_sql('人工导入陈老师测试', con=engine, if_exists='replace', index=False, chunksize=500)
+    data_file.to_sql('人工导入2407组织结算_无合计', con=engine, if_exists='replace', index=False, chunksize=500)
     # 输出"数据插入完成"
     print("数据插入完成")
 
@@ -58,7 +58,7 @@ def connection_database():
 # 读取
 engine = connection_database()
 # window
-download_file_path = r"C:\Users\73769\Desktop\7月开票深圳市榴芒一刻食品有限公司_销货明细导出文件_.xlsx"
+download_file_path = r"C:\Users\73769\Desktop\7月组织间结算V2.0.xlsx"
 # mac
 # download_file_path = r"/Users/liyazhou/Desktop/公司桌面/2024年02月深圳销售明细.xlsx"
 file_dispose(download_file_path, engine)
