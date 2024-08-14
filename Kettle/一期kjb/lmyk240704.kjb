@@ -545,7 +545,7 @@ create table dw_多店合账 as
 select case brand when '榴芒一刻官方旗舰店' then '抖音旗舰店-sz' when '榴芒一刻生鲜旗舰店' then '抖音生鲜店-sz' when '榴芒一刻零食旗舰店' then '抖音零食店-sz' else '抖音三毛店-sz' end as 店铺,
 date_format(time_of_moving_account,'%Y%m') 动账年月,
 replace(order_number,'''','') as 订单号,sum(order_actual_payment_payable
-+actual_platform_subsidies__freight+actual_platform_subsidies+actual_talent_allowance+actual_tiktok_payment_subsidy+actual_monthly_marketing_subsidies_paid_by_tiktok+bank_subsidies
++actual_platform_subsidies__freight+actual_platform_subsidies+actual_talent_allowance+actual_tiktok_payment_subsidy+actual_monthly_marketing_subsidies_paid_by_tiktok
 )订单实付应结
 ,sum(order_refund)订单退款,'账单' as 款项类型
 from rpa.ods_01财务_rpa_0112财务对账_抖店_资金_资金流水明细 
@@ -582,15 +582,21 @@ select case brand when '榴芒一刻三毛专卖店' then '快手专卖店-sz' e
 from rpa.ods_01财务_rpa_0115财务对账_快手小店_资金_结算账单明细 
 group by brand,date_format(actual_settlement_time,'%Y%m'),order_number
 union all
-
 select case brand when '榴芒一刻' then '有赞店铺-sz' when '榴芒一刻美食' then '有赞美食店-sz' end
 ,date_format(time_of_entry,'%Y%m')
-,case when business_order_no IN(select 网店没有平台来凑号 from dw_金蝶销售出库单) then business_order_no else associated_doc_no end,
+,case when business_order_no IN(select 网店没有平台来凑号 from sc.dw_金蝶销售出库单) then business_order_no else associated_doc_no end,
 sum(income_yuan),sum(expenditure_yuan*-1),'账单'
+from 
+(select platform,brand,`date`,`type`,name,business_order_no,payment_serial_number,associated_doc_no,source_of_transaction,accounting_entity,account
+,case when `type` = '快速回款-还款' then expenditure_yuan else income_yuan end income_yuan
+,case when `type` = '快速回款-还款' then '0' else expenditure_yuan end expenditure_yuan
+,remaining_amount,payment_method,counterparty,channel,order_time_,time_of_entry,operator,additional_information,remarks,source,update_time
 from rpa.ods_01财务_rpa_018财务对账_有赞_资产_对账单明细
-where `type` in('订单入账','退款','快速回款-保理放款','快速回款-订单提前入账','快速回款-还款','快速回款-垫付')
+where `type` in('订单入账','退款','快速回款-保理放款','快速回款-订单提前入账','快速回款-还款')
+-- and business_order_no = 'E20240501165617092406171'
+) ppp
 group by brand,date_format(time_of_entry,'%Y%m')
-,case when business_order_no IN(select 网店没有平台来凑号 from dw_金蝶销售出库单) then business_order_no else associated_doc_no end
+,case when business_order_no IN(select 网店没有平台来凑号 from sc.dw_金蝶销售出库单) then business_order_no else associated_doc_no end
 
 -- 有赞储蓄卡
 union all 

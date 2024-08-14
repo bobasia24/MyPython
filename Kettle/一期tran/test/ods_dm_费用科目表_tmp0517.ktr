@@ -632,7 +632,7 @@ case
 end as 管理报表核算渠道名称,
 case when a.分销私域代理KA渠道商名 regexp('不分客户') then  
 		case when 	substring_index(substring_index(核算维度, ';', 2) , '/', -1) regexp ('线下|线上') then '公共'	else null end
-	 -- when a.分销私域代理KA渠道商名 regexp('盒马') then  '盒马总店'
+	 when a.分销私域代理KA渠道商名 regexp('盒马') then  '盒马总店'
 	 when a.分销私域代理KA渠道商名 regexp('xnMKTT') then  'MKTT'
 	 when a.管理报表核算渠道名称 regexp('市场部兑换卡') then  '市场部兑换卡'
 	 when a.核算维度 regexp('有赞店铺-sz') and a.核算维度 regexp('私域') then  ''
@@ -650,8 +650,8 @@ case
 	when a.核算维度 regexp('应交未交税金') then '财务部'
 	when a.科目全名 regexp('资产减值损失') then '总经办'
 	when a.分组 regexp('拼多多|京东|京多') then '京多事业部' 
-	when a.分组 regexp('抖音|快手|生鲜|微信视频|视频零食|视频食品|兴趣电商') then '兴趣电商部'
-	when a.分组 regexp('天猫|榴芒企业店|淘宝|三夫|三毛|小红书|得物|隆阳|一大包') then '天猫事业部'
+	when a.分组 regexp('抖音|快手|生鲜|微信视频') then '兴趣电商部'
+	when a.分组 regexp('天猫|榴芒企业店|淘宝|三夫|三毛|小红书|得物') then '天猫事业部'
 	when a.分组 regexp('市场部') then '市场部'
 	when a.分组 regexp('KA|线下') then '线下业务部'
 	when a.分组 regexp('分销') then '分销事业部'
@@ -823,13 +823,13 @@ end as 管理报表核算渠道名称,
  		substring_index(substring_index(f_detail_id, ';', 2) , '/', -1)
 --  		substring_index(substring_index(substring_index(f_detail_id, ';', 2) , '/', -1),'-',1)
 
- 	when (substring_index( substring_index(f_detail_id,';',2),'-',-1 ) regexp ('线上分销|线下|私域|分销' ) and substring_index( substring_index(f_detail_id,';',2),'-',-1 ) not regexp ('京东线下' )  ) then 
+ 	when substring_index( substring_index(f_detail_id,';',2),'-',-1 ) regexp ('线上分销|线下|私域|分销' ) then 
  		substring_index(substring_index(f_detail_id, ';', 3) , '/', -1)
 --  		substring_index(substring_index(substring_index(f_detail_id, ';', 3) , '/', -1),'-',1)
- 	when (substring_index( substring_index(f_detail_id,';',2),'/',-1 ) regexp ('线上分销|线下|私域组|分销' ) and substring_index( substring_index(f_detail_id,';',2),'/',-1 ) not regexp ('京东线下' ) )then 
+ 	when substring_index( substring_index(f_detail_id,';',2),'/',-1 ) regexp ('线上分销|线下|私域组|分销' ) then 
  		substring_index(substring_index(f_detail_id, ';', 3) , '/', -1)
 --  		substring_index(substring_index(substring_index(f_detail_id, ';', 3) , '/', -1),'-',1)
- 	when (substring_index( substring_index(f_detail_id,';',3),'/',-1 ) regexp ('线上分销|线下|私域组|分销' ) and substring_index( substring_index(f_detail_id,';',3),'/',-1 ) not regexp ('京东线下' ) )then 
+ 	when substring_index( substring_index(f_detail_id,';',3),'/',-1 ) regexp ('线上分销|线下|私域组|分销' ) then 
  		substring_index(substring_index(f_detail_id, ';', 4) , '/', -1) 	
 --  		substring_index(substring_index(substring_index(f_detail_id, ';', 4) , '/', -1) ,'-',1)	
 
@@ -926,11 +926,10 @@ case when f_acct_full_name regexp ('管理费用|销售费用|研发费用') the
 from
 	lmykerp_pro.jindie_voucher
 where
-	f_date regexp ('2024|2025') 
-	and f_period > '6'
+	f_date regexp ('2024|2025')
 	and f_account_book_id_name regexp '深圳'
 	and f_explanation not rlike ('结转本期损益')
-  	and f_acct_full_name   regexp('管理费用|销售费用|研发费用|财务费用|主营业务收入|主营业务成本|营业税金及附加|其他业务收入|其他业务成本|其他业务支出|营业外收入|营业外支出|资产减值损失|应交税费_应交增值税_进项税额|应交税费_应交增值税_销项税额|所得税费用')
+  	and f_acct_full_name   regexp('管理费用|销售费用|研发费用|财务费用|主营业务收入|主营业务成本|营业税金及附加|其他业务收入|其他业务成本|其他业务支出|营业外收入|营业外支出|资产减值损失|应交税费_应交增值税_进项税额|应交税费_应交增值税_销项税额')
 )a
 
 union all
@@ -1040,11 +1039,10 @@ end as 费用归属组
 from
 	lmykerp_pro.jindie_voucher
 where
-	f_date regexp ('2024|2025') 
-	and f_period > '6'
+	f_date regexp ('2023|2024|2025')
 	and f_account_book_id_name regexp '东莞'
 	and f_explanation not rlike ('结转本期损益')
-	and f_acct_full_name  regexp('管理费用|销售费用|研发费用|财务费用|主营业务收入|主营业务成本|营业税金及附加|其他业务收入|其他业务成本|其他业务支出|营业外收入|营业外支出|资产减值损失|应交税费_应交增值税_进项税额|应交税费_应交增值税_销项税额|所得税费用')
+	and f_acct_full_name  regexp('管理费用|销售费用|研发费用|财务费用|主营业务收入|主营业务成本|营业税金及附加|其他业务收入|其他业务成本|其他业务支出|营业外收入|营业外支出|资产减值损失|应交税费_应交增值税_进项税额|应交税费_应交增值税_销项税额')
 )a</sql>
     <limit>0</limit>
     <lookup/>

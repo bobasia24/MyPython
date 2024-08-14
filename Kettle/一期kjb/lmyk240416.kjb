@@ -434,8 +434,7 @@ case when distribution_channel in('零食放心购-sz','榴芒一刻零食旗舰
 ,creation_time 下单时间
 ,amount_of_money 报价
 ,null 订单来源 
-from (select * from rpa.ods_01财务_rpa_吉客云_销售明细单数据 
-where  delivery_time like '2024%') A ; -- 稍微清洗一下数据
+from rpa.ods_01财务_rpa_吉客云_销售明细单数据 A ; -- 稍微清洗一下数据
 CREATE INDEX dw_吉客云销售单明细账_物流单号_IDX USING BTREE ON sc.dw_吉客云销售单明细账 (物流单号);
 CREATE INDEX dw_吉客云销售单明细账_网店订单号_IDX USING BTREE ON sc.dw_吉客云销售单明细账 (网店订单号);
 CREATE INDEX dw_吉客云销售单明细账_货品编号_IDX USING BTREE ON sc.dw_吉客云销售单明细账 (货品编号);-- 合理的配上索引
@@ -503,12 +502,6 @@ select distinct update_time 导入时间,replace(order_number,'	','') 订单号,
 union all
 select update_time,order_number,current_state,quantity*purchase_price,sku_name,merchant_sku,null 
 from rpa.ods_01财务_rpa_0121财务对账_京东自营_订单管理_门店订单
-union all 
-select 
-update_time ,replace(order_number,'	','') ,order_status ,actual_payment_amount_of_the_order ,product_name ,product_code ,cast(null as char) 
-from rpa.ods_01财务_rpa_微信视频号_订单_月维度   
-group by actual_payment_amount_of_the_order,order_number
-
 -- 整合清洗订单数据
 /*===============
 union all
@@ -545,7 +538,7 @@ create table dw_多店合账 as
 select case brand when '榴芒一刻官方旗舰店' then '抖音旗舰店-sz' when '榴芒一刻生鲜旗舰店' then '抖音生鲜店-sz' when '榴芒一刻零食旗舰店' then '抖音零食店-sz' else '抖音三毛店-sz' end as 店铺,
 date_format(time_of_moving_account,'%Y%m') 动账年月,
 replace(order_number,'''','') as 订单号,sum(order_actual_payment_payable
-+actual_platform_subsidies__freight+actual_platform_subsidies+actual_talent_allowance+actual_tiktok_payment_subsidy+actual_monthly_marketing_subsidies_paid_by_tiktok+bank_subsidies
++actual_platform_subsidies__freight+actual_platform_subsidies+actual_talent_allowance+actual_tiktok_payment_subsidy+actual_monthly_marketing_subsidies_paid_by_tiktok
 )订单实付应结
 ,sum(order_refund)订单退款,'账单' as 款项类型
 from rpa.ods_01财务_rpa_0112财务对账_抖店_资金_资金流水明细 
@@ -557,8 +550,8 @@ when '榴芒一刻三毛专卖店' then '天猫三毛店-sz' when '榴芒一刻�
 ,replace(substr(SUBSTRING_INDEX(trade_name,' lid_',1),instr(trade_name,'tid_')),'tid_',''))
 ,sum(income_amount_yuan),sum(expenditure_amount_yuan),'账单'
 from rpa.ods_01财务_rpa_支付宝_账单明细数据 
-where business_description regexp('交易收款-交易收款|交易退款-余额退款|交易收款-预售定金（买家责任不退还）|交易退款-交易退款|交易退款-保证金退款')
-or remarks in ('境内商户结算	','境内商户结算','补差价专用')
+where business_description in('0010001|交易收款-交易收款','0020001|交易退款-余额退款','0010001|交易收款-交易收款	','0010002|交易收款-预售定金（买家责任不退还）','0020011|交易退款-交易退款	','0020001|交易退款-余额退款	')
+or remarks in ('境内商户结算	','境内商户结算') -- business_description in('0010001|交易收款-交易收款','0020001|交易退款-余额退款','0010001|交易收款-交易收款	','0020001|交易退款-余额退款	') 
 group by brand,
 if(instr(trade_name,'天猫优选商品订单 备注')=0,replace(business_basic_order_no,'	','')
 ,replace(substr(SUBSTRING_INDEX(trade_name,' lid_',1),instr(trade_name,'tid_')),'tid_',''))
@@ -582,16 +575,14 @@ select case brand when '榴芒一刻三毛专卖店' then '快手专卖店-sz' e
 from rpa.ods_01财务_rpa_0115财务对账_快手小店_资金_结算账单明细 
 group by brand,date_format(actual_settlement_time,'%Y%m'),order_number
 union all
-
 select case brand when '榴芒一刻' then '有赞店铺-sz' when '榴芒一刻美食' then '有赞美食店-sz' end
 ,date_format(time_of_entry,'%Y%m')
 ,case when business_order_no IN(select 网店没有平台来凑号 from dw_金蝶销售出库单) then business_order_no else associated_doc_no end,
 sum(income_yuan),sum(expenditure_yuan*-1),'账单'
 from rpa.ods_01财务_rpa_018财务对账_有赞_资产_对账单明细
-where `type` in('订单入账','退款','快速回款-保理放款','快速回款-订单提前入账','快速回款-还款','快速回款-垫付')
+where `type` in('订单入账','退款')
 group by brand,date_format(time_of_entry,'%Y%m')
 ,case when business_order_no IN(select 网店没有平台来凑号 from dw_金蝶销售出库单) then business_order_no else associated_doc_no end
-
 -- 有赞储蓄卡
 union all 
 SELECT '有赞店铺-sz',date_format(`time`,'%Y%m'),odd_numbers,sum(if(`type`='消费',balance_change,0))*-1,sum(if(`type`='退款',balance_change,0))*-1,'储值卡' 
@@ -613,7 +604,7 @@ union all
 select '天猫超市-sz'
 ,date_format(`bill_generation_time`,'%Y%m')
 ,concat(external_order_number,replace(waybill_number,'`','-'))
-,sum(if(amount_including_tax>0,amount_including_tax,0))
+,sum(if(amount_including_tax&gt;0,amount_including_tax,0))
 ,sum(if(amount_including_tax>0,0,amount_including_tax)),'账单'
 from rpa.ods_01财务_rpa_0113财务对账_猫超_结算管理_对账单明细 a
 join rpa.ods_01财务_rpa_0113财务对账_大宝wms_出库_订单查询 b 
@@ -648,20 +639,6 @@ where ifnull(num,0)>0
 -- and date_format(entering_accounts_payable_time,'%Y%m') = '202401' 
 -- and a.purchase_order_number = '1600634277' 
 group by date_format(`document_date`,'%Y%m'),customer_order_number
-union all 
-select  shop,动账年月,associated_order_number,sum(ifnull(订单实付,0) )订单实付 ,sum(ifnull(订单退款,0) ) 订单退款,账单 from (
-select 
-shop ,date_format(bookkeeping_time,'%Y%m') 动账年月,associated_order_number
-,case when moving_account_type regexp '结算' then sum(income_and_expenditure_amount) end 订单实付
-,case when moving_account_type regexp '退款' then -sum(income_and_expenditure_amount) end  订单退款
-,'账单'
-from 
-rpa.ods_01财务_rpa_微信视频号_账单_月维度
-where moving_account_type regexp '订单结算|订单退款'
-group by shop,date_format(bookkeeping_time,'%Y%m'),associated_order_number,moving_account_type)a
-group by shop,动账年月,associated_order_number
-
-
 -- 整合清洗账单数据,并粗化粒度
 
 /*===============
@@ -808,7 +785,7 @@ select b.* from
 from sc.dw_多店自营并集_对仗1 
 where 客户 in('抖音生鲜店-sz','糕点放心购-sz','放心购自营-sz','榴芒一刻零食旗舰店','抖音旗舰店-sz','抖音零食店-sz','天猫旗舰店-sz','淘宝美食店-sz','拼多多糕点店-sz',
 '天猫美食-sz','榴芒企业店-sz','天猫三毛店-sz','拼多多旗舰店-sz','拼多多专卖店-sz','拼多多鲜果店-sz','天猫超市-sz','京东自营渠道-sz','京东自营店-sz'
-,'拼多多糕点-sz','小红书-sz','快手专卖店-sz','快手-sz','有赞美食店-sz','有赞店铺-sz','京东旗舰店-sz','视频零食店-sz','视频食品店-sz','微信视频小店-sz','微信视频旗舰店-sz') 
+,'拼多多糕点-sz','小红书-sz','快手专卖店-sz','快手-sz','有赞美食店-sz','有赞店铺-sz','京东旗舰店-sz') 
 -- and(动账年月='202302' or 跨月动账年月='202302' or 发货年月='202302') 
 group by 网店订单号,客户,动账年月,跨月动账年月)a 
 right join
@@ -839,7 +816,7 @@ select 时间,单据编号,京自采购价,猫超采购价,客户,发货组织,�
 ,ifnull(up跨月退款,跨月退款) 跨月退款,ifnull(up上期跨月收入,上期跨月收入) 上期跨月收入,ifnull(up上期跨月退款,上期跨月退款) 上期跨月退款
 ,深圳_成本,深圳_总运费 
 from dw_多店自营并集_对仗1 b left join dw_上下层效验 a 
-on b.网店订单号=a.订单号  and a.动账年月=b.动账年月 and ifnull(a.跨月动账年月,'0')=ifnull(b.跨月动账年月,'0')  and (`零售价-加工价税合计` is not null or instr(客户,'有赞')>0 or 物料编码 is null or 物料编码 ='' );
+on b.网店订单号=a.订单号  and a.动账年月=b.动账年月 and ifnull(a.跨月动账年月,'0')=ifnull(b.跨月动账年月,'0')  and (`零售价-加工价税合计` is not null or instr(客户,'有赞')>0 or 物料编码 is null);
 update sc.dw_多店自营并集_对仗_校验结果 set 深圳_成本=0 where
 网店订单号 in (select 网店订单号 from sc.dw_多店自营并集_对仗 where 款项类型 is not null group by 网店订单号 having count(distinct 款项类型)>1)
 and 款项类型&lt;&gt;'账单' and 订单类型='售后发货';

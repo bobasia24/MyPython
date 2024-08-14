@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>ods_dm_损益类科目</name>
+    <name>ods_dm_费用科目表</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -428,16 +428,16 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2023/07/29 15:53:05.477</created_date>
+    <created_date>2023/07/26 14:14:00.926</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2023/07/29 15:53:05.477</modified_date>
+    <modified_date>2023/07/26 14:14:00.926</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
   <connection>
-    <name>Fbi</name>
+    <name>BI</name>
     <server>125.91.113.114</server>
     <type>MYSQL</type>
     <access>Native</access>
@@ -493,86 +493,13 @@
   </connection>
   <order>
     <hop>
-      <from>表输入</from>
-      <to>表输出</to>
+      <from>ods_dm_费用科目表_tmp</from>
+      <to>ods_dm_费用科目表</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>表输入</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>Fbi</connection>
-    <sql>select id,日期
-,年度
-,月份
-,凭证号
-,摘要
-,科目编码
-,科目全名
-,核算维度
-,借方金额
-,贷方金额
-,原币金额
-,资产分类
-,
-case when 明细科目 ='主营业务成本' then 
-	case when 核算维度 regexp('运费')  then  '主营业务成本-运费'
-		 when 核算维度 regexp('货品')  then  '主营业务成本-货品'
-	else '主营业务成本'
-	end
-else 明细科目
-end as 明细科目
-,管理报表核算渠道名称
-,substring_index(分销私域代理KA渠道商名,'-sz',1) 分销私域代理KA渠道商名
-,季节性产品
-,费用归属组
-,投资名称归属
-,业务主体
-,case 
-	 when 业务主体 = '东莞' then '代工业务'
-	 when 管理报表核算渠道名称 regexp('直营') then 'KA直营'
-	 when 管理报表核算渠道名称 regexp('抖音|榴芒一刻零食旗舰店|榴芒一刻生鲜旗舰店') then '抖音'
-	 when 管理报表核算渠道名称 regexp('京东旗舰店') then '京东'
-	 when 管理报表核算渠道名称 regexp('京东自营') then '京东自营'
-	 when 管理报表核算渠道名称 ='有赞' then '私域-有赞'
-	 when 管理报表核算渠道名称 regexp('榴芒一刻旗舰店') then '天猫'
-	 when 管理报表核算渠道名称 regexp('天猫超市') then '天猫超市'
-	 when 管理报表核算渠道名称 regexp('华南|华北|华中|线下业务部') then 'KA分销'
-	 when 管理报表核算渠道名称 regexp('私域代理|拼多多|快手|小红书|有赞美食|榴芒一刻美食店|小红书') then '其它（其它线上2C平台合计）'
-	 when 管理报表核算渠道名称 regexp('分销') then '线上分销-其他的平台集合店'
-end as 投资名称
-from profit.ods_dm_费用科目表
-where 科目全名 regexp('管理费用|销售费用|研发费用|财务费用|主营业务收入|主营业务成本|营业税金及附加|其他业务收入|其他业务成本|其他业务支出|营业外收入|营业外支出|资产减值损失|所得税费用')
-</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>176</xloc>
-      <yloc>240</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>表输出</name>
+    <name>ods_dm_费用科目表</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
@@ -582,9 +509,9 @@ where 科目全名 regexp('管理费用|销售费用|研发费用|财务费用|�
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>Fbi</connection>
+    <connection>BI</connection>
     <schema/>
-    <table>ods_dm_损益类科目</table>
+    <table>ods_dm_费用科目表</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -661,6 +588,10 @@ where 科目全名 regexp('管理费用|销售费用|研发费用|财务费用|�
         <stream_name>管理报表核算渠道名称</stream_name>
       </field>
       <field>
+        <column_name>原生渠道</column_name>
+        <stream_name>原生渠道</stream_name>
+      </field>
+      <field>
         <column_name>分销私域代理KA渠道商名</column_name>
         <stream_name>分销私域代理KA渠道商名</stream_name>
       </field>
@@ -680,10 +611,6 @@ where 科目全名 regexp('管理费用|销售费用|研发费用|财务费用|�
         <column_name>业务主体</column_name>
         <stream_name>业务主体</stream_name>
       </field>
-      <field>
-        <column_name>投资名称</column_name>
-        <stream_name>投资名称</stream_name>
-      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -694,8 +621,152 @@ where 科目全名 regexp('管理费用|销售费用|研发费用|财务费用|�
       </output>
     </remotesteps>
     <GUI>
-      <xloc>560</xloc>
-      <yloc>240</yloc>
+      <xloc>576</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>ods_dm_费用科目表_tmp</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>BI</connection>
+    <sql>
+select d.id,d.日期,d.年度,d.月份,d.凭证号,d.摘要,d.科目编码,d.科目全名,d.核算维度,d.借方金额,d.贷方金额,
+d.原币金额,d.资产分类,d.明细科目,
+case 
+	when (b1.渠道  is  null or b1.渠道 ='' )  then d.管理报表核算渠道名称
+	else b1.管理报表渠道名称 
+end as 管理报表核算渠道名称,
+d.原生渠道,
+d.分销私域代理KA渠道商名,
+d.季节性产品,
+d.费用归属组,d.投资名称归属,d.业务主体
+from (
+select c.id,c.日期,c.年度,c.月份,c.凭证号,c.摘要,c.科目编码,c.科目全名,c.核算维度,c.借方金额,c.贷方金额,
+c.原币金额,c.资产分类,c.明细科目,
+case 
+	when (c.管理报表渠道名称  is  null or c.管理报表渠道名称 ='' )  then substring_index(c.管理报表核算渠道名称 ,'-',1 )
+	else c.管理报表渠道名称 
+end as 管理报表核算渠道名称,
+case 
+	when (c.管理报表渠道名称  is  null or c.管理报表渠道名称 ='' )  then c.渠道_1   
+	else c.管理报表渠道名称 
+end as 原生渠道,
+c.分销私域代理KA渠道商名,
+c.季节性产品,
+c.费用归属组,c.投资名称归属,c.业务主体
+from (
+select a1.id,a1.日期,a1.年度,a1.月份,a1.凭证号,a1.摘要,a1.科目编码,a1.科目全名,
+a1.核算维度,a1.借方金额,a1.贷方金额,a1.原币金额,a1.资产分类,a1.明细科目,
+case 
+
+	when a1.管理报表核算渠道名称 ='天猫组' then '天猫事业部'
+	when a1.管理报表核算渠道名称 ='抖音组' then '兴趣电商部'
+	when a1.管理报表核算渠道名称 ='京多组' then '京多事业部'
+	when a1.管理报表核算渠道名称 ='私域组' then '私域事业部'
+	when a1.管理报表核算渠道名称 regexp('线下KA|线下部') then 
+		case when a1.核算维度 regexp('QY0010359') then '华南'
+			when a1.核算维度 regexp('QY0010358') then '华北'
+			when a1.核算维度 regexp('QY0010360') then '华中'
+			when a1.核算维度 regexp('QY0010361') then '直营'
+			when a1.核算维度 regexp('QY0010394') then '西南'
+			when a1.核算维度 regexp('QY0010395') then '华东'
+			else '线下业务部'
+		end
+	when a1.管理报表核算渠道名称 regexp('线上分销') then '分销事业部'
+ 	else a1.管理报表核算渠道名称
+ end  as 管理报表核算渠道名称,
+管理报表核算渠道名称 as 渠道_1,
+a1.分销私域代理KA渠道商名 ,b1.管理报表渠道名称 ,a1.季节性产品,a1.费用归属组,
+
+case 
+	when a1.科目全名 regexp('财务费用') then '财务费用'
+	when a1.科目全名 regexp '管理费用' then 
+		case 
+			when a1.明细科目 regexp('差旅费|交通费|业务招待费') then '差旅招待费'
+			when a1.明细科目 regexp('工资|公积金|社保|福利费|残疾人') then '人员成本'
+			when a1.明细科目 regexp('物业|水电|水费|电费') then '场地租金及水电费'
+			when a1.明细科目 regexp('办公费') then '办公费' 
+			when a1.明细科目 regexp('通讯费') then '通讯费' 
+			when a1.明细科目 regexp('咨询费|专利') then '第三方公司代理费' 
+			when a1.明细科目 regexp('其他费用|寄样|快递费|咨询费|劳务|物料消耗|低耗品|累计摊销|报废|材料成本|车辆|工会|伙食|垃圾|软件|维修|市场活动') then '事务性费用' 
+			when a1.明细科目 regexp('培训费') then '培训费'
+			when a1.明细科目 regexp('招聘费') then '招聘费'
+			when a1.明细科目 regexp('税金') then '税金'
+			when a1.明细科目 regexp('折旧') then '折旧费'
+			else a1.明细科目 
+		end
+		
+
+	when a1.科目全名 regexp'销售费用' then 
+	
+		case 
+			when a1.明细科目 regexp('办公费') then '办公费'
+			when a1.明细科目 regexp('快递费|寄样运费') then '仓储物流费'
+			when a1.明细科目 regexp('平台佣金|售后扣款') then '平台佣金费'
+			when a1.明细科目 regexp('工资|公积金|社保|福利费|劳务') then '人工相关费用'
+			when a1.明细科目 regexp('差旅费|交通费') then '差旅交通费'
+			when a1.明细科目 regexp('通讯费') then '通讯费'
+			when a1.明细科目 regexp('业务招待费') then '差旅招待费'
+			when a1.明细科目 regexp('培训费|物料消耗|低耗品|条码费|其他费用') then '事务性费用'
+			when a1.明细科目 regexp('代理推广佣金|广告促销|平台其他') and a1.管理报表核算渠道名称 regexp('市场部') then '品牌投放费用'
+			when a1.明细科目 regexp('代理推广佣金|广告促销|平台其他|寄样成本|售后扣款') and (a1.费用归属组  regexp ('京多|天猫|兴趣|私域|分销') or a1.管理报表核算渠道名称  regexp ('小红书')) then '线上渠道'
+			when a1.明细科目 regexp('代理推广佣金|广告促销|平台其他|寄样成本|售后扣款') and a1.费用归属组 regexp ('线下业务部') then '线下渠道'
+			when a1.明细科目 regexp('寄样成本') and a1.管理报表核算渠道名称 regexp('客服部|市场部') then '样品成本'
+			else a1.明细科目
+		end	
+	when a1.科目全名='研发费用' then 
+		case 
+			when a1.明细科目 regexp('工资|公积金|社保|福利费|劳务') then '人员成本'
+			when a1.明细科目 regexp('差旅费|交通费') then '差旅招待费'
+			when a1.明细科目 regexp('办公费') then '办公费'
+			when a1.明细科目 regexp('通讯费') then '通讯费' 
+			else a1.明细科目
+		end 
+		
+	when a1.明细科目='营业税金及附加' then '营业税金及附加'  
+	when a1.明细科目 regexp('应交未交税金') then '税金'    
+	else a1.明细科目
+end as 投资名称归属,
+a1.业务主体
+from 
+profit.ods_dm_费用科目表_tmp a1 
+left join (select 管理报表渠道名称,渠道 from profit.dm_01财务_profit_客户中间表 group by 渠道) b1
+on (a1.分销私域代理KA渠道商名 =b1.渠道 )
+)c
+)d
+left join 
+(select 管理报表渠道名称,渠道 from profit.dm_01财务_profit_客户中间表 group by 渠道) b1
+on d.管理报表核算渠道名称 = substring_index(b1.渠道 ,'-',1)
+
+
+
+
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>240</xloc>
+      <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

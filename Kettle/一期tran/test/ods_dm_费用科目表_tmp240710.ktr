@@ -650,8 +650,8 @@ case
 	when a.核算维度 regexp('应交未交税金') then '财务部'
 	when a.科目全名 regexp('资产减值损失') then '总经办'
 	when a.分组 regexp('拼多多|京东|京多') then '京多事业部' 
-	when a.分组 regexp('抖音|快手|生鲜|微信视频|视频零食|视频食品|兴趣电商') then '兴趣电商部'
-	when a.分组 regexp('天猫|榴芒企业店|淘宝|三夫|三毛|小红书|得物|隆阳|一大包') then '天猫事业部'
+	when a.分组 regexp('抖音|快手|生鲜|微信视频|视频零食|视频食品|一大包|兴趣电商') then '兴趣电商部'
+	when a.分组 regexp('天猫|榴芒企业店|淘宝|三夫|三毛|小红书|得物|隆阳') then '天猫事业部'
 	when a.分组 regexp('市场部') then '市场部'
 	when a.分组 regexp('KA|线下') then '线下业务部'
 	when a.分组 regexp('分销') then '分销事业部'
@@ -927,7 +927,6 @@ from
 	lmykerp_pro.jindie_voucher
 where
 	f_date regexp ('2024|2025') 
-	and f_period > '6'
 	and f_account_book_id_name regexp '深圳'
 	and f_explanation not rlike ('结转本期损益')
   	and f_acct_full_name   regexp('管理费用|销售费用|研发费用|财务费用|主营业务收入|主营业务成本|营业税金及附加|其他业务收入|其他业务成本|其他业务支出|营业外收入|营业外支出|资产减值损失|应交税费_应交增值税_进项税额|应交税费_应交增值税_销项税额|所得税费用')
@@ -1040,8 +1039,7 @@ end as 费用归属组
 from
 	lmykerp_pro.jindie_voucher
 where
-	f_date regexp ('2024|2025') 
-	and f_period > '6'
+	f_date regexp ('2024|2025')
 	and f_account_book_id_name regexp '东莞'
 	and f_explanation not rlike ('结转本期损益')
 	and f_acct_full_name  regexp('管理费用|销售费用|研发费用|财务费用|主营业务收入|主营业务成本|营业税金及附加|其他业务收入|其他业务成本|其他业务支出|营业外收入|营业外支出|资产减值损失|应交税费_应交增值税_进项税额|应交税费_应交增值税_销项税额|所得税费用')

@@ -653,7 +653,7 @@ from (
 select c.id,c.日期,c.年度,c.月份,c.凭证号,c.摘要,c.科目编码,c.科目全名,c.核算维度,c.借方金额,c.贷方金额,
 c.原币金额,c.资产分类,c.明细科目,
 case 
-	when (c.管理报表渠道名称  is  null or c.管理报表渠道名称 ='' )  then substring_index(c.管理报表核算渠道名称 ,'-',1 )
+	when (c.管理报表渠道名称  is  null or c.管理报表渠道名称 ='' )  then c.管理报表核算渠道名称 
 	else c.管理报表渠道名称 
 end as 管理报表核算渠道名称,
 case 
@@ -677,6 +677,8 @@ case
 			when a1.核算维度 regexp('QY0010358') then '华北'
 			when a1.核算维度 regexp('QY0010360') then '华中'
 			when a1.核算维度 regexp('QY0010361') then '直营'
+			when a1.核算维度 regexp('QY0010394') then '西南'
+			when a1.核算维度 regexp('QY0010395') then '华东'
 			else '线下业务部'
 		end
 	when a1.管理报表核算渠道名称 regexp('线上分销') then '分销事业部'
@@ -737,13 +739,14 @@ end as 投资名称归属,
 a1.业务主体
 from 
 profit.ods_dm_费用科目表_tmp a1 
+-- (select * from profit.ods_dm_费用科目表_tmp where 年度 = '2024' and 月份 = '4' and 核算维度 regexp '有赞店铺' and 科目全名 not regexp '应交税费') a1 
 left join (select 管理报表渠道名称,渠道 from profit.dm_01财务_profit_客户中间表 group by 渠道) b1
 on (a1.分销私域代理KA渠道商名 =b1.渠道 )
 )c
 )d
 left join 
 (select 管理报表渠道名称,渠道 from profit.dm_01财务_profit_客户中间表 group by 渠道) b1
-on d.管理报表核算渠道名称 = substring_index(b1.渠道 ,'-',1)
+on d.管理报表核算渠道名称 = b1.渠道
 
 
 
