@@ -12,7 +12,9 @@ select '订单',count(1),'ods_01财务_rpa_有赞商城_订单明细' from rpa.o
 union all
 select '订单',count(1),'ods_01财务_rpa_0118财务对账_生意经_订单明细' from rpa.ods_01财务_rpa_0118财务对账_生意经_订单明细 where `date`  = '${do_date}'
 union all
-select '订单',count(1),'ods_01财务_rpa_0119财务对账_京东旗舰店_订单明细' from rpa.ods_01财务_rpa_0119财务对账_京东旗舰店_订单明细 where query_date = '${do_date}'
+select '京东旗舰订单',count(1),'ods_01财务_rpa_0119财务对账_京东旗舰店_订单明细' from rpa.ods_01财务_rpa_0119财务对账_京东旗舰店_订单明细 where query_date = '${do_date}' and brand regexp('旗舰')
+union all
+select '京东生鲜订单',count(1),'ods_01财务_rpa_0119财务对账_京东旗舰店_订单明细' from rpa.ods_01财务_rpa_0119财务对账_京东旗舰店_订单明细 where query_date = '${do_date}' and brand regexp('生鲜')
 union all
 select '订单',count(1),'ods_01财务_rpa_0121财务对账_京东自营_订单管理_门店订单' from rpa.ods_01财务_rpa_0121财务对账_京东自营_订单管理_门店订单 where query_date = '${do_date}'
 union all
@@ -32,6 +34,16 @@ select '账单',count(1),'ods_01财务_rpa_018财务对账_有赞_资产_对账�
 union all
 select '账单',count(1),'ods_01财务_rpa_018财务对账_有赞_资产_储值资金用户交易' from rpa.ods_01财务_rpa_018财务对账_有赞_资产_储值资金用户交易  where `time` like '%${do_date}%'
 union all
-select '账单',count(1),'ods_01财务_rpa_0117财务对账_京东金融_收款管理_已收款账单' from rpa.ods_01财务_rpa_0117财务对账_京东金融_收款管理_已收款账单  where  fee_settlement_time like '%${do_date}%'
+select '京东旗舰账单',count(1),'ods_01财务_rpa_0117财务对账_京东金融_收款管理_已收款账单' from rpa.ods_01财务_rpa_0117财务对账_京东金融_收款管理_已收款账单  where  fee_settlement_time like '%${do_date}%' and brand regexp('旗舰')
+union all
+select '京东生鲜账单',count(1),'ods_01财务_rpa_0117财务对账_京东金融_收款管理_已收款账单' from rpa.ods_01财务_rpa_0117财务对账_京东金融_收款管理_已收款账单  where  fee_settlement_time like '%${do_date}%' and brand regexp('生鲜')
 union all
 select '账单',count(1),'ods_01财务_rpa_0121财务对账_京东自营_结算管理_应收应付对账单' from rpa.ods_01财务_rpa_0121财务对账_京东自营_结算管理_应收应付对账单  where document_date like '%${do_date}%'
+
+union all
+
+select '吉客云销售单',count(1),'ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询'  from  rpa.ods_01财务_rpa_0120财务对账_吉客云_销售出库单查询 where delivery_time like '%${do_date}%'
+union all
+select '吉客云销售单明细',count(1),'ods_01财务_rpa_吉客云_销售明细单数据'  from  rpa.ods_01财务_rpa_吉客云_销售明细单数据 where delivery_time like '%${do_date}%'
+
+

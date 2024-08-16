@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DBNavigator.Project.DataEditorManager">
     <record-view-column-sorting-type value="BY_INDEX" />
-    <value-preview-text-wrapping value="true" />
+    <value-preview-text-wrapping value="false" />
     <value-preview-pinned value="false" />
   </component>
   <component name="DBNavigator.Project.DataExportManager">
@@ -31,7 +31,7 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="d3714f4b-3c08-4f04-8a56-0c837d817780">
-      <console name="BI" type="STANDARD" schema="profit" session="Main"><![CDATA[select]]></console>
+      <console name="BI" type="STANDARD" schema="profit" session="Main">select</console>
       <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
@@ -39,9 +39,7 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="d3714f4b-3c08-4f04-8a56-0c837d817780" object-ref="consoles/BI" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="d3714f4b-3c08-4f04-8a56-0c837d817780" />
